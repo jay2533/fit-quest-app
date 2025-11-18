@@ -73,6 +73,8 @@ class ViewController: UIViewController {
         print("Sign In tapped with email: \(email)")
         // TODO: Yet to implement sign in logic
         // TODO: Navigate to main app screen after successful login
+//        let calendarVC = CalendarScreenViewController()
+//        navigationController?.pushViewController(calendarVC, animated: true)
     }
     
     @objc func onForgotPasswordTapped() {
