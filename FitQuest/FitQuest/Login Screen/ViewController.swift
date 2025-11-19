@@ -71,10 +71,12 @@ class ViewController: UIViewController {
         }
         
         print("Sign In tapped with email: \(email)")
-        // TODO: Yet to implement sign in logic
-        // TODO: Navigate to main app screen after successful login
-//        let calendarVC = CalendarScreenViewController()
-//        navigationController?.pushViewController(calendarVC, animated: true)
+        
+        // TODO: real sign-in logic later
+        
+        // Navigate to main dashboard after “success”
+        let homeVC = HomeScreenViewController()
+        navigationController?.pushViewController(homeVC, animated: true)
     }
     
     @objc func onForgotPasswordTapped() {
