@@ -55,7 +55,6 @@ extension CalendarScreenViewController: UICollectionViewDelegate, UICollectionVi
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
-        print("Selected date: \(dateFormatter.string(from: selectedDate))")
         
         // TODO: Filter tasks based on selected date
     }

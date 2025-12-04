@@ -83,12 +83,10 @@ class CalendarScreenViewController: UIViewController {
     
 
     @objc func onProfileTapped() {
-        print("Profile button tapped")
         // TODO: Navigate to profile screen
     }
     
     @objc func onPreviousWeekTapped() {
-        print("Previous week button tapped")
         // TODO: Navigate to previous week
         guard let newDate = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: selectedDate) else { return }
         selectedDate = newDate
@@ -96,7 +94,6 @@ class CalendarScreenViewController: UIViewController {
     }
     
     @objc func onNextWeekTapped() {
-        print("Next week button tapped")
         // TODO: Navigate to next week
         guard let newDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: selectedDate) else { return }
         selectedDate = newDate
@@ -105,7 +102,6 @@ class CalendarScreenViewController: UIViewController {
     
     @objc func onAddTaskTapped() {
         // TODO: change navigation, right now just for testing
-        print("Add task button tapped - Navigating to History (temp)")
 //        let historyVC = HistoryScreenViewController()
 //        navigationController?.pushViewController(historyVC, animated: true)
     }
@@ -123,7 +119,6 @@ class CalendarScreenViewController: UIViewController {
     }
     
     @objc func onLogoTapped() {
-        print("Calendar logo tapped - going back")
         navigationController?.popViewController(animated: true)
     }
 }

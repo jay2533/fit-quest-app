@@ -53,12 +53,10 @@ class HistoryScreenViewController: UIViewController {
     }
     
     @objc func onProfileTapped() {
-        print("Profile button tapped from History screen")
         // TODO: Navigate to profile screen
     }
     
     @objc func onLogoTapped() {
-        print("Logo tapped - Navigating back")
         navigationController?.popViewController(animated: true)
     }
         

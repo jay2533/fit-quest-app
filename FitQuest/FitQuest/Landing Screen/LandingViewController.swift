@@ -27,14 +27,12 @@ class LandingViewController: UIViewController {
     }
     
     @objc func onSignUpTapped() {
-        print("Sign Up button tapped")
         // TODO: Navigate to Sign Up screen
          let registerVC = RegisterViewController()
          navigationController?.pushViewController(registerVC, animated: true)
     }
     
     @objc func onLogInTapped() {
-        print("Log In button tapped")
         // TODO: Navigate to Log In screen
          let loginVC = ViewController()
          navigationController?.pushViewController(loginVC, animated: true)
