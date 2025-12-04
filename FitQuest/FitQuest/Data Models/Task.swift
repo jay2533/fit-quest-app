@@ -13,7 +13,7 @@ enum TaskCategory: String, Codable, CaseIterable {
     case physical = "Physical"
     case mental = "Mental"
     case social = "Social"
-    
+
     var displayName: String {
         return rawValue
     }
@@ -52,7 +52,7 @@ struct FitQuestTask: Codable, Identifiable {
     let notes: String?
     let imageURL: String?
     let createdAt: Date
-    
+
     init(id: String? = nil, userId: String, title: String,
          category: TaskCategory, isCustom: Bool = true,
          duration: Int, scheduledDate: Date, scheduledTime: Date,

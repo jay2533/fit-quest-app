@@ -16,11 +16,11 @@ struct ValidationHelper {
         return emailPredicate.evaluate(with: email)
     }
     
-    // MARK: - Phone Validation
-    static func isValidPhone(_ phone: String) -> Bool {
-        let digitsOnly = phone.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
-        return digitsOnly.count == 10
-    }
+//    // MARK: - Phone Validation
+//    static func isValidPhone(_ phone: String) -> Bool {
+//        let digitsOnly = phone.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+//        return digitsOnly.count == 10
+//    }
     
     // MARK: - Password Validation
     static func isValidPassword(_ password: String) -> (isValid: Bool, message: String?) {

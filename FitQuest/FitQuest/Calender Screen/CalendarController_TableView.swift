@@ -39,7 +39,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let task = dummyTasks[indexPath.row]
-        print("Task tapped: \(task.name)")
         // TODO: Navigate to task detail or mark complete
     }
 }

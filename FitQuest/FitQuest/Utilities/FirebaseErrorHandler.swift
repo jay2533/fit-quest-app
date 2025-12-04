@@ -18,81 +18,74 @@ struct FirebaseErrorHandler {
             return error.localizedDescription
         }
         
-        // Cast to AuthErrorCode directly
-        guard let errorCode = AuthErrorCode(_bridgedNSError: nsError) else {
-            return "Authentication failed. Please check your credentials and try again."
-        }
-        
-        switch errorCode.code {
-        // Login Errors
-        case .invalidEmail:
-            return "The email address is invalid."
-        case .wrongPassword:
-            return "The password is incorrect."
-        case .userNotFound:
-            return "No account found with this email address."
-        case .userDisabled:
-            return "This account has been disabled."
-        case .invalidCredential:
-            return "Invalid email or password. Please check your credentials."
-        case .userTokenExpired, .invalidUserToken:
-            return "Your session has expired. Please sign in again."
-            
-        // Registration Errors
-        case .emailAlreadyInUse:
-            return "This email is already registered. Please sign in instead."
-        case .weakPassword:
-            return "The password is too weak. Please use at least 6 characters."
-        case .operationNotAllowed:
-            return "Email/password accounts are not enabled. Please contact support."
-            
-        // Network & System Errors
-        case .networkError:
-            return "Network error. Please check your connection."
-        case .tooManyRequests:
-            return "Too many unsuccessful attempts. Please try again later."
-        case .internalError:
-            return "An internal error occurred. Please try again later."
-            
-        // Validation Errors
-        case .missingEmail:
-            return "Please provide an email address."
-//        case .missing:
-//            return "Please provide a password."
-            
-        // Token/Credential Errors
-        case .invalidCustomToken, .customTokenMismatch:
-            return "Authentication token error. Please sign in again."
-        case .credentialAlreadyInUse:
-            return "This credential is already associated with a different user account."
-        case .accountExistsWithDifferentCredential:
-            return "An account already exists with the same email but different sign-in credentials."
-            
-        // Session Errors
-        case .requiresRecentLogin:
-            return "This operation requires recent authentication. Please log in again."
-        case .sessionExpired:
-            return "Your session has expired. Please sign in again."
-            
-        // Verification Errors
-        case .invalidVerificationCode:
-            return "The verification code is invalid."
-        case .invalidVerificationID:
-            return "The verification ID is invalid."
-        case .missingVerificationCode:
-            return "Please provide a verification code."
-            
-        // Action Code Errors
-        case .expiredActionCode:
-            return "This link has expired."
-        case .invalidActionCode:
-            return "This link is invalid or has already been used."
-            
-        // Default fallback
-        default:
-            // Log the actual error for debugging
-            print("⚠️ Unhandled Firebase Auth Error: \(errorCode.code.rawValue) - \(error.localizedDescription)")
-            return "Authentication failed. Please check your credentials and try again."
+        switch nsError.code {
+            // Login Errors
+            case AuthErrorCode.invalidEmail.rawValue:
+                return "The email address is invalid."
+            case AuthErrorCode.wrongPassword.rawValue:
+                return "The password is incorrect."
+            case AuthErrorCode.userNotFound.rawValue:
+                return "No account found with this email address."
+            case AuthErrorCode.userDisabled.rawValue:
+                return "This account has been disabled."
+            case AuthErrorCode.invalidCredential.rawValue:
+                return "Invalid email or password. Please check your credentials."
+            case AuthErrorCode.userTokenExpired.rawValue, AuthErrorCode.invalidUserToken.rawValue:
+                return "Your session has expired. Please sign in again."
+                
+            // Registration Errors
+            case AuthErrorCode.emailAlreadyInUse.rawValue:
+                return "This email is already registered. Please sign in instead."
+            case AuthErrorCode.weakPassword.rawValue:
+                return "The password is too weak. Please use at least 6 characters."
+            case AuthErrorCode.operationNotAllowed.rawValue:
+                return "Email/password accounts are not enabled. Please contact support."
+                
+            // Network & System Errors
+            case AuthErrorCode.networkError.rawValue:
+                return "Network error. Please check your connection."
+            case AuthErrorCode.tooManyRequests.rawValue:
+                return "Too many unsuccessful attempts. Please try again later."
+            case AuthErrorCode.internalError.rawValue:
+                return "An internal error occurred. Please try again later."
+                
+            // Validation Errors
+            case AuthErrorCode.missingEmail.rawValue:
+                return "Please provide an email address."
+                
+            // Token/Credential Errors
+            case AuthErrorCode.invalidCustomToken.rawValue, AuthErrorCode.customTokenMismatch.rawValue:
+                return "Authentication token error. Please sign in again."
+            case AuthErrorCode.credentialAlreadyInUse.rawValue:
+                return "This credential is already associated with a different user account."
+            case AuthErrorCode.accountExistsWithDifferentCredential.rawValue:
+                return "An account already exists with the same email but different sign-in credentials."
+                
+            // Session Errors
+            case AuthErrorCode.requiresRecentLogin.rawValue:
+                return "This operation requires recent authentication. Please log in again."
+            case AuthErrorCode.sessionExpired.rawValue:
+                return "Your session has expired. Please sign in again."
+                
+            // Verification Errors
+            case AuthErrorCode.invalidVerificationCode.rawValue:
+                return "The verification code is invalid."
+            case AuthErrorCode.invalidVerificationID.rawValue:
+                return "The verification ID is invalid."
+            case AuthErrorCode.missingVerificationCode.rawValue:
+                return "Please provide a verification code."
+                
+            // Action Code Errors
+            case AuthErrorCode.expiredActionCode.rawValue:
+                return "This link has expired."
+            case AuthErrorCode.invalidActionCode.rawValue:
+                return "This link is invalid or has already been used."
+                
+            // Default fallback
+            default:
+                print("⚠️ Unhandled Firebase Auth Error Code: \(nsError.code)")
+                print("   Full error: \(error)")
+                return "Authentication failed. Please check your credentials and try again."
         }
     }
 }

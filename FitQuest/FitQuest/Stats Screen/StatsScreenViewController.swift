@@ -37,12 +37,11 @@ class StatsScreenViewController: UIViewController {
     }
     
     @objc func onProfileTapped() {
-        let accountVC = AccountSettingsViewController()
+        let accountVC = ProfileViewController()
         navigationController?.pushViewController(accountVC, animated: true)
     }
     
     @objc func onLogoTapped() {
-        print("Stats logo tapped - going back")
         navigationController?.popViewController(animated: true)
     }
 }

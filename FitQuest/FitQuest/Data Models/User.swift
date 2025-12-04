@@ -12,7 +12,6 @@ struct User: Codable {
     let userId: String
     let name: String
     let email: String
-    let phone: String
     let profileImageURL: String?
     let dateOfBirth: Date?
     let totalXP: Int
@@ -21,14 +20,13 @@ struct User: Codable {
     let createdAt: Date
     let lastActive: Date
     
-    init(userId: String, name: String, email: String, phone: String,
+    init(userId: String, name: String, email: String,
          profileImageURL: String? = nil, dateOfBirth: Date? = nil,
          totalXP: Int = 0, currentLevel: Int = 1, currentTier: Int = 1,
          createdAt: Date = Date(), lastActive: Date = Date()) {
         self.userId = userId
         self.name = name
         self.email = email
-        self.phone = phone
         self.profileImageURL = profileImageURL
         self.dateOfBirth = dateOfBirth
         self.totalXP = totalXP

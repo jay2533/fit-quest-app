@@ -32,7 +32,6 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let category = categoryData[indexPath.row]
-        print("Category tapped: \(category.name)")
         // TODO: Navigate to detailed task list for this category
     }
 }
