@@ -62,16 +62,30 @@ extension Date {
         return Calendar.current.date(byAdding: components, to: startOfDay) ?? self
     }
     
-    func isToday() -> Bool {
-        return Calendar.current.isDateInToday(self)
+    // Helper function for comparing days
+    func isSameDay(with date: Date) -> Bool {
+        Calendar.current.compare(self, to: date, toGranularity: .day) == .orderedSame
     }
     
-    func isYesterday() -> Bool {
-        return Calendar.current.isDateInYesterday(self)
+    // Use computed property (cleaner)
+    var isToday: Bool {
+        Calendar.current.isDateInToday(self)
     }
     
-    func isTomorrow() -> Bool {
-        return Calendar.current.isDateInTomorrow(self)
+    var isYesterday: Bool {
+        Calendar.current.isDateInYesterday(self)
+    }
+    
+    var isTomorrow: Bool {
+        Calendar.current.isDateInTomorrow(self)
+    }
+    
+    var isPast: Bool {
+        self < Calendar.current.startOfDay(for: Date())
+    }
+    
+    var isFuture: Bool {
+        self > Calendar.current.startOfDay(for: Date())
     }
     
     func timeAgo() -> String {

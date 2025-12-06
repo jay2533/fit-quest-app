@@ -80,6 +80,10 @@ class StatsService {
             fieldName = "mentalCompleted"
         case .social:
             fieldName = "socialCompleted"
+        case .creativity:
+            fieldName = "creativeCompleted"
+        case .miscellaneous:
+            fieldName = "miscellaneousCompleted"
         }
         
         // Check if document exists

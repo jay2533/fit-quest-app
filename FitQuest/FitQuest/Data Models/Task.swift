@@ -13,24 +13,30 @@ enum TaskCategory: String, Codable, CaseIterable {
     case physical = "Physical"
     case mental = "Mental"
     case social = "Social"
-
+    case creativity = "Creative"
+    case miscellaneous = "Miscellaneous"
+    
     var displayName: String {
         return rawValue
     }
-
+    
     var icon: String {
         switch self {
         case .physical: return "figure.run"
         case .mental: return "brain.head.profile"
         case .social: return "person.3.fill"
+        case .creativity: return "paintpalette.fill"
+        case .miscellaneous: return "list.bullet"
         }
     }
-
+    
     var colorHex: String {
         switch self {
         case .physical: return "#3B82F6" // Blue
         case .mental: return "#8B5CF6"   // Purple
         case .social: return "#10B981"   // Green
+        case .creativity: return "#F59E0B"   // Orange
+        case .miscellaneous: return "#6B7280" //  Gray
         }
     }
 }

@@ -224,11 +224,22 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let task = filteredTasks[indexPath.row]
-        cell.taskNameLabel.text = task.name
-        cell.categoryBadge.text = task.category
-        cell.timeLabel.text = task.time
-        cell.completionLabel.text = task.completion
+        
+        // MARK: fix this properly with new task cell view
+        // MARK: Sunny's code, please fix this as i have changed the task cell.
+//        let task = filteredTasks[indexPath.row]
+//        cell.taskNameLabel.text = task.name
+//        cell.categoryBadge.text = task.category
+//        cell.timeLabel.text = task.time
+//        cell.completionLabel.text = task.completion
+        
+        // MARK: fix this properly with new task cell view
+//        let task = dummyTasks[indexPath.row]
+//        cell.taskNameLabel.text = task.name
+//        cell.categoryBadge.text = task.category
+//        cell.timeLabel.text = task.time
+//        cell.completionLabel.text = task.completion
+        
         return cell
     }
     

@@ -14,10 +14,11 @@ class CalendarScreenView: UIView {
     var profileButton: UIButton!
     
     var monthYearLabel: UILabel!
-    var previousWeekButton: UIButton!
-    var nextWeekButton: UIButton!
     
     var weekCollectionView: UICollectionView!
+    
+    var previousWeekButton: UIButton!
+    var nextWeekButton: UIButton!
     
     var tasksTableView: UITableView!
     
@@ -35,6 +36,10 @@ class CalendarScreenView: UIView {
         setupAddTaskButton()
         
         initConstraints()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Setup Methods
@@ -71,7 +76,6 @@ class CalendarScreenView: UIView {
     func setupMonthYearLabel() {
         monthYearLabel = UILabel()
         
-        // Set current month and year
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMMM yyyy"
         monthYearLabel.text = dateFormatter.string(from: Date())
@@ -79,8 +83,27 @@ class CalendarScreenView: UIView {
         monthYearLabel.font = .systemFont(ofSize: 18, weight: .semibold)
         monthYearLabel.textColor = .white
         monthYearLabel.textAlignment = .center
+        monthYearLabel.isUserInteractionEnabled = true
         monthYearLabel.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(monthYearLabel)
+    }
+    
+    func setupWeekCollectionView() {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = 8
+        layout.minimumLineSpacing = 8
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        
+        weekCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        weekCollectionView.backgroundColor = .clear
+        weekCollectionView.showsHorizontalScrollIndicator = false
+        weekCollectionView.isScrollEnabled = false
+        weekCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        
+        weekCollectionView.register(WeekDayCell.self, forCellWithReuseIdentifier: WeekDayCell.identifier)
+        
+        self.addSubview(weekCollectionView)
     }
     
     func setupWeekNavigationButtons() {
@@ -101,26 +124,6 @@ class CalendarScreenView: UIView {
         self.addSubview(nextWeekButton)
     }
     
-    func setupWeekCollectionView() {
-        // Create flow layout
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        layout.minimumInteritemSpacing = 8
-        layout.minimumLineSpacing = 8
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        
-        weekCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        weekCollectionView.backgroundColor = .clear
-        weekCollectionView.showsHorizontalScrollIndicator = false
-        weekCollectionView.isScrollEnabled = false
-        weekCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Register cell
-        weekCollectionView.register(WeekDayCell.self, forCellWithReuseIdentifier: WeekDayCell.identifier)
-        
-        self.addSubview(weekCollectionView)
-    }
-    
     func setupTasksTableView() {
         tasksTableView = UITableView()
         tasksTableView.backgroundColor = .clear
@@ -128,23 +131,19 @@ class CalendarScreenView: UIView {
         tasksTableView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(tasksTableView)
         
-        // Register a basic cell
         tasksTableView.register(TaskTableViewCell.self, forCellReuseIdentifier: "TaskCell")
     }
     
     func setupAddTaskButton() {
         addTaskButton = UIButton(type: .system)
         
-        // Create circular button with + icon
         let config = UIImage.SymbolConfiguration(pointSize: 24, weight: .semibold)
         addTaskButton.setImage(UIImage(systemName: "plus", withConfiguration: config), for: .normal)
         addTaskButton.tintColor = .white
         addTaskButton.backgroundColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         
-        // Make it circular
         addTaskButton.layer.cornerRadius = 28
         
-        // Add shadow for elevation
         addTaskButton.layer.shadowColor = UIColor.black.cgColor
         addTaskButton.layer.shadowOffset = CGSize(width: 0, height: 4)
         addTaskButton.layer.shadowOpacity = 0.3
@@ -156,7 +155,7 @@ class CalendarScreenView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Logo (top left) - use safeAreaLayoutGuide for top
+            // Logo (top left)
             logoImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 10),
             logoImageView.widthAnchor.constraint(equalToConstant: 35),
@@ -178,39 +177,34 @@ class CalendarScreenView: UIView {
             monthYearLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
             // Previous Week Button
-            previousWeekButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-            previousWeekButton.topAnchor.constraint(equalTo: monthYearLabel.bottomAnchor, constant: 15),
-            previousWeekButton.widthAnchor.constraint(equalToConstant: 44),
-            previousWeekButton.heightAnchor.constraint(equalToConstant: 44),
-            
+            previousWeekButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15),
+            previousWeekButton.centerYAnchor.constraint(equalTo: weekCollectionView.centerYAnchor),
+            previousWeekButton.widthAnchor.constraint(equalToConstant: 40),
+            previousWeekButton.heightAnchor.constraint(equalToConstant: 40),
+
             // Next Week Button
-            nextWeekButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            nextWeekButton.centerYAnchor.constraint(equalTo: previousWeekButton.centerYAnchor),
-            nextWeekButton.widthAnchor.constraint(equalToConstant: 44),
-            nextWeekButton.heightAnchor.constraint(equalToConstant: 44),
+            nextWeekButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -15),
+            nextWeekButton.centerYAnchor.constraint(equalTo: weekCollectionView.centerYAnchor),
+            nextWeekButton.widthAnchor.constraint(equalToConstant: 40),
+            nextWeekButton.heightAnchor.constraint(equalToConstant: 40),
             
             // Week Collection View
-            weekCollectionView.topAnchor.constraint(equalTo: previousWeekButton.bottomAnchor, constant: 15),
-            weekCollectionView.leadingAnchor.constraint(equalTo: previousWeekButton.trailingAnchor, constant: 10),
-            weekCollectionView.trailingAnchor.constraint(equalTo: nextWeekButton.leadingAnchor, constant: -10),
-            weekCollectionView.heightAnchor.constraint(equalToConstant: 80),  
+            weekCollectionView.topAnchor.constraint(equalTo: monthYearLabel.bottomAnchor, constant: 15),
+            weekCollectionView.leadingAnchor.constraint(equalTo: previousWeekButton.trailingAnchor, constant: 8),
+            weekCollectionView.trailingAnchor.constraint(equalTo: nextWeekButton.leadingAnchor, constant: -8),
+            weekCollectionView.heightAnchor.constraint(equalToConstant: 80),
             
-            // Tasks Table View - use safeAreaLayoutGuide for bottom
+            // Tasks Table View
             tasksTableView.topAnchor.constraint(equalTo: weekCollectionView.bottomAnchor, constant: 25),
             tasksTableView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             tasksTableView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             tasksTableView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
             
-            // Add Task Button (floating bottom right) - use safeAreaLayoutGuide for bottom
+            // Add Task Button (floating bottom right)
             addTaskButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -25),
             addTaskButton.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -25),
             addTaskButton.widthAnchor.constraint(equalToConstant: 56),
             addTaskButton.heightAnchor.constraint(equalToConstant: 56)
         ])
     }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
 }
