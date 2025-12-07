@@ -203,6 +203,11 @@ class ProfileViewController: UIViewController {
     
     // MARK: - Logout
     private func performLogout() {
+        guard let userId = authService.currentUserId else { return }
+        
+        // 🔥 Clear notification read states
+        NotificationStateManager.shared.clearAllReadStates(userId: userId)
+        
         do {
             try authService.signOut()
             navigateToLogin()

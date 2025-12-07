@@ -51,22 +51,29 @@ class NotificationDrawerViewController: UIViewController {
         
         Task {
             do {
-                // 🔥 Method 1: Generate from tasks (no database storage)
+                // Generate from tasks
                 let generatedNotifications = try await generateNotificationsFromTasks(userId: userId)
                 
-                // 🔥 Method 2: Fetch from database (if you're storing them)
+                // Fetch stored notifications
                 let storedNotifications = try await notificationService.fetchUserNotifications(userId: userId)
                 
-                // Combine both (stored notifications + generated task notifications)
-                let allNotifications = storedNotifications + generatedNotifications
+                // Combine both
+                var allNotifications = storedNotifications + generatedNotifications
                 
-                // Sort by date (newest first)
-                let sortedNotifications = allNotifications.sorted { $0.createdAt > $1.createdAt }
+                // 🔥 Sort by priority first, then by date
+                allNotifications.sort { notification1, notification2 in
+                    if notification1.type.priority != notification2.type.priority {
+                        return notification1.type.priority < notification2.type.priority
+                    }
+                    return notification1.createdAt > notification2.createdAt
+                }
                 
                 await MainActor.run {
-                    self.notifications = sortedNotifications
+                    self.notifications = allNotifications
                     self.updateEmptyState()
                     self.drawerView.tableView.reloadData()
+                    
+                    print("📬 Loaded \(allNotifications.count) total notifications")
                 }
             } catch {
                 print("Failed to load notifications: \(error.localizedDescription)")
@@ -76,65 +83,91 @@ class NotificationDrawerViewController: UIViewController {
     
     // 🔥 Generate Notifications from Active Tasks
     private func generateNotificationsFromTasks(userId: String) async throws -> [AppNotification] {
-        // Fetch active tasks
         let tasks = try await taskService.fetchActiveTasks(userId: userId)
+        let stateManager = NotificationStateManager.shared
         
         var generatedNotifications: [AppNotification] = []
         let calendar = Calendar.current
         let now = Date()
         
         for task in tasks {
-            // Check if task is due today
-            if calendar.isDateInToday(task.scheduledDate) {
-                let timeString = DateFormatter.timeOnly.string(from: task.scheduledTime)
+            guard let taskId = task.id else { continue }
+            
+            let taskDate = task.scheduledDate
+            let timeString = DateFormatter.timeOnly.string(from: task.scheduledTime)
+            
+            // 🔥 Check if this task's notification has been marked as read
+            let isRead = stateManager.isTaskNotificationRead(userId: userId, taskId: taskId)
+            
+            // 1. OVERDUE TASKS
+            if taskDate < calendar.startOfDay(for: now) {
+                let daysOverdue = calendar.dateComponents([.day], from: taskDate, to: now).day ?? 0
                 
                 let notification = AppNotification(
-                    id: "task_\(task.id ?? UUID().uuidString)", // Temporary ID
-                    userId: userId,
-                    type: .taskDue,
-                    title: "Due Today: \(task.title)",
-                    message: "Scheduled for \(timeString) - \(task.category.rawValue) category",
-                    relatedTaskId: task.id,
-                    isRead: false,
-                    createdAt: task.scheduledDate
-                )
-                
-                generatedNotifications.append(notification)
-            }
-            // Check if task is due tomorrow
-            else if calendar.isDateInTomorrow(task.scheduledDate) {
-                let timeString = DateFormatter.timeOnly.string(from: task.scheduledTime)
-                
-                let notification = AppNotification(
-                    id: "task_\(task.id ?? UUID().uuidString)",
-                    userId: userId,
-                    type: .taskReminder,
-                    title: "Tomorrow: \(task.title)",
-                    message: "Scheduled for \(timeString) - \(task.category.rawValue) category",
-                    relatedTaskId: task.id,
-                    isRead: false,
-                    createdAt: task.scheduledDate
-                )
-                
-                generatedNotifications.append(notification)
-            }
-            // Check if task is overdue
-            else if task.scheduledDate < now {
-                let notification = AppNotification(
-                    id: "task_\(task.id ?? UUID().uuidString)",
+                    id: "task_overdue_\(taskId)",
                     userId: userId,
                     type: .taskReminder,
                     title: "⚠️ Overdue: \(task.title)",
-                    message: "This task is overdue - \(task.category.rawValue) category",
-                    relatedTaskId: task.id,
-                    isRead: false,
+                    message: "\(daysOverdue) day(s) overdue - \(task.category.rawValue) category",
+                    relatedTaskId: taskId,
+                    isRead: isRead,  // 🔥 Use stored read state
+                    createdAt: task.scheduledDate
+                )
+                
+                generatedNotifications.append(notification)
+            }
+            // 2. DUE TODAY
+            else if calendar.isDateInToday(taskDate) {
+                let notification = AppNotification(
+                    id: "task_today_\(taskId)",
+                    userId: userId,
+                    type: .taskDue,
+                    title: "📌 Due Today: \(task.title)",
+                    message: "Scheduled for \(timeString) - \(task.category.rawValue) category",
+                    relatedTaskId: taskId,
+                    isRead: isRead,  // 🔥 Use stored read state
+                    createdAt: task.scheduledDate
+                )
+                
+                generatedNotifications.append(notification)
+            }
+            // 3. DUE TOMORROW
+            else if calendar.isDateInTomorrow(taskDate) {
+                let notification = AppNotification(
+                    id: "task_tomorrow_\(taskId)",
+                    userId: userId,
+                    type: .taskReminder,
+                    title: "📅 Tomorrow: \(task.title)",
+                    message: "Scheduled for \(timeString) - \(task.category.rawValue) category",
+                    relatedTaskId: taskId,
+                    isRead: isRead,  // 🔥 Use stored read state
+                    createdAt: task.scheduledDate
+                )
+                
+                generatedNotifications.append(notification)
+            }
+            // 4. UPCOMING THIS WEEK
+            else if let daysUntil = calendar.dateComponents([.day], from: now, to: taskDate).day,
+                    daysUntil >= 2 && daysUntil <= 7 {
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "EEE, MMM d"
+                let dateString = dateFormatter.string(from: taskDate)
+                
+                let notification = AppNotification(
+                    id: "task_week_\(taskId)",
+                    userId: userId,
+                    type: .taskReminder,
+                    title: "📆 Upcoming: \(task.title)",
+                    message: "\(dateString) at \(timeString) - \(task.category.rawValue) category",
+                    relatedTaskId: taskId,
+                    isRead: isRead,  // 🔥 Use stored read state
                     createdAt: task.scheduledDate
                 )
                 
                 generatedNotifications.append(notification)
             }
         }
-        
         return generatedNotifications
     }
     
@@ -152,9 +185,26 @@ class NotificationDrawerViewController: UIViewController {
     }
     
     @objc private func handleMarkAllRead() {
+        guard let userId = authService.currentUserId else { return }
+        
         // Mark all as read locally
         for index in notifications.indices {
-            notifications[index].isRead = true
+            var notification = notifications[index]
+            
+            if !notification.isRead {
+                notification.isRead = true
+                notifications[index] = notification
+                
+                // 🔥 Persist read state for task notifications
+                if let taskId = notification.relatedTaskId {
+                    NotificationStateManager.shared.markTaskNotificationAsRead(userId: userId, taskId: taskId)
+                }
+            }
+        }
+        
+        // 🔥 Also mark stored notifications as read in Firestore
+        Task {
+            try? await notificationService.markAllAsRead(userId: userId)
         }
         
         drawerView.tableView.reloadData()
@@ -199,19 +249,33 @@ extension NotificationDrawerViewController: UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let notification = notifications[indexPath.row]
+        var notification = notifications[indexPath.row]
         
-        // Mark as read
+        // Mark as read if it was unread
         if !notification.isRead {
-            notifications[indexPath.row].isRead = true
+            notification.isRead = true
+            notifications[indexPath.row] = notification
+            
+            // 🔥 If it's a task notification, persist the read state
+            if let taskId = notification.relatedTaskId,
+               let userId = authService.currentUserId {
+                NotificationStateManager.shared.markTaskNotificationAsRead(userId: userId, taskId: taskId)
+            }
+            
+            // 🔥 If it's a stored notification, update in Firestore
+            if let notificationId = notification.id, !notificationId.hasPrefix("task_") {
+                Task {
+                    try? await notificationService.markAsRead(notificationId: notificationId)
+                }
+            }
+            
             tableView.reloadRows(at: [indexPath], with: .automatic)
-            onDismiss?()
+            onDismiss?() // Update badge
         }
         
         // TODO: Navigate to related task
         if let taskId = notification.relatedTaskId {
-            // dismissDrawer()
-            // Navigate to task detail screen
+            print("Navigate to task: \(taskId)")
         }
     }
     
