@@ -70,6 +70,46 @@ class NotificationService {
         try await database.collection("notifications").document(notificationId).delete()
     }
     
+    // MARK: - Fetch Total Unread Count (Including Generated Notifications)
+    func fetchTotalUnreadCount(userId: String) async throws -> Int {
+        // 1. Count stored notifications
+        let storedUnread = try await fetchUnreadCount(userId: userId)
+        
+        // 2. Count task-based notifications
+        let taskService = TaskService.shared
+        let stateManager = NotificationStateManager.shared
+        let activeTasks = try await taskService.fetchActiveTasks(userId: userId)
+        
+        let calendar = Calendar.current
+        let now = Date()
+        var taskNotificationCount = 0
+        
+        for task in activeTasks {
+            guard let taskId = task.id else { continue }
+            
+            // 🔥 Skip if already marked as read
+            if stateManager.isTaskNotificationRead(userId: userId, taskId: taskId) {
+                continue
+            }
+            
+            let taskDate = task.scheduledDate
+            
+            // Count: Overdue, Today, Tomorrow, This Week
+            if taskDate < calendar.startOfDay(for: now) {
+                taskNotificationCount += 1 // Overdue
+            } else if calendar.isDateInToday(taskDate) {
+                taskNotificationCount += 1 // Today
+            } else if calendar.isDateInTomorrow(taskDate) {
+                taskNotificationCount += 1 // Tomorrow
+            } else if let daysUntil = calendar.dateComponents([.day], from: now, to: taskDate).day,
+                      daysUntil >= 2 && daysUntil <= 7 {
+                taskNotificationCount += 1 // This week
+            }
+        }
+        
+        return storedUnread + taskNotificationCount
+    }
+    
     // MARK: - Create Task Due Notifications
     func createTaskDueNotifications(userId: String, tasks: [FitQuestTask]) async throws {
         let calendar = Calendar.current

@@ -18,19 +18,31 @@ enum NotificationType: String, Codable {
     
     var icon: String {
         switch self {
-        case .taskReminder, .taskDue: return "bell.fill"
+        case .taskReminder: return "clock.fill"
+        case .taskDue: return "bell.badge.fill"
         case .streakReminder: return "flame.fill"
         case .dailySummary: return "chart.bar.fill"
         case .levelUp: return "star.circle.fill"
         }
     }
-    
+
     var color: UIColor {
         switch self {
-        case .taskReminder, .taskDue: return UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
-        case .streakReminder: return .systemOrange
-        case .dailySummary: return .systemPurple
-        case .levelUp: return .systemYellow
+        case .taskReminder: return UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0) // Blue
+        case .taskDue: return UIColor.systemOrange // Orange for urgent
+        case .streakReminder: return UIColor.systemRed // Red flame
+        case .dailySummary: return UIColor.systemPurple
+        case .levelUp: return UIColor.systemYellow
+        }
+    }
+
+    var priority: Int {
+        switch self {
+        case .taskDue: return 1 // Highest priority (due today)
+        case .taskReminder: return 2 // Medium (upcoming)
+        case .levelUp: return 3
+        case .streakReminder: return 4
+        case .dailySummary: return 5 // Lowest priority
         }
     }
 }

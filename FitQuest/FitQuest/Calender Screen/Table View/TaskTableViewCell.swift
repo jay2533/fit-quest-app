@@ -187,6 +187,8 @@ class TaskTableViewCell: UITableViewCell {
     
     // MARK: - Configuration
     
+    // MARK: - Configuration
+
     func configure(with task: FitQuestTask, isCompleted: Bool = false) {
         // Store task and state
         self.currentTask = task
@@ -199,11 +201,11 @@ class TaskTableViewCell: UITableViewCell {
         let iconName = getCategoryIcon(for: task.category)
         categoryIconImageView.image = UIImage(systemName: iconName)
         
-        // Category Color for icon only
+        // Category Color for icon
         let categoryColor = getCategoryColor(for: task.category)
         categoryIconImageView.tintColor = categoryColor
         
-        // Time
+        // Time - Format scheduled time
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         timeLabel.text = formatter.string(from: task.scheduledTime)
@@ -214,7 +216,7 @@ class TaskTableViewCell: UITableViewCell {
         // XP
         xpLabel.text = "\(task.xpValue) XP"
         
-        // Completion State (this will set the border color)
+        // Completion State
         updateCompletionState(isCompleted: isCompleted, animated: false)
     }
     

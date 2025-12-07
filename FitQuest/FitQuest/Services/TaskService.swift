@@ -17,11 +17,17 @@ class TaskService {
     private init() {}
     
     // MARK: - Create Task
+    // MARK: - Create Task
     func createTask(_ task: FitQuestTask) async throws -> String {
+        // Save task to Firestore
         let taskData = try Firestore.Encoder().encode(task)
         let docRef = try await database.collection("tasks").addDocument(data: taskData)
-        return docRef.documentID
+        let taskId = docRef.documentID
+        
+        return taskId
     }
+
+    
     
     // MARK: - Fetch User's Active Tasks
     func fetchActiveTasks(userId: String) async throws -> [FitQuestTask] {
