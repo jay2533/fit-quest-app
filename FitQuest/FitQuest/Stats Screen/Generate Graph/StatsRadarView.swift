@@ -1,13 +1,18 @@
-//
-//  StatsRadarView.swift
-//  FitQuest
-//
-//  Created by Rushad Daruwalla on 11/18/25.
-//
-
 import UIKit
 
 class StatsRadarView: UIView {
+    
+    /// Values for each category, normalized 0.0–1.0.
+    /// Order: Physical, Mental, Social, Creativity, Miscellaneous.
+    var values: [CGFloat] = [0, 0, 0, 0, 0] {
+        didSet {
+            if values.count != 5 {
+                values = Array(values.prefix(5)) + Array(repeating: 0, count: max(0, 5 - values.count))
+            }
+            values = values.map { min(max($0, 0), 1) }
+            setNeedsDisplay()
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -29,16 +34,15 @@ class StatsRadarView: UIView {
         let fillColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 0.35)
         let strokeColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 0.9)
         
-        // Helper to compute a point on the pentagon
         func point(at index: Int, radius: CGFloat) -> CGPoint {
-            // Start at top and go around
-            let angle = -CGFloat.pi / 2 + CGFloat(index) * (2 * CGFloat.pi / 5)
+            // Start at the top and go clockwise around the pentagon.
+            let angle = -CGFloat.pi / 2 + CGFloat(index) * (2 * .pi / 5)
             let x = center.x + radius * cos(angle)
             let y = center.y + radius * sin(angle)
             return CGPoint(x: x, y: y)
         }
         
-        // Draw concentric pentagon grid
+        // 1) Draw concentric grid
         let levels = 4
         ctx.setLineWidth(1)
         gridColor.setStroke()
@@ -58,7 +62,7 @@ class StatsRadarView: UIView {
             path.stroke()
         }
         
-        // 2) Draw radial lines from center to each vertex
+        // 2) Radial lines
         for i in 0..<5 {
             let p = point(at: i, radius: outerRadius)
             let path = UIBezierPath()
@@ -67,11 +71,12 @@ class StatsRadarView: UIView {
             path.stroke()
         }
         
-        // 3) Draw main light-blue pentagon (filled)
-        let statRadius = outerRadius * 0.8
+        // 3) Data polygon
         let statPath = UIBezierPath()
         for i in 0..<5 {
-            let p = point(at: i, radius: statRadius)
+            let normalized = values[i]   // 0–1
+            let r = outerRadius * normalized
+            let p = point(at: i, radius: r)
             if i == 0 {
                 statPath.move(to: p)
             } else {

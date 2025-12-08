@@ -1,0 +1,4 @@
+module FirebaseCoreExtension {
+umbrella "/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/firebase-ios-sdk/FirebaseCore/Extension"
+export *
+}

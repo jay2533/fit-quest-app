@@ -170,7 +170,7 @@
 		</data>
 		<key>FitQuest.debug.dylib</key>
 		<data>
-		tfWvffsOXEOJto9jCNao06qojds=
+		qMCTSvlFzBTNHVs9/NLe/y7JbcU=
 		</data>
 		<key>Frameworks/FirebaseFirestoreInternal.framework/FirebaseFirestoreInternal</key>
 		<data>
@@ -299,6 +299,14 @@
 		<key>GTMSessionFetcher_GTMSessionFetcherCore.bundle/_CodeSignature/CodeSignature</key>
 		<data>
 		2jmj7l5rSw0yVb/vlWAYkK/YBwk=
+		</data>
+		<key>GoogleService-Info 2.plist</key>
+		<data>
+		IMA6CIHb1tVZzrMKinYT+uWSR/o=
+		</data>
+		<key>GoogleService-Info.plist</key>
+		<data>
+		IMA6CIHb1tVZzrMKinYT+uWSR/o=
 		</data>
 		<key>GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle/Info.plist</key>
 		<data>
@@ -970,7 +978,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			7RtX56Q4yzEoVpCRVp4kwJGRNgN9suzXukbpAIb++SA=
+			s4q/QaGKj0Ew4LRH2yRll5PtbeuedW+VV3tbzoEo/V0=
 			</data>
 		</dict>
 		<key>Frameworks/FirebaseFirestoreInternal.framework/FirebaseFirestoreInternal</key>
@@ -1195,6 +1203,20 @@
 			<key>hash2</key>
 			<data>
 			47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
+			</data>
+		</dict>
+		<key>GoogleService-Info 2.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Vh7rlEQQ/AfDnqxaKyxb3+dlDEn6dJcwikhpWH0PWR0=
+			</data>
+		</dict>
+		<key>GoogleService-Info.plist</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Vh7rlEQQ/AfDnqxaKyxb3+dlDEn6dJcwikhpWH0PWR0=
 			</data>
 		</dict>
 		<key>GoogleUtilities_GoogleUtilities-AppDelegateSwizzler.bundle/Info.plist</key>

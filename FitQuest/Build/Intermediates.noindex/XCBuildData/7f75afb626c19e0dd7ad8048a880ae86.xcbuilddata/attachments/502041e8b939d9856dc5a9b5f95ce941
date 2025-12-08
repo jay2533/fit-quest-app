@@ -1,0 +1,4 @@
+module GoogleUtilities_NSData {
+umbrella "/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/GoogleUtilities/GoogleUtilities/NSData+zlib/Public"
+export *
+}

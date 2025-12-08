@@ -1,0 +1,18 @@
+"/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/firebase-ios-sdk/FirebaseStorage/Sources/Internal/StoragePath.swift":
+  object: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StoragePath.o"
+  diagnostics: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StoragePath.dia"
+  swift-dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StoragePath.swiftdeps"
+  dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StoragePath.d"
+  const-values: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StoragePath.swiftconstvalues"
+"/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/firebase-ios-sdk/FirebaseStorage/Sources/Internal/StorageListTask.swift":
+  diagnostics: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageListTask.dia"
+  swift-dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageListTask.swiftdeps"
+  object: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageListTask.o"
+  const-values: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageListTask.swiftconstvalues"
+  dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageListTask.d"
+"/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/firebase-ios-sdk/FirebaseStorage/Sources/Internal/StorageTaskState.swift":
+  object: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageTaskState.o"
+  dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageTaskState.d"
+  const-values: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageTaskState.swiftconstvalues"
+  swift-dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageTaskState.swiftdeps"
+  diagnostics: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/Firebase.build/Debug-iphonesimulator/FirebaseStorage.build/Objects-normal/arm64/StorageTaskState.dia"

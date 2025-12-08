@@ -1,0 +1,30 @@
+"/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/FitQuest/Utilities/Constants.swift":
+  swift-dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Constants.swiftdeps"
+  dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Constants.d"
+  const-values: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Constants.swiftconstvalues"
+  diagnostics: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Constants.dia"
+  object: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Constants.o"
+"/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/FitQuest/Calender Screen/AddTask form/AddTaskViewController.swift":
+  const-values: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/AddTaskViewController.swiftconstvalues"
+  object: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/AddTaskViewController.o"
+  dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/AddTaskViewController.d"
+  swift-dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/AddTaskViewController.swiftdeps"
+  diagnostics: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/AddTaskViewController.dia"
+"/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/FitQuest/Data Models/Notifications.swift":
+  object: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Notifications.o"
+  swift-dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Notifications.swiftdeps"
+  const-values: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Notifications.swiftconstvalues"
+  diagnostics: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Notifications.dia"
+  dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/Notifications.d"
+"/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/FitQuest/History Screen/HistoryControllerTableView.swift":
+  const-values: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/HistoryControllerTableView.swiftconstvalues"
+  diagnostics: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/HistoryControllerTableView.dia"
+  object: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/HistoryControllerTableView.o"
+  swift-dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/HistoryControllerTableView.swiftdeps"
+  dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/HistoryControllerTableView.d"
+"/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/FitQuest/Calender Screen/Task type selection/TaskTypeSelectionView.swift":
+  swift-dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/TaskTypeSelectionView.swiftdeps"
+  dependencies: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/TaskTypeSelectionView.d"
+  object: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/TaskTypeSelectionView.o"
+  const-values: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/TaskTypeSelectionView.swiftconstvalues"
+  diagnostics: "/Users/rushaddaruwalla/Documents/CS5520/fit-quest-app/FitQuest/Build/Intermediates.noindex/FitQuest.build/Debug-iphonesimulator/FitQuest.build/Objects-normal/arm64/TaskTypeSelectionView.dia"

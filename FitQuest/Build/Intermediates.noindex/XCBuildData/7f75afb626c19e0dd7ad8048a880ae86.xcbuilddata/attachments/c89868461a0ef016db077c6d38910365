@@ -1,0 +1,4 @@
+module third_party_IsAppEncrypted {
+umbrella "/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/GoogleUtilities/third_party/IsAppEncrypted/Public"
+export *
+}

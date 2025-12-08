@@ -1,0 +1,4 @@
+module opensslWrapper {
+umbrella "/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/grpc-binary/openssl-grpc-Wrapper/include"
+export *
+}

@@ -304,6 +304,58 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 #if defined(__OBJC__)
 
+@class NSCoder;
+SWIFT_CLASS("_TtC8FitQuest11AddTaskView")
+@interface AddTaskView : UIView
+- (nonnull instancetype)initWithFrame:(CGRect)frame OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@class NSNotification;
+@class NSString;
+@class NSBundle;
+SWIFT_CLASS("_TtC8FitQuest21AddTaskViewController")
+@interface AddTaskViewController : UIViewController
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (void)loadView;
+- (void)viewDidLoad;
+@property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
+- (void)onCloseTapped;
+- (void)onDurationButtonTapped;
+- (void)onDifficultyChanged;
+- (void)onDateButtonTapped;
+- (void)onDateChanged;
+- (void)onTimeButtonTapped;
+- (void)onTimeChanged;
+- (void)onCreateTapped;
+- (void)keyboardWillShowWithNotification:(NSNotification * _Nonnull)notification;
+- (void)keyboardWillHideWithNotification:(NSNotification * _Nonnull)notification;
+- (void)dismissKeyboard;
+- (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil SWIFT_UNAVAILABLE;
+@end
+
+@class UITextField;
+@interface AddTaskViewController (SWIFT_EXTENSION(FitQuest)) <UITextFieldDelegate>
+- (BOOL)textFieldShouldReturn:(UITextField * _Nonnull)textField SWIFT_WARN_UNUSED_RESULT;
+@end
+
+@class UITextView;
+@interface AddTaskViewController (SWIFT_EXTENSION(FitQuest)) <UITextViewDelegate>
+- (void)textViewDidBeginEditing:(UITextView * _Nonnull)textView;
+- (void)textViewDidEndEditing:(UITextView * _Nonnull)textView;
+- (BOOL)textView:(UITextView * _Nonnull)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString * _Nonnull)text SWIFT_WARN_UNUSED_RESULT;
+@end
+
+@class UIPickerView;
+@class NSAttributedString;
+@interface AddTaskViewController (SWIFT_EXTENSION(FitQuest)) <UIPickerViewDataSource, UIPickerViewDelegate>
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView * _Nonnull)pickerView SWIFT_WARN_UNUSED_RESULT;
+- (NSInteger)pickerView:(UIPickerView * _Nonnull)pickerView numberOfRowsInComponent:(NSInteger)component SWIFT_WARN_UNUSED_RESULT;
+- (NSString * _Nullable)pickerView:(UIPickerView * _Nonnull)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component SWIFT_WARN_UNUSED_RESULT;
+- (void)pickerView:(UIPickerView * _Nonnull)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component;
+- (NSAttributedString * _Nullable)pickerView:(UIPickerView * _Nonnull)pickerView attributedTitleForRow:(NSInteger)row forComponent:(NSInteger)component SWIFT_WARN_UNUSED_RESULT;
+@end
+
 @class UIApplication;
 @class UISceneSession;
 @class UISceneConnectionOptions;
@@ -316,32 +368,42 @@ SWIFT_CLASS("_TtC8FitQuest11AppDelegate")
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class NSCoder;
 SWIFT_CLASS("_TtC8FitQuest18CalendarScreenView")
 @interface CalendarScreenView : UIView
 - (nonnull instancetype)initWithFrame:(CGRect)frame OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class NSString;
-@class NSBundle;
 SWIFT_CLASS("_TtC8FitQuest28CalendarScreenViewController")
 @interface CalendarScreenViewController : UIViewController
 - (void)loadView;
 - (void)viewDidLoad;
 @property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
 - (void)viewWillAppear:(BOOL)animated;
-- (void)onProfileTapped;
+- (void)viewWillDisappear:(BOOL)animated;
 - (void)onPreviousWeekTapped;
 - (void)onNextWeekTapped;
+- (void)onProfileTapped;
 - (void)onAddTaskTapped;
+- (void)onMonthYearTapped;
+- (void)onDatePickerDone;
+- (void)onDatePickerCancel;
 - (void)onLogoTapped;
 - (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class UICollectionView;
+@class UITableView;
 @class NSIndexPath;
+@class UITableViewCell;
+@interface CalendarScreenViewController (SWIFT_EXTENSION(FitQuest)) <UITableViewDataSource, UITableViewDelegate>
+- (NSInteger)tableView:(UITableView * _Nonnull)tableView numberOfRowsInSection:(NSInteger)section SWIFT_WARN_UNUSED_RESULT;
+- (UITableViewCell * _Nonnull)tableView:(UITableView * _Nonnull)tableView cellForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
+- (CGFloat)tableView:(UITableView * _Nonnull)tableView heightForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
+- (void)tableView:(UITableView * _Nonnull)tableView didSelectRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
+@end
+
+@class UICollectionView;
 @class UICollectionViewCell;
 @class UICollectionViewLayout;
 @interface CalendarScreenViewController (SWIFT_EXTENSION(FitQuest)) <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
@@ -351,14 +413,46 @@ SWIFT_CLASS("_TtC8FitQuest28CalendarScreenViewController")
 - (void)collectionView:(UICollectionView * _Nonnull)collectionView didSelectItemAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
 @end
 
-@class UITableView;
-@class UITableViewCell;
-@interface CalendarScreenViewController (SWIFT_EXTENSION(FitQuest)) <UITableViewDataSource, UITableViewDelegate>
-- (NSInteger)tableView:(UITableView * _Nonnull)tableView numberOfRowsInSection:(NSInteger)section SWIFT_WARN_UNUSED_RESULT;
-- (UITableViewCell * _Nonnull)tableView:(UITableView * _Nonnull)tableView cellForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
-- (CGFloat)tableView:(UITableView * _Nonnull)tableView heightForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
-- (CGFloat)tableView:(UITableView * _Nonnull)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
-- (void)tableView:(UITableView * _Nonnull)tableView didSelectRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
+SWIFT_CLASS("_TtC8FitQuest21CategorySelectionView")
+@interface CategorySelectionView : UIView
+- (nonnull instancetype)initWithFrame:(CGRect)frame OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@class UIButton;
+SWIFT_CLASS("_TtC8FitQuest31CategorySelectionViewController")
+@interface CategorySelectionViewController : UIViewController
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (void)loadView;
+- (void)viewDidLoad;
+@property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
+- (void)onCategoryTapped:(UIButton * _Nonnull)sender;
+- (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil SWIFT_UNAVAILABLE;
+@end
+
+SWIFT_CLASS("_TtC8FitQuest18ForgotPasswordView")
+@interface ForgotPasswordView : UIView
+- (nonnull instancetype)initWithFrame:(CGRect)frame OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+SWIFT_CLASS("_TtC8FitQuest28ForgotPasswordViewController")
+@interface ForgotPasswordViewController : UIViewController
+- (void)loadView;
+- (void)viewDidLoad;
+@property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
+- (void)viewWillAppear:(BOOL)animated;
+- (void)viewWillDisappear:(BOOL)animated;
+- (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@interface ForgotPasswordViewController (SWIFT_EXTENSION(FitQuest)) <UITextFieldDelegate>
+- (BOOL)textFieldShouldReturn:(UITextField * _Nonnull)textField SWIFT_WARN_UNUSED_RESULT;
+@end
+
+@interface ForgotPasswordViewController (SWIFT_EXTENSION(FitQuest))
+- (void)hideKeyboardOnTap;
 @end
 
 SWIFT_CLASS("_TtC8FitQuest17HistoryScreenView")
@@ -406,20 +500,29 @@ SWIFT_CLASS("_TtC8FitQuest24HomeScreenViewController")
 - (void)viewDidLoad;
 @property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
 - (void)viewWillAppear:(BOOL)animated;
+- (void)onSearchButtonTapped;
+- (void)searchTextChanged;
+- (void)clearSearchText;
+- (void)dismissSearch;
+- (void)onNotificationTapped;
 - (void)onCalendarTapped;
 - (void)onTaskHistoryTapped;
 - (void)onStatsTapped;
-- (void)onRewardsTapped;
-- (void)onNotificationsTapped;
+- (void)onLeaderboardsTapped;
+- (void)onProfileTapped;
 - (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@interface HomeScreenViewController (SWIFT_EXTENSION(FitQuest)) <UITextFieldDelegate>
+- (BOOL)textFieldShouldReturn:(UITextField * _Nonnull)textField SWIFT_WARN_UNUSED_RESULT;
+- (BOOL)textFieldShouldBeginEditing:(UITextField * _Nonnull)textField SWIFT_WARN_UNUSED_RESULT;
 @end
 
 @interface HomeScreenViewController (SWIFT_EXTENSION(FitQuest)) <UITableViewDataSource, UITableViewDelegate>
 - (NSInteger)tableView:(UITableView * _Nonnull)tableView numberOfRowsInSection:(NSInteger)section SWIFT_WARN_UNUSED_RESULT;
 - (UITableViewCell * _Nonnull)tableView:(UITableView * _Nonnull)tableView cellForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
 - (CGFloat)tableView:(UITableView * _Nonnull)tableView heightForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
-- (CGFloat)tableView:(UITableView * _Nonnull)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
 - (void)tableView:(UITableView * _Nonnull)tableView didSelectRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
 @end
 
@@ -446,13 +549,57 @@ SWIFT_CLASS("_TtC8FitQuest9LoginView")
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
 
+SWIFT_CLASS("_TtC8FitQuest16NotificationCell")
+@interface NotificationCell : UITableViewCell
+- (nonnull instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString * _Nullable)reuseIdentifier OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+SWIFT_CLASS("_TtC8FitQuest22NotificationDrawerView")
+@interface NotificationDrawerView : UIView
+- (nonnull instancetype)initWithFrame:(CGRect)frame OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+SWIFT_CLASS("_TtC8FitQuest32NotificationDrawerViewController")
+@interface NotificationDrawerViewController : UIViewController
+- (void)loadView;
+- (void)viewDidLoad;
+- (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@interface NotificationDrawerViewController (SWIFT_EXTENSION(FitQuest)) <UITableViewDataSource, UITableViewDelegate>
+- (NSInteger)tableView:(UITableView * _Nonnull)tableView numberOfRowsInSection:(NSInteger)section SWIFT_WARN_UNUSED_RESULT;
+- (UITableViewCell * _Nonnull)tableView:(UITableView * _Nonnull)tableView cellForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
+- (CGFloat)tableView:(UITableView * _Nonnull)tableView heightForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
+- (CGFloat)tableView:(UITableView * _Nonnull)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath SWIFT_WARN_UNUSED_RESULT;
+- (void)tableView:(UITableView * _Nonnull)tableView didSelectRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
+- (void)tableView:(UITableView * _Nonnull)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath * _Nonnull)indexPath;
+@end
+
+SWIFT_CLASS("_TtC8FitQuest11ProfileView")
+@interface ProfileView : UIView
+- (nonnull instancetype)initWithFrame:(CGRect)frame OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+SWIFT_CLASS("_TtC8FitQuest21ProfileViewController")
+@interface ProfileViewController : UIViewController
+- (void)loadView;
+- (void)viewDidLoad;
+@property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
+- (void)viewWillAppear:(BOOL)animated;
+- (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
 SWIFT_CLASS("_TtC8FitQuest12RegisterView")
 @interface RegisterView : UIView
 - (nonnull instancetype)initWithFrame:(CGRect)frame OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class NSNotification;
 SWIFT_CLASS("_TtC8FitQuest22RegisterViewController")
 @interface RegisterViewController : UIViewController
 - (void)loadView;
@@ -460,19 +607,22 @@ SWIFT_CLASS("_TtC8FitQuest22RegisterViewController")
 @property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
 - (void)viewWillAppear:(BOOL)animated;
 - (void)viewWillDisappear:(BOOL)animated;
-- (void)keyboardWillShowWithNotification:(NSNotification * _Nonnull)notification;
-- (void)keyboardWillHideWithNotification:(NSNotification * _Nonnull)notification;
-- (void)dateChanged;
-- (void)onSignUpTapped;
-- (void)onSignInTapped;
-- (void)dismissKeyboard;
 - (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class UITextField;
 @interface RegisterViewController (SWIFT_EXTENSION(FitQuest)) <UITextFieldDelegate>
 - (BOOL)textFieldShouldReturn:(UITextField * _Nonnull)textField SWIFT_WARN_UNUSED_RESULT;
+@end
+
+@interface RegisterViewController (SWIFT_EXTENSION(FitQuest))
+- (void)hideKeyboardOnTap;
+@end
+
+@class UIImagePickerController;
+@interface RegisterViewController (SWIFT_EXTENSION(FitQuest)) <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+- (void)imagePickerController:(UIImagePickerController * _Nonnull)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> * _Nonnull)info;
+- (void)imagePickerControllerDidCancel:(UIImagePickerController * _Nonnull)picker;
 @end
 
 @class UIWindow;
@@ -506,9 +656,9 @@ SWIFT_CLASS("_TtC8FitQuest25StatsScreenViewController")
 @interface StatsScreenViewController : UIViewController
 - (void)loadView;
 - (void)viewDidLoad;
-@property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
 - (void)viewWillAppear:(BOOL)animated;
-- (void)onNotificationsTapped;
+@property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
+- (void)onProfileTapped;
 - (void)onLogoTapped;
 - (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
@@ -520,6 +670,24 @@ SWIFT_CLASS("_TtC8FitQuest17TaskTableViewCell")
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
 
+SWIFT_CLASS("_TtC8FitQuest21TaskTypeSelectionView")
+@interface TaskTypeSelectionView : UIView
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
+@end
+
+SWIFT_CLASS("_TtC8FitQuest31TaskTypeSelectionViewController")
+@interface TaskTypeSelectionViewController : UIViewController
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (void)loadView;
+- (void)viewDidLoad;
+@property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
+- (void)onCloseTapped;
+- (void)onCustomTaskTapped;
+- (void)onPredefinedTaskTapped:(UIButton * _Nonnull)sender;
+- (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil SWIFT_UNAVAILABLE;
+@end
+
 SWIFT_CLASS("_TtC8FitQuest14ViewController")
 @interface ViewController : UIViewController
 - (void)loadView;
@@ -527,16 +695,16 @@ SWIFT_CLASS("_TtC8FitQuest14ViewController")
 @property (nonatomic, readonly) UIStatusBarStyle preferredStatusBarStyle;
 - (void)viewWillAppear:(BOOL)animated;
 - (void)viewWillDisappear:(BOOL)animated;
-- (void)onSignInTapped;
-- (void)onForgotPasswordTapped;
-- (void)onRegisterTapped;
-- (void)dismissKeyboard;
 - (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
 
 @interface ViewController (SWIFT_EXTENSION(FitQuest)) <UITextFieldDelegate>
 - (BOOL)textFieldShouldReturn:(UITextField * _Nonnull)textField SWIFT_WARN_UNUSED_RESULT;
+@end
+
+@interface ViewController (SWIFT_EXTENSION(FitQuest))
+- (void)hideKeyboardOnTap;
 @end
 
 SWIFT_CLASS("_TtC8FitQuest11WeekDayCell")

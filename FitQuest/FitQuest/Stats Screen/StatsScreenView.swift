@@ -150,14 +150,14 @@ class StatsScreenView: UIView {
             physicalLabel.centerXAnchor.constraint(equalTo: radarView.centerXAnchor),
             
             // Left middle (Mental)
-            mentalLabel.centerYAnchor.constraint(equalTo: radarView.centerYAnchor, constant: -6),
-            mentalLabel.trailingAnchor.constraint(equalTo: radarView.leadingAnchor, constant: -4),
-            mentalLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor, constant: 8),
+            miscellaneousLabel.centerYAnchor.constraint(equalTo: radarView.centerYAnchor, constant: -6),
+            miscellaneousLabel.trailingAnchor.constraint(equalTo: radarView.leadingAnchor, constant: -4),
+            miscellaneousLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor, constant: 8),
             
             // Right middle (Social)
-            socialLabel.centerYAnchor.constraint(equalTo: radarView.centerYAnchor, constant: -6),
-            socialLabel.leadingAnchor.constraint(equalTo: radarView.trailingAnchor, constant: 4),
-            socialLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor, constant: -8),
+            mentalLabel.centerYAnchor.constraint(equalTo: radarView.centerYAnchor, constant: -6),
+            mentalLabel.leadingAnchor.constraint(equalTo: radarView.trailingAnchor, constant: 4),
+            mentalLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor, constant: -8),
             
             // Bottom-left (Creativity)
             creativityLabel.topAnchor.constraint(equalTo: radarView.bottomAnchor, constant: 6),
@@ -165,9 +165,9 @@ class StatsScreenView: UIView {
             creativityLabel.widthAnchor.constraint(equalTo: radarView.widthAnchor, multiplier: 0.4),
             
             // Bottom-right (Miscellaneous)
-            miscellaneousLabel.topAnchor.constraint(equalTo: radarView.bottomAnchor, constant: 6),
-            miscellaneousLabel.centerXAnchor.constraint(equalTo: radarView.centerXAnchor, constant: 80),
-            miscellaneousLabel.widthAnchor.constraint(equalTo: radarView.widthAnchor, multiplier: 0.4)
+            socialLabel.topAnchor.constraint(equalTo: radarView.bottomAnchor, constant: 6),
+            socialLabel.centerXAnchor.constraint(equalTo: radarView.centerXAnchor, constant: 80),
+            socialLabel.widthAnchor.constraint(equalTo: radarView.widthAnchor, multiplier: 0.4)
         ])
     }
 }

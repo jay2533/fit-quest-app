@@ -101,6 +101,8 @@ class StatsService {
                 "physicalCompleted": 0,
                 "mentalCompleted": 0,
                 "socialCompleted": 0,
+                "creativeCompleted": 0,
+                "miscellaneousCompleted": 0,
                 "totalXPEarned": xpEarned
             ]
             data[fieldName] = 1
@@ -221,5 +223,52 @@ class StatsService {
         let monthAgo = calendar.date(byAdding: .month, value: -1, to: today) ?? today
         
         return try await fetchDailyProgress(userId: userId, startDate: monthAgo, endDate: today)
+    }
+}
+
+// MARK: - Radar Chart XP Fetch
+
+extension StatsService {
+    
+    func fetchCategoryXPForRadar(userId: String) async throws -> CategoryXP {
+        let snapshot = try await database.collection("stats")
+            .document(userId)
+            .collection("categoryStats")
+            .getDocuments()
+        
+        var physical = 0
+        var mental = 0
+        var social = 0
+        var creativity = 0
+        var miscellaneous = 0
+        
+        for document in snapshot.documents {
+            let data = document.data()
+            let totalXP = data["totalXPEarned"] as? Int ?? 0
+            let id = document.documentID   // e.g. "Physical", "Mental", etc.
+            
+            if let category = TaskCategory(rawValue: id) {
+                switch category {
+                case .physical:
+                    physical += totalXP
+                case .mental:
+                    mental += totalXP
+                case .social:
+                    social += totalXP
+                case .creativity:
+                    creativity += totalXP
+                case .miscellaneous:
+                    miscellaneous += totalXP
+                }
+            }
+        }
+        
+        return CategoryXP(
+            physical: physical,
+            mental: mental,
+            social: social,
+            creativity: creativity,
+            miscellaneous: miscellaneous
+        )
     }
 }
