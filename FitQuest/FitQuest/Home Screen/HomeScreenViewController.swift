@@ -313,14 +313,25 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
                     // Update stats
                     try await StatsService.shared.updateStatsAfterTaskCompletion(userId: userId, task: task)
                     
-                    // 🔥 Clear read state since task is now complete
+                    // Clear read state since task is now complete
                     NotificationStateManager.shared.clearReadStateForTask(userId: userId, taskId: taskId)
+                    
+                    // ✅ NEW: Show XP toast
+                    await MainActor.run {
+                        self.showXPToast("+\(task.xpValue) XP", for: task)
+                    }
+                    
+                    print("✅ Task completed: \(task.title)")
+                    print("💰 Awarded \(task.xpValue) XP")
+                    
                 } else {
                     // Mark as incomplete
                     try await taskService.updateTask(taskId: taskId, updates: [
                         "isCompleted": false,
                         "completedAt": NSNull()
                     ])
+                    
+                    print("⭕️ Task unmarked: \(task.title)")
                 }
                 
                 await MainActor.run {
@@ -328,16 +339,89 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.updateCompletionState(isCompleted: newCompletionStatus, animated: true)
                     }
                     
+                    // Reload tasks (completed task will disappear from "due tasks" list)
                     self.loadDueTasks()
-                    self.checkForUnreadNotifications() // 🔥 Update badge
+                    self.checkForUnreadNotifications()
                 }
                 
             } catch {
                 await MainActor.run {
                     print("Failed to update task: \(error.localizedDescription)")
+                    self.showAlert(title: "Error", message: "Failed to update task")
                 }
             }
         }
+    }
+
+    // MARK: - ✅ NEW: XP Toast Helper
+    private func showXPToast(_ message: String, for task: FitQuestTask) {
+        // Create toast with task title
+        let toastContainer = UIView()
+        toastContainer.backgroundColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 0.95)
+        toastContainer.layer.cornerRadius = 12
+        toastContainer.clipsToBounds = true
+        toastContainer.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Task title
+        let titleLabel = UILabel()
+        titleLabel.text = task.title
+        titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        titleLabel.textColor = .white
+        titleLabel.textAlignment = .center
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // XP message
+        let xpLabel = UILabel()
+        xpLabel.text = message
+        xpLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        xpLabel.textColor = .white
+        xpLabel.textAlignment = .center
+        xpLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        toastContainer.addSubview(titleLabel)
+        toastContainer.addSubview(xpLabel)
+        view.addSubview(toastContainer)
+        
+        NSLayoutConstraint.activate([
+            toastContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            toastContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            toastContainer.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 40),
+            toastContainer.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -40),
+            toastContainer.heightAnchor.constraint(equalToConstant: 70),
+            
+            titleLabel.topAnchor.constraint(equalTo: toastContainer.topAnchor, constant: 12),
+            titleLabel.leadingAnchor.constraint(equalTo: toastContainer.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: toastContainer.trailingAnchor, constant: -16),
+            
+            xpLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            xpLabel.leadingAnchor.constraint(equalTo: toastContainer.leadingAnchor, constant: 16),
+            xpLabel.trailingAnchor.constraint(equalTo: toastContainer.trailingAnchor, constant: -16),
+            xpLabel.bottomAnchor.constraint(equalTo: toastContainer.bottomAnchor, constant: -12)
+        ])
+        
+        // Animate in
+        toastContainer.alpha = 0
+        toastContainer.transform = CGAffineTransform(translationX: 0, y: 20)
+        
+        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: [], animations: {
+            toastContainer.alpha = 1
+            toastContainer.transform = .identity
+        }) { _ in
+            // Animate out after 2 seconds
+            UIView.animate(withDuration: 0.3, delay: 2.0, options: [], animations: {
+                toastContainer.alpha = 0
+                toastContainer.transform = CGAffineTransform(translationX: 0, y: 20)
+            }) { _ in
+                toastContainer.removeFromSuperview()
+            }
+        }
+    }
+
+    // ✅ NEW: Alert Helper
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 
