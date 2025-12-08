@@ -68,6 +68,7 @@ extension CalendarScreenViewController: UICollectionViewDelegate, UICollectionVi
         let calendar = Calendar.current
         if !calendar.isDate(previousDate, inSameDayAs: selectedDate) {
             fetchTasks(for: selectedDate)
+            updateMonthYearLabel()
         }
         
         // Update week view to show new selection

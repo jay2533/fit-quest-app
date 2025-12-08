@@ -201,11 +201,11 @@ class TaskTableViewCell: UITableViewCell {
         let iconName = getCategoryIcon(for: task.category)
         categoryIconImageView.image = UIImage(systemName: iconName)
         
-        // Category Color for icon
+        // Category Color
         let categoryColor = getCategoryColor(for: task.category)
         categoryIconImageView.tintColor = categoryColor
         
-        // Time - Format scheduled time
+        // Time
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         timeLabel.text = formatter.string(from: task.scheduledTime)
@@ -216,31 +216,48 @@ class TaskTableViewCell: UITableViewCell {
         // XP
         xpLabel.text = "\(task.xpValue) XP"
         
-        // Completion State
-        updateCompletionState(isCompleted: isCompleted, animated: false)
+        // Check if task is overdue
+        let isOverdue = !isCompleted && task.scheduledTime < Date()
+        
+        // Completion State (includes overdue styling)
+        updateCompletionState(isCompleted: isCompleted, isOverdue: isOverdue, animated: false)
     }
     
-    func updateCompletionState(isCompleted: Bool, animated: Bool = true) {
+    func updateCompletionState(isCompleted: Bool, isOverdue: Bool = false, animated: Bool = true) {
         // Update internal state
         self.isTaskCompleted = isCompleted
         
         let duration = animated ? 0.3 : 0.0
         
+        // Get the original category color
+        let categoryColor = currentTask != nil ? getCategoryColor(for: currentTask!.category) : UIColor.systemGray
+        
         if isCompleted {
-            // Completed state - bright green (success color)
+            // Completed state - dark blue-green tint
             UIView.animate(withDuration: duration) {
-                self.containerView.backgroundColor = UIColor(red: 20/255, green: 40/255, blue: 30/255, alpha: 1.0) // Dark green tint
+                self.containerView.backgroundColor = UIColor(red: 26/255, green: 47/255, blue: 47/255, alpha: 1.0)
                 self.leftBorderView.backgroundColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 1.0) // Bright green
                 self.checkboxButton.setImage(UIImage(systemName: "checkmark.square.fill"), for: .normal)
-                self.checkboxButton.tintColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 1.0) // Bright green
+                self.checkboxButton.tintColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 1.0)
+                self.timeLabel.textColor = UIColor(red: 156/255, green: 163/255, blue: 175/255, alpha: 1.0) // ✅ ADDED: Normal gray
+            }
+        } else if isOverdue {
+            // Overdue state - red tint
+            UIView.animate(withDuration: duration) {
+                self.containerView.backgroundColor = UIColor(red: 45/255, green: 20/255, blue: 20/255, alpha: 1.0) // Dark red tint
+                self.leftBorderView.backgroundColor = UIColor(red: 239/255, green: 68/255, blue: 68/255, alpha: 1.0) // Bright red
+                self.checkboxButton.setImage(UIImage(systemName: "square"), for: .normal)
+                self.checkboxButton.tintColor = UIColor(red: 209/255, green: 213/255, blue: 219/255, alpha: 1.0)
+                self.timeLabel.textColor = UIColor(red: 239/255, green: 68/255, blue: 68/255, alpha: 1.0) // Red time
             }
         } else {
-            // Incomplete state - neutral gray border
+            // Incomplete state - dark gray-blue
             UIView.animate(withDuration: duration) {
-                self.containerView.backgroundColor = UIColor(red: 28/255, green: 41/255, blue: 56/255, alpha: 1.0) // Dark gray-blue
-                self.leftBorderView.backgroundColor = UIColor(red: 100/255, green: 116/255, blue: 139/255, alpha: 1.0) // Neutral gray
+                self.containerView.backgroundColor = UIColor(red: 28/255, green: 41/255, blue: 56/255, alpha: 1.0)
+                self.leftBorderView.backgroundColor = categoryColor // Bright category color
                 self.checkboxButton.setImage(UIImage(systemName: "square"), for: .normal)
-                self.checkboxButton.tintColor = UIColor(red: 209/255, green: 213/255, blue: 219/255, alpha: 1.0) // Light gray
+                self.checkboxButton.tintColor = UIColor(red: 209/255, green: 213/255, blue: 219/255, alpha: 1.0)
+                self.timeLabel.textColor = UIColor(red: 156/255, green: 163/255, blue: 175/255, alpha: 1.0) // Normal gray
             }
         }
         
