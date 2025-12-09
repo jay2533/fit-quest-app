@@ -277,7 +277,8 @@ class HomeScreenViewController: UIViewController {
     }
     
     @objc func onLeaderboardsTapped() {
-        print("Leaderboards tapped")
+        let leaderboardVC = LeaderboardViewController()
+        navigationController?.pushViewController(leaderboardVC, animated: true)
     }
     
     @objc func onProfileTapped() {

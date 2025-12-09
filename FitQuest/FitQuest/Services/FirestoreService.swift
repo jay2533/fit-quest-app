@@ -60,11 +60,10 @@ class FirestoreService {
             .document("summary")
             .setData(overallData)
         
-        // Category stats
-        let categories = ["Physical", "Mental", "Social"]
-        for category in categories {
+        // Category stats — use ALL TaskCategory cases
+        for category in TaskCategory.allCases {
             let categoryData: [String: Any] = [
-                "category": category,
+                "category": category.rawValue,
                 "totalCompleted": 0,
                 "totalXPEarned": 0,
                 "currentStreak": 0,
@@ -74,10 +73,11 @@ class FirestoreService {
             try await database.collection("stats")
                 .document(userId)
                 .collection("categoryStats")
-                .document(category)
+                .document(category.rawValue)
                 .setData(categoryData)
         }
     }
+
     
     // MARK: - Fetch User Profile
     func fetchUserProfile(userId: String) async throws -> User {

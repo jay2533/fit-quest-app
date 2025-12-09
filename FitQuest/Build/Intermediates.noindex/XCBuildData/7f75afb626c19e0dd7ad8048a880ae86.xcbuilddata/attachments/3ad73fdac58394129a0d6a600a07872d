@@ -1,4 +1,0 @@
-module grpcWrapper {
-umbrella "/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/grpc-binary/grpc-Wrapper/include"
-export *
-}

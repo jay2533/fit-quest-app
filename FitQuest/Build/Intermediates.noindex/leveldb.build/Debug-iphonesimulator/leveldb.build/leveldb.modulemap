@@ -1,4 +1,0 @@
-module leveldb {
-umbrella "/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/leveldb/include"
-export *
-}

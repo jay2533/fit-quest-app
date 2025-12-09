@@ -49,17 +49,38 @@ class StatsService {
     }
     
     // MARK: - Update Category Stats
-    private func updateCategoryStats(userId: String, category: TaskCategory, xpEarned: Int) async throws {
+    private func updateCategoryStats(
+        userId: String,
+        category: TaskCategory,
+        xpEarned: Int
+    ) async throws {
         let categoryRef = database.collection("stats")
             .document(userId)
             .collection("categoryStats")
             .document(category.rawValue)
-        
-        try await categoryRef.updateData([
-            "totalCompleted": FieldValue.increment(Int64(1)),
-            "totalXPEarned": FieldValue.increment(Int64(xpEarned))
-        ])
+
+        // Check if this category doc already exists
+        let snapshot = try await categoryRef.getDocument()
+
+        if snapshot.exists {
+            // Normal incremental update
+            try await categoryRef.updateData([
+                "totalCompleted": FieldValue.increment(Int64(1)),
+                "totalXPEarned": FieldValue.increment(Int64(xpEarned))
+            ])
+        } else {
+            // First time this category is used – create the document
+            try await categoryRef.setData([
+                "category": category.rawValue,
+                "totalCompleted": 1,
+                "totalXPEarned": xpEarned,
+                "currentStreak": 1,
+                "averageCompletionRate": 0.0
+            ])
+        }
     }
+
+
     
     // MARK: - Update Daily Progress
     private func updateDailyProgress(userId: String, category: TaskCategory, xpEarned: Int) async throws {
@@ -74,17 +95,13 @@ class StatsService {
         
         let fieldName: String
         switch category {
-        case .physical:
-            fieldName = "physicalCompleted"
-        case .mental:
-            fieldName = "mentalCompleted"
-        case .social:
-            fieldName = "socialCompleted"
-        case .creativity:
-            fieldName = "creativeCompleted"
-        case .miscellaneous:
-            fieldName = "miscellaneousCompleted"
+        case .physical:       fieldName = "physicalCompleted"
+        case .mental:         fieldName = "mentalCompleted"
+        case .social:         fieldName = "socialCompleted"
+        case .creativity:     fieldName = "creativityCompleted"
+        case .miscellaneous:  fieldName = "miscellaneousCompleted"
         }
+
         
         // Check if document exists
         let document = try await progressRef.getDocument()
@@ -101,11 +118,12 @@ class StatsService {
                 "physicalCompleted": 0,
                 "mentalCompleted": 0,
                 "socialCompleted": 0,
-                "creativeCompleted": 0,
+                "creativityCompleted": 0,
                 "miscellaneousCompleted": 0,
                 "totalXPEarned": xpEarned
             ]
             data[fieldName] = 1
+
             
             try await progressRef.setData(data)
         }

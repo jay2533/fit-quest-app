@@ -1,4 +1,0 @@
-module nanopb {
-umbrella "/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/nanopb/spm_headers"
-export *
-}

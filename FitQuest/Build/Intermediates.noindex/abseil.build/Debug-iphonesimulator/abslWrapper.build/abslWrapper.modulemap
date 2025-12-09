@@ -1,4 +1,0 @@
-module abslWrapper {
-umbrella "/Users/rushaddaruwalla/Library/Developer/Xcode/DerivedData/FitQuest-dbhaqakjsnprufdcnwcwuqmsmvpy/SourcePackages/checkouts/abseil-cpp-binary/absl-Wrapper/include"
-export *
-}
