@@ -55,18 +55,38 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let task = tasks[indexPath.row]
         
-        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, view, completionHandler) in
-            self?.confirmDeleteTask(task: task, at: indexPath)
-            completionHandler(true)
+        // ✅ CHECK: Only allow delete for incomplete tasks
+        if task.isCompleted {
+            // Completed task - show "Cannot Delete" action (disabled style)
+            let cannotDeleteAction = UIContextualAction(style: .normal, title: "Completed") { [weak self] (action, view, completionHandler) in
+                // Show message
+                self?.showCannotDeleteCompletedAlert()
+                completionHandler(false)
+            }
+            
+            cannotDeleteAction.backgroundColor = UIColor.systemGray
+            cannotDeleteAction.image = UIImage(systemName: "checkmark.circle.fill")
+            
+            let configuration = UISwipeActionsConfiguration(actions: [cannotDeleteAction])
+            configuration.performsFirstActionWithFullSwipe = false
+            
+            return configuration
+            
+        } else {
+            // Incomplete task - allow delete
+            let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, view, completionHandler) in
+                self?.confirmDeleteTask(task: task, at: indexPath)
+                completionHandler(true)
+            }
+            
+            deleteAction.backgroundColor = .systemRed
+            deleteAction.image = UIImage(systemName: "trash.fill")
+            
+            let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+            configuration.performsFirstActionWithFullSwipe = false // Requires tap, not full swipe
+            
+            return configuration
         }
-        
-        deleteAction.backgroundColor = .systemRed
-        deleteAction.image = UIImage(systemName: "trash.fill")
-        
-        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
-        configuration.performsFirstActionWithFullSwipe = false // Requires tap, not full swipe
-        
-        return configuration
     }
     
     // MARK: - Show Task Detail
@@ -205,6 +225,17 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         let alert = UIAlertController(
             title: "Cannot Undo",
             message: "Tasks can only be unmarked within 5 minutes of completion.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    // Cannot Delete Completed Task Alert
+    private func showCannotDeleteCompletedAlert() {
+        let alert = UIAlertController(
+            title: "Cannot Delete",
+            message: "Completed tasks cannot be deleted to preserve your XP and task history.",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "OK", style: .default))

@@ -37,8 +37,8 @@ struct Constants {
     // MARK: - Level Thresholds
     struct Levels {
         static let tier1Threshold = 0
-        static let tier2Threshold = 1000
-        static let tier3Threshold = 5000
+        static let tier2Threshold = 5000
+        static let tier3Threshold = 10000
         
         static func getTier(xp: Int) -> Int {
             if xp >= tier3Threshold {
@@ -51,12 +51,12 @@ struct Constants {
         }
         
         static func getLevel(xp: Int) -> Int {
-            return max(1, xp / 100)
+            return max(1, xp / 250)
         }
         
         static func xpForNextLevel(currentXP: Int) -> Int {
             let currentLevel = getLevel(xp: currentXP)
-            let nextLevelXP = (currentLevel + 1) * 100
+            let nextLevelXP = (currentLevel + 1) * 250
             return nextLevelXP - currentXP
         }
     }

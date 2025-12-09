@@ -52,6 +52,9 @@ class CalendarScreenViewController: UIViewController {
         
         calendarView.tasksTableView.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.identifier)
         
+        calendarView.tasksTableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 80, right: 0)
+        calendarView.tasksTableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 80, right: 0)
+            
         setupLoadingIndicator()
         
         setupRefreshControl()
@@ -70,7 +73,6 @@ class CalendarScreenViewController: UIViewController {
         fetchTasks(for: selectedDate)
         
         // Add button actions
-        calendarView.profileButton.addTarget(self, action: #selector(onProfileTapped), for: .touchUpInside)
         calendarView.addTaskButton.addTarget(self, action: #selector(onAddTaskTapped), for: .touchUpInside)
         
         // Logo tap gesture
@@ -324,11 +326,6 @@ class CalendarScreenViewController: UIViewController {
         selectedDate = newDate
         loadCurrentWeek()
         print("Next week - now showing week of: \(selectedDate)")
-    }
-    
-    @objc func onProfileTapped() {
-        print("Profile button tapped")
-        // TODO: Navigate to profile screen
     }
     
     @objc func onAddTaskTapped() {
