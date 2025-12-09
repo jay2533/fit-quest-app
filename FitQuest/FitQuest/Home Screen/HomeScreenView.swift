@@ -42,11 +42,6 @@ class HomeScreenView: UIView {
     var searchTextField: UITextField!
     var customClearButton: UIButton!
     
-    var powerLevelStack: UIStackView!
-    var powerLevelTitleLabel: UILabel!
-    var powerLevelValueLabel: UILabel!
-    var powerLevelBar: UIProgressView!
-    
     // MARK: - Tasks Table
     var tasksTableView: UITableView!
     
@@ -97,14 +92,29 @@ class HomeScreenView: UIView {
         notificationBadge = UIView()
         notificationBadge.backgroundColor = .systemRed
         notificationBadge.layer.cornerRadius = 6
-        notificationBadge.isHidden = true  // Hidden by default
+        notificationBadge.isHidden = true
         notificationBadge.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(notificationBadge)
         
-        profileButton = UIButton(type: .system)
-        let profileConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
-        profileButton.setImage(UIImage(systemName: "person.circle.fill", withConfiguration: profileConfig), for: .normal)
+        // 🔥 UPDATED: Profile Button - Larger with Image Support
+        profileButton = UIButton(type: .custom)  // Changed to .custom for better image control
+        
+        // Default placeholder image
+        let profileConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
+        let placeholderImage = UIImage(systemName: "person.circle.fill", withConfiguration: profileConfig)
+        profileButton.setImage(placeholderImage, for: .normal)
         profileButton.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
+        
+        // Make it circular
+        profileButton.layer.cornerRadius = 22  // Half of 44
+        profileButton.layer.borderWidth = 2
+        profileButton.layer.borderColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 0.5).cgColor
+        profileButton.clipsToBounds = true
+        profileButton.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        
+        // Image view properties
+        profileButton.imageView?.contentMode = .scaleAspectFill
+        
         profileButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(profileButton)
     }
@@ -250,30 +260,6 @@ class HomeScreenView: UIView {
         customClearButton.translatesAutoresizingMaskIntoConstraints = false
         
         dueTasksContainer.addSubview(customClearButton)
-        
-        powerLevelTitleLabel = UILabel()
-        powerLevelTitleLabel.text = "Power level"
-        powerLevelTitleLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        powerLevelTitleLabel.textColor = .lightGray
-        
-        powerLevelValueLabel = UILabel()
-        powerLevelValueLabel.text = "250"
-        powerLevelValueLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-        powerLevelValueLabel.textColor = .white
-        
-        powerLevelBar = UIProgressView(progressViewStyle: .default)
-        powerLevelBar.progress = 0.5
-        powerLevelBar.translatesAutoresizingMaskIntoConstraints = false
-        
-        powerLevelStack = UIStackView(arrangedSubviews: [powerLevelTitleLabel, powerLevelValueLabel])
-        powerLevelStack.axis = .vertical
-        powerLevelStack.spacing = 2
-        powerLevelStack.alignment = .trailing
-        powerLevelStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Add power level BEFORE clear button in subview hierarchy
-        dueTasksContainer.insertSubview(powerLevelStack, at: 0)
-        dueTasksContainer.insertSubview(powerLevelBar, at: 0)
     }
     
     func setupTasksTableView() {
@@ -291,8 +277,6 @@ class HomeScreenView: UIView {
     func showSearchMode() {
         UIView.animate(withDuration: 0.3) {
             self.dueTasksLabel.alpha = 0
-            self.powerLevelStack.alpha = 0
-            self.powerLevelBar.alpha = 0
             self.searchTextField.alpha = 1
             self.customClearButton.alpha = 1
         } completion: { _ in
@@ -308,8 +292,6 @@ class HomeScreenView: UIView {
             self.searchTextField.alpha = 0
             self.customClearButton.alpha = 0
             self.dueTasksLabel.alpha = 1
-            self.powerLevelStack.alpha = 1
-            self.powerLevelBar.alpha = 1
         }
     }
     
@@ -317,6 +299,12 @@ class HomeScreenView: UIView {
         UIView.animate(withDuration: 0.2) {
             self.notificationBadge.isHidden = !hasUnread
         }
+    }
+    
+    // MARK: - Update Profile Image
+    func updateProfileImage(with image: UIImage) {
+        profileButton.setImage(image.withRenderingMode(.alwaysOriginal), for: .normal)
+        profileButton.imageView?.contentMode = .scaleAspectFill
     }
     
     // MARK: - Constraints
@@ -343,10 +331,11 @@ class HomeScreenView: UIView {
             notificationBadge.widthAnchor.constraint(equalToConstant: 12),
             notificationBadge.heightAnchor.constraint(equalToConstant: 12),
             
+            // Profile Button - LARGER
             profileButton.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
             profileButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -24),
-            profileButton.widthAnchor.constraint(equalToConstant: 32),
-            profileButton.heightAnchor.constraint(equalToConstant: 32),
+            profileButton.widthAnchor.constraint(equalToConstant: 44),
+            profileButton.heightAnchor.constraint(equalToConstant: 44),
                 
             // Top row cards
             calendarCardView.topAnchor.constraint(equalTo: appNameLabel.bottomAnchor, constant: 24),
@@ -411,7 +400,7 @@ class HomeScreenView: UIView {
             dueTasksContainer.topAnchor.constraint(equalTo: statsCardView.bottomAnchor, constant: 24),
             dueTasksContainer.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             dueTasksContainer.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            dueTasksContainer.heightAnchor.constraint(equalToConstant: 70),
+            dueTasksContainer.heightAnchor.constraint(equalToConstant: 50),
             
             // Search Button
             searchButton.leadingAnchor.constraint(equalTo: dueTasksContainer.leadingAnchor, constant: 16),
@@ -433,14 +422,6 @@ class HomeScreenView: UIView {
             customClearButton.centerYAnchor.constraint(equalTo: dueTasksContainer.centerYAnchor),
             customClearButton.widthAnchor.constraint(equalToConstant: 24),
             customClearButton.heightAnchor.constraint(equalToConstant: 24),
-            
-            powerLevelStack.trailingAnchor.constraint(equalTo: dueTasksContainer.trailingAnchor, constant: -16),
-            powerLevelStack.topAnchor.constraint(equalTo: dueTasksContainer.topAnchor, constant: 10),
-            
-            powerLevelBar.leadingAnchor.constraint(equalTo: powerLevelStack.leadingAnchor),
-            powerLevelBar.trailingAnchor.constraint(equalTo: powerLevelStack.trailingAnchor),
-            powerLevelBar.topAnchor.constraint(equalTo: powerLevelStack.bottomAnchor, constant: 4),
-            powerLevelBar.bottomAnchor.constraint(equalTo: dueTasksContainer.bottomAnchor, constant: -10),
             
             // Tasks table
             tasksTableView.topAnchor.constraint(equalTo: dueTasksContainer.bottomAnchor, constant: 12),

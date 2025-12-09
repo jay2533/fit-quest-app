@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseFirestore
 
 class HomeScreenViewController: UIViewController {
     
@@ -50,9 +51,10 @@ class HomeScreenViewController: UIViewController {
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
         
-        // Load tasks from Firestore
+        // Load data
         loadDueTasks()
         checkForUnreadNotifications()
+        loadUserAIAvatar()  // 🔥 Load AI avatar
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -63,9 +65,10 @@ class HomeScreenViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         
-        // Reload tasks when returning to this screen
+        // Reload data
         loadDueTasks()
         checkForUnreadNotifications()
+        loadUserAIAvatar()  // 🔥 Reload AI avatar
     }
     
     // MARK: - Setup
@@ -89,38 +92,79 @@ class HomeScreenViewController: UIViewController {
         homeView.leaderboardsCardView.isUserInteractionEnabled = true
     }
     
-    // MARK: - Load Tasks from Firestore
-    
-    private func loadDueTasks() {
+    // MARK: - Load User AI Avatar
+    private func loadUserAIAvatar() {
         guard let userId = authService.currentUserId else { return }
         
         Task {
             do {
-                let activeTasks = try await taskService.fetchActiveTasks(userId: userId)
-                print("📦 Fetched \(activeTasks.count) active tasks")
+                // Fetch user name from Firestore
+                let document = try await Firestore.firestore()
+                    .collection("users")
+                    .document(userId)
+                    .getDocument()
                 
-                let calendar = Calendar.current
-                let now = Date()
-                
-                // Get today's date components (year, month, day only)
-                let todayComponents = calendar.dateComponents([.year, .month, .day], from: now)
-                
-                let dueTodayTasks = activeTasks.filter { task in
-                    // Get task's date components
-                    let taskComponents = calendar.dateComponents([.year, .month, .day], from: task.scheduledDate)
-                    
-                    // Compare only year, month, day (ignore time)
-                    let isDueToday = todayComponents.year == taskComponents.year &&
-                                     todayComponents.month == taskComponents.month &&
-                                     todayComponents.day == taskComponents.day
-                    
-                    print("   \(task.title): \(taskComponents.month ?? 0)/\(taskComponents.day ?? 0) vs Today: \(todayComponents.month ?? 0)/\(todayComponents.day ?? 0) = \(isDueToday)")
-                    
-                    return isDueToday
+                guard let data = document.data(),
+                      let name = data["name"] as? String else {
+                    await MainActor.run {
+                        self.setAIAvatar(name: "User")
+                    }
+                    return
                 }
                 
-                print("✅ Found \(dueTodayTasks.count) tasks due today")
+                // Generate AI avatar
+                await MainActor.run {
+                    self.setAIAvatar(name: name)
+                }
                 
+            } catch {
+                print("Failed to load user name: \(error.localizedDescription)")
+                await MainActor.run {
+                    self.setAIAvatar(name: "User")
+                }
+            }
+        }
+    }
+    
+    private func setAIAvatar(name: String) {
+        Task {
+            // 🔥 Use the SAME avatar generator as profile page
+            let avatar = await AvatarGenerator.shared.getAIAvatar(name: name, size: 44)
+            
+            await MainActor.run {
+                self.homeView.updateProfileImage(with: avatar)
+            }
+        }
+    }
+    
+    // MARK: - Load Tasks from Firestore
+    
+    private func loadDueTasks() {
+        guard let userId = authService.currentUserId else {
+            print("❌ No user logged in")
+            return
+        }
+        
+        Task {
+            do {
+                // Fetch all active tasks
+                let activeTasks = try await taskService.fetchActiveTasks(userId: userId)
+                
+                // Get today's date components
+                let calendar = Calendar.current
+                let now = Date()
+                let todayComponents = calendar.dateComponents([.year, .month, .day], from: now)
+                
+                // Filter tasks due today
+                let dueTodayTasks = activeTasks.filter { task in
+                    let taskComponents = calendar.dateComponents([.year, .month, .day], from: task.scheduledDate)
+                    
+                    return todayComponents.year == taskComponents.year &&
+                           todayComponents.month == taskComponents.month &&
+                           todayComponents.day == taskComponents.day
+                }
+                
+                // Sort by scheduled time
                 let sortedTasks = dueTodayTasks.sorted { $0.scheduledTime < $1.scheduledTime }
                 
                 await MainActor.run {
@@ -130,7 +174,12 @@ class HomeScreenViewController: UIViewController {
                 }
                 
             } catch {
-                print("❌ Error: \(error)")
+                await MainActor.run {
+                    print("❌ Failed to load tasks: \(error.localizedDescription)")
+                    self.allTasks = []
+                    self.filteredTasks = []
+                    self.homeView.tasksTableView.reloadData()
+                }
             }
         }
     }
@@ -150,10 +199,8 @@ class HomeScreenViewController: UIViewController {
         guard let searchText = homeView.searchTextField.text else { return }
         
         if searchText.isEmpty {
-            // Show all tasks
             filteredTasks = allTasks
         } else {
-            // Filter tasks by title or category
             filteredTasks = allTasks.filter { task in
                 task.title.lowercased().contains(searchText.lowercased()) ||
                 task.category.rawValue.lowercased().contains(searchText.lowercased())
@@ -201,7 +248,6 @@ class HomeScreenViewController: UIViewController {
         
         Task {
             do {
-                // Use the new total count method
                 let totalUnread = try await NotificationService.shared.fetchTotalUnreadCount(userId: userId)
                 
                 await MainActor.run {
@@ -232,7 +278,6 @@ class HomeScreenViewController: UIViewController {
     
     @objc func onLeaderboardsTapped() {
         print("Leaderboards tapped")
-        // TODO: implement leaderboards screen
     }
     
     @objc func onProfileTapped() {
@@ -246,7 +291,6 @@ class HomeScreenViewController: UIViewController {
 extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // Show empty state if no tasks
         if filteredTasks.isEmpty {
             let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 100))
             
@@ -289,7 +333,7 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 78  // Fixed height from your cell design
+        return 78
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -299,6 +343,7 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     // MARK: - Task Completion
+    
     private func handleTaskCompletion(task: FitQuestTask, at indexPath: IndexPath) {
         guard let taskId = task.id, let userId = authService.currentUserId else { return }
         
@@ -315,23 +360,12 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
                     
                     // Clear read state since task is now complete
                     NotificationStateManager.shared.clearReadStateForTask(userId: userId, taskId: taskId)
-                    
-                    // ✅ NEW: Show XP toast
-                    await MainActor.run {
-                        self.showXPToast("+\(task.xpValue) XP", for: task)
-                    }
-                    
-                    print("✅ Task completed: \(task.title)")
-                    print("💰 Awarded \(task.xpValue) XP")
-                    
                 } else {
                     // Mark as incomplete
                     try await taskService.updateTask(taskId: taskId, updates: [
                         "isCompleted": false,
                         "completedAt": NSNull()
                     ])
-                    
-                    print("⭕️ Task unmarked: \(task.title)")
                 }
                 
                 await MainActor.run {
@@ -339,7 +373,6 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.updateCompletionState(isCompleted: newCompletionStatus, animated: true)
                     }
                     
-                    // Reload tasks (completed task will disappear from "due tasks" list)
                     self.loadDueTasks()
                     self.checkForUnreadNotifications()
                 }
@@ -347,81 +380,9 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
             } catch {
                 await MainActor.run {
                     print("Failed to update task: \(error.localizedDescription)")
-                    self.showAlert(title: "Error", message: "Failed to update task")
                 }
             }
         }
-    }
-
-    // MARK: - ✅ NEW: XP Toast Helper
-    private func showXPToast(_ message: String, for task: FitQuestTask) {
-        // Create toast with task title
-        let toastContainer = UIView()
-        toastContainer.backgroundColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 0.95)
-        toastContainer.layer.cornerRadius = 12
-        toastContainer.clipsToBounds = true
-        toastContainer.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Task title
-        let titleLabel = UILabel()
-        titleLabel.text = task.title
-        titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
-        titleLabel.textColor = .white
-        titleLabel.textAlignment = .center
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        // XP message
-        let xpLabel = UILabel()
-        xpLabel.text = message
-        xpLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        xpLabel.textColor = .white
-        xpLabel.textAlignment = .center
-        xpLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        toastContainer.addSubview(titleLabel)
-        toastContainer.addSubview(xpLabel)
-        view.addSubview(toastContainer)
-        
-        NSLayoutConstraint.activate([
-            toastContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            toastContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            toastContainer.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 40),
-            toastContainer.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -40),
-            toastContainer.heightAnchor.constraint(equalToConstant: 70),
-            
-            titleLabel.topAnchor.constraint(equalTo: toastContainer.topAnchor, constant: 12),
-            titleLabel.leadingAnchor.constraint(equalTo: toastContainer.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: toastContainer.trailingAnchor, constant: -16),
-            
-            xpLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            xpLabel.leadingAnchor.constraint(equalTo: toastContainer.leadingAnchor, constant: 16),
-            xpLabel.trailingAnchor.constraint(equalTo: toastContainer.trailingAnchor, constant: -16),
-            xpLabel.bottomAnchor.constraint(equalTo: toastContainer.bottomAnchor, constant: -12)
-        ])
-        
-        // Animate in
-        toastContainer.alpha = 0
-        toastContainer.transform = CGAffineTransform(translationX: 0, y: 20)
-        
-        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: [], animations: {
-            toastContainer.alpha = 1
-            toastContainer.transform = .identity
-        }) { _ in
-            // Animate out after 2 seconds
-            UIView.animate(withDuration: 0.3, delay: 2.0, options: [], animations: {
-                toastContainer.alpha = 0
-                toastContainer.transform = CGAffineTransform(translationX: 0, y: 20)
-            }) { _ in
-                toastContainer.removeFromSuperview()
-            }
-        }
-    }
-
-    // ✅ NEW: Alert Helper
-    private func showAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
 }
 

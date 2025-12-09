@@ -424,22 +424,12 @@ class ProfileViewController: UIViewController {
     private func generateAIAvatar() {
         guard let name = profileView.nameValueLabel.text else { return }
         
-        // Using DiceBear API (free)
-        let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "user"
-        let avatarURL = "https://api.dicebear.com/7.x/avataaars/png?seed=\(encodedName)"
-        
-        guard let url = URL(string: avatarURL) else { return }
-        
         Task {
-            do {
-                let (data, _) = try await URLSession.shared.data(from: url)
-                if let image = UIImage(data: data) {
-                    await MainActor.run {
-                        profileView.aiAvatarImageView.image = image
-                    }
-                }
-            } catch {
-                print("Failed to generate AI avatar: \(error.localizedDescription)")
+            // 🔥 Use shared avatar generator (same as home screen)
+            let avatar = await AvatarGenerator.shared.getAIAvatar(name: name, size: 120)
+            
+            await MainActor.run {
+                profileView.aiAvatarImageView.image = avatar
             }
         }
     }
