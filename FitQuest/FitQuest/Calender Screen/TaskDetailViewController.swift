@@ -11,6 +11,7 @@ class TaskDetailViewController: UIViewController {
     
     // MARK: - Properties
     private let task: FitQuestTask
+    var onTaskDeleted: (() -> Void)? // Callback to refresh list after deletion
     
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
@@ -116,14 +117,16 @@ class TaskDetailViewController: UIViewController {
         return label
     }()
     
-    private let editButton: UIButton = {
+    // ✅ Delete Button (Red styling)
+    private let deleteButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Edit Task", for: .normal)
+        button.setTitle("Delete Task", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        button.backgroundColor = UIColor.white.withAlphaComponent(0.1)
-        button.setTitleColor(.lightGray, for: .normal)
+        button.backgroundColor = UIColor.systemRed.withAlphaComponent(0.2)
+        button.setTitleColor(.systemRed, for: .normal)
         button.layer.cornerRadius = 12
-        button.isEnabled = false // ✅ Disabled for now
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.systemRed.withAlphaComponent(0.5).cgColor
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -172,7 +175,7 @@ class TaskDetailViewController: UIViewController {
         contentView.addSubview(notesValueLabel)
         contentView.addSubview(divider2)
         contentView.addSubview(statusLabel)
-        contentView.addSubview(editButton)
+        contentView.addSubview(deleteButton)
         contentView.addSubview(closeButton)
         
         setupConstraints()
@@ -253,14 +256,14 @@ class TaskDetailViewController: UIViewController {
             statusLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
             statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
             
-            // Edit Button
-            editButton.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 32),
-            editButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
-            editButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
-            editButton.heightAnchor.constraint(equalToConstant: 50),
+            // Delete Button
+            deleteButton.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 32),
+            deleteButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+            deleteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            deleteButton.heightAnchor.constraint(equalToConstant: 50),
             
             // Close Button
-            closeButton.topAnchor.constraint(equalTo: editButton.bottomAnchor, constant: 16),
+            closeButton.topAnchor.constraint(equalTo: deleteButton.bottomAnchor, constant: 16),
             closeButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             closeButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -24),
         ])
@@ -268,6 +271,7 @@ class TaskDetailViewController: UIViewController {
     
     private func setupActions() {
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+        deleteButton.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Configuration
@@ -307,15 +311,147 @@ class TaskDetailViewController: UIViewController {
                 statusLabel.text = "✅ Completed"
                 statusLabel.textColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 1.0)
             }
+            
+            // ✅ DISABLE DELETE for completed tasks
+            deleteButton.isEnabled = false
+            deleteButton.alpha = 0.5
+            deleteButton.setTitle("Cannot Delete Completed Task", for: .normal)
+            deleteButton.backgroundColor = UIColor.gray.withAlphaComponent(0.2)
+            deleteButton.setTitleColor(.gray, for: .normal)
+            deleteButton.layer.borderColor = UIColor.gray.withAlphaComponent(0.5).cgColor
+            
         } else {
             statusLabel.text = "⭕️ Not completed"
             statusLabel.textColor = UIColor.lightGray
+            
+            // ✅ ENABLE DELETE for incomplete tasks
+            deleteButton.isEnabled = true
+            deleteButton.alpha = 1.0
         }
     }
     
     // MARK: - Actions
     @objc private func closeButtonTapped() {
         dismiss(animated: true)
+    }
+    
+    // ✅ Delete Button Action
+    @objc private func deleteButtonTapped() {
+        // ✅ 1. Show confirmation alert
+        let alert = UIAlertController(
+            title: "Delete Task?",
+            message: "Are you sure you want to delete \"\(task.title)\"?\n\nThis cannot be undone.",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+            self?.deleteTask()
+        })
+        
+        present(alert, animated: true)
+    }
+    
+    // ✅ Delete Task Method
+    private func deleteTask() {
+        guard let taskId = task.id else {
+            showErrorToast("Cannot delete task")
+            return
+        }
+        
+        Task {
+            do {
+                try await TaskService.shared.deleteTask(taskId: taskId)
+                
+                print("🗑️ Task deleted: \(task.title)")
+                
+                await MainActor.run {
+                    // ✅ 2. Dismiss detail view
+                    self.dismiss(animated: true) {
+                        // ✅ 3. Show toast in parent view
+                        if let presentingVC = self.presentingViewController {
+                            self.showToastOnViewController(presentingVC, message: "Task deleted")
+                        }
+                        
+                        // ✅ 4. Notify parent to refresh
+                        self.onTaskDeleted?()
+                    }
+                }
+                
+            } catch {
+                await MainActor.run {
+                    self.showErrorToast("Failed to delete task")
+                }
+                print("❌ Error deleting task: \(error)")
+            }
+        }
+    }
+    
+    // ✅ Toast Helper (Shows on parent ViewController)
+    private func showToastOnViewController(_ viewController: UIViewController, message: String) {
+        let toastLabel = UILabel()
+        toastLabel.text = message
+        toastLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        toastLabel.textColor = .white
+        toastLabel.backgroundColor = UIColor.systemRed.withAlphaComponent(0.9)
+        toastLabel.textAlignment = .center
+        toastLabel.layer.cornerRadius = 20
+        toastLabel.clipsToBounds = true
+        toastLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        viewController.view.addSubview(toastLabel)
+        
+        NSLayoutConstraint.activate([
+            toastLabel.centerXAnchor.constraint(equalTo: viewController.view.centerXAnchor),
+            toastLabel.bottomAnchor.constraint(equalTo: viewController.view.safeAreaLayoutGuide.bottomAnchor, constant: -100),
+            toastLabel.widthAnchor.constraint(equalToConstant: 150),
+            toastLabel.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        
+        toastLabel.alpha = 0
+        UIView.animate(withDuration: 0.3, animations: {
+            toastLabel.alpha = 1
+        }) { _ in
+            UIView.animate(withDuration: 0.3, delay: 1.5, options: [], animations: {
+                toastLabel.alpha = 0
+            }) { _ in
+                toastLabel.removeFromSuperview()
+            }
+        }
+    }
+    
+    // ✅ Error Toast Helper (Shows on current view)
+    private func showErrorToast(_ message: String) {
+        let toastLabel = UILabel()
+        toastLabel.text = message
+        toastLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        toastLabel.textColor = .white
+        toastLabel.backgroundColor = UIColor.systemRed.withAlphaComponent(0.9)
+        toastLabel.textAlignment = .center
+        toastLabel.layer.cornerRadius = 20
+        toastLabel.clipsToBounds = true
+        toastLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(toastLabel)
+        
+        NSLayoutConstraint.activate([
+            toastLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            toastLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -100),
+            toastLabel.widthAnchor.constraint(equalToConstant: 180),
+            toastLabel.heightAnchor.constraint(equalToConstant: 40)
+        ])
+        
+        toastLabel.alpha = 0
+        UIView.animate(withDuration: 0.3, animations: {
+            toastLabel.alpha = 1
+        }) { _ in
+            UIView.animate(withDuration: 0.3, delay: 1.5, options: [], animations: {
+                toastLabel.alpha = 0
+            }) { _ in
+                toastLabel.removeFromSuperview()
+            }
+        }
     }
     
     // MARK: - Helpers

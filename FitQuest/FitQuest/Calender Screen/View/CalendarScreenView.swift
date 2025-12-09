@@ -11,7 +11,6 @@ class CalendarScreenView: UIView {
 
     var logoImageView: UIImageView!
     var titleLabel: UILabel!
-    var profileButton: UIButton!
     
     var monthYearLabel: UILabel!
     
@@ -64,13 +63,6 @@ class CalendarScreenView: UIView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(titleLabel)
         
-        // Profile Button
-        profileButton = UIButton(type: .system)
-        let profileConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
-        profileButton.setImage(UIImage(systemName: "person.circle.fill", withConfiguration: profileConfig), for: .normal)
-        profileButton.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
-        profileButton.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(profileButton)
     }
     
     func setupMonthYearLabel() {
@@ -164,12 +156,6 @@ class CalendarScreenView: UIView {
             // Title (center)
             titleLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             titleLabel.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
-            
-            // Profile Button (top right)
-            profileButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            profileButton.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
-            profileButton.widthAnchor.constraint(equalToConstant: 35),
-            profileButton.heightAnchor.constraint(equalToConstant: 35),
             
             // Month/Year Label
             monthYearLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 25),

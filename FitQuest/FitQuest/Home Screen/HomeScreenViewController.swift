@@ -337,9 +337,31 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
         let task = filteredTasks[indexPath.row]
-        print("Task tapped: \(task.title)")
-        // TODO: Navigate to task detail screen
+        print("📋 Task tapped: \(task.title)")
+        
+        // Show task detail bottom sheet
+        showTaskDetail(for: task)
+    }
+
+    // MARK: - Show Task Detail
+    private func showTaskDetail(for task: FitQuestTask) {
+        let detailVC = TaskDetailViewController(task: task)
+        
+        // ✅ Refresh list after deletion
+        detailVC.onTaskDeleted = { [weak self] in
+            self?.loadDueTasks()
+        }
+        
+        if let sheet = detailVC.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = false
+            sheet.preferredCornerRadius = 20
+        }
+        
+        present(detailVC, animated: true)
     }
     
     // MARK: - Task Completion

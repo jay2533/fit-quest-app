@@ -67,7 +67,7 @@ struct DailyProgress: Codable, Identifiable {
     var creativityCompleted: Int
     
     var totalCompleted: Int {
-        return physicalCompleted + mentalCompleted + socialCompleted
+        return physicalCompleted + mentalCompleted + socialCompleted + miscellaneousCompleted + creativityCompleted
     }
     
     init(id: String? = nil, date: Date, physicalCompleted: Int = 0,
