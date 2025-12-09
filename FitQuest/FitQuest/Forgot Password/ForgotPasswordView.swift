@@ -9,6 +9,9 @@ import UIKit
 
 class ForgotPasswordView: UIView {
     
+    var scrollView: UIScrollView!
+    var contentView: UIView!
+    
     var logoImageView: UIImageView!
     var titleLabel: UILabel!
     var subtitleLabel: UILabel!
@@ -20,6 +23,7 @@ class ForgotPasswordView: UIView {
         super.init(frame: frame)
         self.backgroundColor = UIColor(red: 0.08, green: 0.15, blue: 0.25, alpha: 1.0)
         
+        setupScrollView()
         setupLogoImageView()
         setupTitleLabel()
         setupSubtitleLabel()
@@ -30,6 +34,19 @@ class ForgotPasswordView: UIView {
         initConstraints()
     }
     
+    func setupScrollView() {
+        scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.backgroundColor = .clear
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(scrollView)
+        
+        contentView = UIView()
+        contentView.backgroundColor = .clear
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(contentView)
+    }
+    
     func setupLogoImageView() {
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
@@ -37,7 +54,7 @@ class ForgotPasswordView: UIView {
         logoImageView.image = UIImage(systemName: "lock.rotation", withConfiguration: config)
         logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(logoImageView)
+        contentView.addSubview(logoImageView)
     }
     
     func setupTitleLabel() {
@@ -47,7 +64,7 @@ class ForgotPasswordView: UIView {
         titleLabel.textColor = .white
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(titleLabel)
+        contentView.addSubview(titleLabel)
     }
     
     func setupSubtitleLabel() {
@@ -58,7 +75,7 @@ class ForgotPasswordView: UIView {
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(subtitleLabel)
+        contentView.addSubview(subtitleLabel)
     }
     
     func setupEmailTextField() {
@@ -85,7 +102,7 @@ class ForgotPasswordView: UIView {
         )
         
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(emailTextField)
+        contentView.addSubview(emailTextField)
     }
     
     func setupSendOTPButton() {
@@ -96,7 +113,7 @@ class ForgotPasswordView: UIView {
         sendOTPButton.backgroundColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         sendOTPButton.layer.cornerRadius = 25
         sendOTPButton.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(sendOTPButton)
+        contentView.addSubview(sendOTPButton)
     }
     
     func setupBackToLoginButton() {
@@ -106,36 +123,58 @@ class ForgotPasswordView: UIView {
         backToLoginButton.setTitleColor(UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0), for: .normal)
         backToLoginButton.backgroundColor = .clear
         backToLoginButton.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(backToLoginButton)
+        contentView.addSubview(backToLoginButton)
     }
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            logoImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 80),
+            // Scroll View
+            scrollView.topAnchor.constraint(equalTo: self.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            
+            // Content View
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            // Logo
+            logoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            logoImageView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 80),
             logoImageView.widthAnchor.constraint(equalToConstant: 90),
             logoImageView.heightAnchor.constraint(equalToConstant: 90),
             
+            // Title
             titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 20),
-            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 40),
-            titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -40),
+            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 40),
+            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -40),
             
+            // Subtitle
             subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15),
-            subtitleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 40),
-            subtitleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -40),
+            subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 40),
+            subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -40),
             
+            // Email
             emailTextField.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 40),
-            emailTextField.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 50),
-            emailTextField.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -50),
+            emailTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 50),
+            emailTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
             emailTextField.heightAnchor.constraint(equalToConstant: 50),
             
+            // Send Button
             sendOTPButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 30),
-            sendOTPButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 50),
-            sendOTPButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -50),
+            sendOTPButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 50),
+            sendOTPButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
             sendOTPButton.heightAnchor.constraint(equalToConstant: 50),
             
+            // Back Button
             backToLoginButton.topAnchor.constraint(equalTo: sendOTPButton.bottomAnchor, constant: 20),
-            backToLoginButton.centerXAnchor.constraint(equalTo: self.centerXAnchor)
+            backToLoginButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            
+            // Bottom padding
+            backToLoginButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -60)
         ])
     }
     

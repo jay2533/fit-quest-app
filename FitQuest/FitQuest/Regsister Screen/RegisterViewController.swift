@@ -49,6 +49,7 @@ class RegisterViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+        view.endEditing(true)
     }
     
     deinit {
@@ -73,6 +74,12 @@ class RegisterViewController: UIViewController {
         registerView.emailTextField.delegate = self
         registerView.passwordTextField.delegate = self
         registerView.dateOfBirthTextField.delegate = self
+        
+        // Set tint color for all text fields
+        [registerView.nameTextField, registerView.emailTextField,
+         registerView.passwordTextField, registerView.dateOfBirthTextField].forEach { textField in
+            textField?.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
+        }
     }
     
     private func setupKeyboardObservers() {
@@ -89,20 +96,63 @@ class RegisterViewController: UIViewController {
             name: UIResponder.keyboardWillHideNotification,
             object: nil
         )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillChangeFrame),
+            name: UIResponder.keyboardWillChangeFrameNotification,
+            object: nil
+        )
     }
     
-    // MARK: - Keyboard Handling
     @objc private func keyboardWillShow(notification: NSNotification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         
-        let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardFrame.height, right: 0)
-        registerView.scrollView.contentInset = contentInsets
-        registerView.scrollView.scrollIndicatorInsets = contentInsets
+        if keyboardFrame.height > 0 {
+            let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardFrame.height, right: 0)
+            registerView.scrollView.contentInset = contentInsets
+            registerView.scrollView.scrollIndicatorInsets = contentInsets
+            scrollToActiveTextField()
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: NSNotification) {
+        UIView.animate(withDuration: 0.3) {
+            self.registerView.scrollView.contentInset = .zero
+            self.registerView.scrollView.scrollIndicatorInsets = .zero
+        }
+    }
+
+    @objc private func keyboardWillChangeFrame(notification: NSNotification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        
+        if keyboardFrame.height > 0 {
+            let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardFrame.height, right: 0)
+            registerView.scrollView.contentInset = contentInsets
+            registerView.scrollView.scrollIndicatorInsets = contentInsets
+        } else {
+            registerView.scrollView.contentInset = .zero
+            registerView.scrollView.scrollIndicatorInsets = .zero
+        }
     }
     
-    @objc private func keyboardWillHide(notification: NSNotification) {
-        registerView.scrollView.contentInset = .zero
-        registerView.scrollView.scrollIndicatorInsets = .zero
+    private func scrollToActiveTextField() {
+        var activeTextField: UITextField?
+        
+        if registerView.nameTextField.isFirstResponder {
+            activeTextField = registerView.nameTextField
+        } else if registerView.emailTextField.isFirstResponder {
+            activeTextField = registerView.emailTextField
+        } else if registerView.passwordTextField.isFirstResponder {
+            activeTextField = registerView.passwordTextField
+        } else if registerView.dateOfBirthTextField.isFirstResponder {
+            activeTextField = registerView.dateOfBirthTextField
+        }
+        
+        if let textField = activeTextField {
+            let textFieldFrame = textField.convert(textField.bounds, to: registerView.scrollView)
+            registerView.scrollView.scrollRectToVisible(textFieldFrame, animated: true)
+        }
     }
     
     // MARK: - Date Picker
@@ -295,6 +345,17 @@ class RegisterViewController: UIViewController {
 
 // MARK: - UITextFieldDelegate
 extension RegisterViewController: UITextFieldDelegate {
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        // Clear any stuck selection
+        textField.selectedTextRange = nil
+        
+        // Scroll to field
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.scrollToActiveTextField()
+        }
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         switch textField {
         case registerView.nameTextField:
