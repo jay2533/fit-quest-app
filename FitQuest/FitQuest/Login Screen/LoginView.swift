@@ -54,9 +54,7 @@ class LoginView: UIView {
     func setupLogoImageView() {
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
-        let config = UIImage.SymbolConfiguration(pointSize: 80, weight: .medium)
-        logoImageView.image = UIImage(systemName: "arrow.up.heart.fill", withConfiguration: config)
-        logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
+        logoImageView.image = UIImage(named: "fitquest_logo")?.withRenderingMode(.alwaysOriginal)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(logoImageView)
     }
@@ -167,61 +165,51 @@ class LoginView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Scroll View
             scrollView.topAnchor.constraint(equalTo: self.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
-            // Content View
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            // Logo
             logoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             logoImageView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 60),
             logoImageView.widthAnchor.constraint(equalToConstant: 100),
             logoImageView.heightAnchor.constraint(equalToConstant: 100),
             
-            // App Name
             appNameLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 15),
             appNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 40),
             appNameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -40),
             
-            // Email
             emailTextField.topAnchor.constraint(equalTo: appNameLabel.bottomAnchor, constant: 60),
             emailTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 50),
             emailTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
             emailTextField.heightAnchor.constraint(equalToConstant: 50),
             
-            // Password
             passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 20),
             passwordTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 50),
             passwordTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
             passwordTextField.heightAnchor.constraint(equalToConstant: 50),
             
-            // Sign In Button
             signInButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 35),
             signInButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 50),
             signInButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
             signInButton.heightAnchor.constraint(equalToConstant: 50),
             
-            // Forgot Password
             forgotPasswordButton.topAnchor.constraint(equalTo: signInButton.bottomAnchor, constant: 20),
             forgotPasswordButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             forgotPasswordButton.heightAnchor.constraint(equalToConstant: 30),
             
-            // Register Section
             dontHaveAccountLabel.topAnchor.constraint(equalTo: forgotPasswordButton.bottomAnchor, constant: 40),
             dontHaveAccountLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor, constant: -40),
             
             registerButton.centerYAnchor.constraint(equalTo: dontHaveAccountLabel.centerYAnchor),
             registerButton.leadingAnchor.constraint(equalTo: dontHaveAccountLabel.trailingAnchor, constant: 5),
             
-            // Bottom padding
             registerButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40)
         ])
     }

@@ -36,9 +36,7 @@ class StatsScreenViewController: UIViewController {
     @objc func onLogoTapped() {
         navigationController?.popViewController(animated: true)
     }
-    
-    // MARK: - Data
-    
+        
     private func loadStats() {
         guard let uid = Auth.auth().currentUser?.uid else {
             statsView.radarView.values = [0, 0, 0, 0, 0]
@@ -81,8 +79,8 @@ class StatsScreenViewController: UIViewController {
         }
     }
     
-    /// Converts raw XP to [0–1] in the order:
-    /// Physical, Mental, Social, Creativity, Miscellaneous.
+    // Converts raw XP to [0–1] in the order:
+    // Physical, Mental, Social, Creativity, Miscellaneous.
     private func normalizeXP(_ xp: CategoryXP) -> [CGFloat] {
         let raw: [CGFloat] = [
             CGFloat(xp.physical),
@@ -99,7 +97,7 @@ class StatsScreenViewController: UIViewController {
         return raw.map { $0 / maxVal }
     }
     
-    /// Compute % of total for each category, as 0–100.
+    // Compute % of total for each category, as 0–100.
     private func computePercentages(from xpValues: [Int]) -> [CGFloat] {
         let total = xpValues.reduce(0, +)
         guard total > 0 else {

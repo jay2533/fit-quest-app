@@ -46,9 +46,7 @@ class LandingView: UIView {
     func setupLogoImageView() {
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
-        let config = UIImage.SymbolConfiguration(pointSize: 120, weight: .medium)
-        logoImageView.image = UIImage(systemName: "arrow.up.heart.fill", withConfiguration: config)
-        logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
+        logoImageView.image = UIImage(named: "fitquest_logo")?.withRenderingMode(.alwaysOriginal)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(logoImageView)
     }
@@ -86,42 +84,35 @@ class LandingView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Scroll View
             scrollView.topAnchor.constraint(equalTo: self.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
-            // Content View
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            // Logo - centered vertically with some top spacing
             logoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             logoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 120),
             logoImageView.widthAnchor.constraint(equalToConstant: 150),
             logoImageView.heightAnchor.constraint(equalToConstant: 150),
             
-            // App Name
             appNameLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 20),
             appNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 40),
             appNameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -40),
             
-            // Sign Up Button
             signUpButton.topAnchor.constraint(equalTo: appNameLabel.bottomAnchor, constant: 100),
             signUpButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 50),
             signUpButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
             signUpButton.heightAnchor.constraint(equalToConstant: 50),
             
-            // Log In Button
             logInButton.topAnchor.constraint(equalTo: signUpButton.bottomAnchor, constant: 20),
             logInButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             logInButton.heightAnchor.constraint(equalToConstant: 44),
             
-            // Bottom padding
             logInButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -60)
         ])
     }

@@ -32,26 +32,21 @@ class HomeScreenViewController: UIViewController {
         homeView.tasksTableView.delegate = self
         homeView.tasksTableView.dataSource = self
         
-        // Search functionality
         homeView.searchButton.addTarget(self, action: #selector(onSearchButtonTapped), for: .touchUpInside)
         homeView.searchTextField.delegate = self
         homeView.searchTextField.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
         homeView.customClearButton.addTarget(self, action: #selector(clearSearchText), for: .touchUpInside)
         
-        // Notification button
         homeView.notificationButton.addTarget(self, action: #selector(onNotificationTapped), for: .touchUpInside)
         
-        // Card tap gestures
         setupCardGestures()
         
         homeView.profileButton.addTarget(self, action: #selector(onProfileTapped), for: .touchUpInside)
         
-        // Tap anywhere to dismiss search
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissSearch))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
         
-        // Load data
         loadDueTasks()
         checkForUnreadNotifications()
         loadUserAIAvatar()
@@ -65,14 +60,11 @@ class HomeScreenViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
         
-        // Reload data
         loadDueTasks()
         checkForUnreadNotifications()
         loadUserAIAvatar()
     }
-    
-    // MARK: - Setup
-    
+        
     private func setupCardGestures() {
         let calendarTap = UITapGestureRecognizer(target: self, action: #selector(onCalendarTapped))
         homeView.calendarCardView.addGestureRecognizer(calendarTap)
@@ -92,7 +84,6 @@ class HomeScreenViewController: UIViewController {
         homeView.leaderboardsCardView.isUserInteractionEnabled = true
     }
     
-    // MARK: - Load User AI Avatar
     private func loadUserAIAvatar() {
         guard let userId = authService.currentUserId else { return }
         
@@ -135,12 +126,10 @@ class HomeScreenViewController: UIViewController {
             }
         }
     }
-    
-    // MARK: - Load Tasks from Firestore
-    
+        
     private func loadDueTasks() {
         guard let userId = authService.currentUserId else {
-            print("❌ No user logged in")
+            print(" No user logged in")
             return
         }
         
@@ -174,7 +163,7 @@ class HomeScreenViewController: UIViewController {
                 
             } catch {
                 await MainActor.run {
-                    print("❌ Failed to load tasks: \(error.localizedDescription)")
+                    print(" Failed to load tasks: \(error.localizedDescription)")
                     self.allTasks = []
                     self.filteredTasks = []
                     self.homeView.tasksTableView.reloadData()
@@ -182,9 +171,7 @@ class HomeScreenViewController: UIViewController {
             }
         }
     }
-    
-    // MARK: - Search Actions
-    
+        
     @objc func onSearchButtonTapped() {
         if !isSearchActive {
             isSearchActive = true
@@ -227,9 +214,7 @@ class HomeScreenViewController: UIViewController {
         homeView.hideSearchMode()
         homeView.tasksTableView.reloadData()
     }
-    
-    // MARK: - Notification Actions
-    
+        
     @objc func onNotificationTapped() {
         let notificationVC = NotificationDrawerViewController()
         notificationVC.modalPresentationStyle = .overFullScreen
@@ -257,9 +242,7 @@ class HomeScreenViewController: UIViewController {
             }
         }
     }
-    
-    // MARK: - Navigation Actions
-    
+        
     @objc func onCalendarTapped() {
         let calendarVC = CalendarScreenViewController()
         navigationController?.pushViewController(calendarVC, animated: true)
@@ -285,8 +268,6 @@ class HomeScreenViewController: UIViewController {
         navigationController?.pushViewController(profileVC, animated: true)
     }
 }
-
-// MARK: - UITableViewDelegate & UITableViewDataSource
 
 extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
     
@@ -340,7 +321,7 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let task = filteredTasks[indexPath.row]
-        print("📋 Task tapped: \(task.title)")
+        print(" Task tapped: \(task.title)")
         
         showTaskDetail(for: task)
     }
@@ -361,9 +342,7 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
         
         present(detailVC, animated: true)
     }
-    
-    // MARK: - Task Completion
-        
+            
     private func handleTaskCompletion(task: FitQuestTask, at indexPath: IndexPath) {
         guard let taskId = task.id, let userId = authService.currentUserId else { return }
         
@@ -402,21 +381,18 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.updateCompletionState(isCompleted: false, animated: true)
                     }
                 }
-                print("❌ Error: \(error.localizedDescription)")
+                print(" Error: \(error.localizedDescription)")
             }
         }
     }
     
-    // MARK: - XP Toast Helper
     private func showXPToast(_ message: String, for task: FitQuestTask) {
-        // Create toast with task title
         let toastContainer = UIView()
         toastContainer.backgroundColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 0.95)
         toastContainer.layer.cornerRadius = 12
         toastContainer.clipsToBounds = true
         toastContainer.translatesAutoresizingMaskIntoConstraints = false
         
-        // Task title
         let titleLabel = UILabel()
         titleLabel.text = task.title
         titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
@@ -424,7 +400,6 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // XP message
         let xpLabel = UILabel()
         xpLabel.text = message
         xpLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
@@ -453,7 +428,6 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
             xpLabel.bottomAnchor.constraint(equalTo: toastContainer.bottomAnchor, constant: -12)
         ])
         
-        // Animate in
         toastContainer.alpha = 0
         toastContainer.transform = CGAffineTransform(translationX: 0, y: 20)
         
@@ -471,15 +445,12 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
 
-    // MARK: - Alert Helper
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
 }
-
-// MARK: - UITextFieldDelegate
 
 extension HomeScreenViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

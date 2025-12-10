@@ -7,8 +7,6 @@
 
 import UIKit
 
-// MARK: - AddTaskDelegate
-
 extension CalendarScreenViewController: AddTaskDelegate {
     func didCreateTask(_ task: FitQuestTask) {
         print("✅ Task created successfully!")
@@ -18,11 +16,6 @@ extension CalendarScreenViewController: AddTaskDelegate {
         print("  Duration: \(task.duration) min")
         print("  XP: \(task.xpValue)")
         
-        // TODO: Reload tasks from Firebase for the selected date
-        // For now, just show success message
         showAlert(title: "Success", message: "Task '\(task.title)' created successfully!")
-        
-        // TODO: Refresh task list
-        // calendarView.tasksTableView.reloadData()
     }
 }

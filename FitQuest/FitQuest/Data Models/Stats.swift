@@ -7,7 +7,6 @@
 
 import Foundation
 
-// MARK: - Overall Stats Model
 struct OverallStats: Codable {
     var totalTasksCompleted: Int
     var totalXPEarned: Int
@@ -36,7 +35,6 @@ struct OverallStats: Codable {
     }
 }
 
-// MARK: - Category Stats Model
 struct CategoryStats: Codable {
     let category: TaskCategory
     var totalCompleted: Int
@@ -55,7 +53,6 @@ struct CategoryStats: Codable {
     }
 }
 
-// MARK: - Daily Progress Model
 struct DailyProgress: Codable, Identifiable {
     var id: String? // Date string "YYYY-MM-DD"
     let date: Date
@@ -84,7 +81,6 @@ struct DailyProgress: Codable, Identifiable {
     }
 }
 
-// MARK: - Weekly Stats Model
 struct WeeklyStats {
     let weekStartDate: Date
     let weekEndDate: Date
@@ -104,7 +100,6 @@ struct WeeklyStats {
     }
 }
 
-// MARK: - Category XP Model for Radar Chart
 struct CategoryXP {
     let physical: Int
     let mental: Int

@@ -9,14 +9,11 @@ import UIKit
 
 class TaskTableViewCell: UITableViewCell {
     
-    // MARK: - Properties
     static let identifier = "TaskTableViewCell"
     
     var onCheckboxTapped: (() -> Void)?
     var currentTask: FitQuestTask?
     var isTaskCompleted: Bool = false
-    
-    // MARK: - UI Components
     
     private let containerView: UIView = {
         let view = UIView()
@@ -49,7 +46,7 @@ class TaskTableViewCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        label.textColor = .white // ✅ White text for dark theme
+        label.textColor = .white
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -94,9 +91,7 @@ class TaskTableViewCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    // MARK: - Initialization
-    
+        
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -107,9 +102,7 @@ class TaskTableViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Setup
-    
+        
     private func setupUI() {
         backgroundColor = .clear
         selectionStyle = .none

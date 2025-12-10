@@ -6,17 +6,13 @@
 //
 import UIKit
 
-// MARK: - CategorySelectionDelegate
-
 extension CalendarScreenViewController: CategorySelectionDelegate {
     func didSelectCategory(_ category: TaskCategory, selectedDate: Date) {
         print("Category selected: \(category.displayName) for date: \(selectedDate)")
         
-        // Show TaskTypeSelection modal
         let taskTypeVC = TaskTypeSelectionViewController(category: category, selectedDate: selectedDate)
         taskTypeVC.delegate = self
         
-        // Present as modal sheet
         if let sheet = taskTypeVC.sheetPresentationController {
             sheet.detents = [.large()]
             sheet.prefersGrabberVisible = true
@@ -26,13 +22,10 @@ extension CalendarScreenViewController: CategorySelectionDelegate {
     }
 }
 
-// MARK: - TaskTypeSelectionDelegate
-
 extension CalendarScreenViewController: TaskTypeSelectionDelegate {
     func didSelectCustomTask(category: TaskCategory, selectedDate: Date) {
         print("Custom task selected for category: \(category.displayName)")
         
-        // Need to wait for TaskTypeSelection to dismiss first
         if let presentedVC = self.presentedViewController {
             presentedVC.dismiss(animated: true) {
                 self.showAddTaskForm(category: category, selectedDate: selectedDate, predefinedTask: nil)
@@ -45,7 +38,6 @@ extension CalendarScreenViewController: TaskTypeSelectionDelegate {
     func didSelectPredefinedTask(_ task: PredefinedTask, category: TaskCategory, selectedDate: Date) {
         print("Predefined task selected: \(task.title)")
         
-        // Need to wait for TaskTypeSelection to dismiss first
         if let presentedVC = self.presentedViewController {
             presentedVC.dismiss(animated: true) {
                 self.showAddTaskForm(category: category, selectedDate: selectedDate, predefinedTask: task)

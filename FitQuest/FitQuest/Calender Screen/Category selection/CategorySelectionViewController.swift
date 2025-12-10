@@ -41,7 +41,6 @@ class CategorySelectionViewController: UIViewController {
     }
     
     func setupActions() {
-        // Add target to all category buttons
         for (index, button) in categoryView.categoryButtons.enumerated() {
             button.addTarget(self, action: #selector(onCategoryTapped(_:)), for: .touchUpInside)
         }
@@ -51,7 +50,6 @@ class CategorySelectionViewController: UIViewController {
         let category = TaskCategory.allCases[sender.tag]
         print("Category selected: \(category.displayName)")
         
-        // Dismiss this sheet first, then notify delegate
         dismiss(animated: true) {
             self.delegate?.didSelectCategory(category, selectedDate: self.selectedDate)
         }

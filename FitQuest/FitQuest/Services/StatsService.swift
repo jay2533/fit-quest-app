@@ -5,7 +5,6 @@
 //  Created by Sunny Yadav on 12/2/25.
 //
 
-
 import Foundation
 import FirebaseFirestore
 
@@ -16,7 +15,6 @@ class StatsService {
     
     private init() {}
     
-    // MARK: Update Stats After Task Completion
     func updateStatsAfterTaskCompletion(userId: String, task: FitQuestTask) async throws {
         // Update overall stats
         try await updateOverallStats(userId: userId, xpEarned: task.xpValue)
@@ -34,7 +32,6 @@ class StatsService {
         try await updateStreak(userId: userId)
     }
     
-    // MARK: - Reverse Stats After Task Unmark
     func reverseStatsAfterUnmark(userId: String, task: FitQuestTask) async throws {
         // Reverse overall stats
         try await reverseOverallStats(userId: userId, xpEarned: task.xpValue)
@@ -51,7 +48,6 @@ class StatsService {
         // DON'T reverse streaks (keep for motivation)
     }
     
-    // MARK: - Update Overall Stats
     private func updateOverallStats(userId: String, xpEarned: Int) async throws {
         let statsRef = database.collection("stats")
             .document(userId)
@@ -65,7 +61,6 @@ class StatsService {
         ])
     }
     
-    // MARK: - Reverse Overall Stats
     private func reverseOverallStats(userId: String, xpEarned: Int) async throws {
         let statsRef = database.collection("stats")
             .document(userId)
@@ -79,7 +74,6 @@ class StatsService {
         ])
     }
     
-    // MARK: - Update Category Stats (AUTO-CREATE if missing)
     private func updateCategoryStats(userId: String, category: TaskCategory, xpEarned: Int) async throws {
         let categoryRef = database.collection("stats")
             .document(userId)
@@ -95,7 +89,7 @@ class StatsService {
             "averageCompletionRate": 0.0  // Only used if creating new document
         ], merge: true)
         
-        print("✅ Updated category stats for \(category.rawValue)")
+        print("Updated category stats for \(category.rawValue)")
     }
     
     // MARK: - Reverse Category Stats (with existence check)
@@ -114,10 +108,10 @@ class StatsService {
                 "totalCompleted": FieldValue.increment(Int64(-1)),
                 "totalXPEarned": FieldValue.increment(Int64(-xpEarned))
             ])
-            print("✅ Reversed category stats for \(category.rawValue)")
+            print(" Reversed category stats for \(category.rawValue)")
         } else {
             // Document doesn't exist - create it with 0 values (shouldn't happen in normal flow)
-            print("⚠️ Category stats for \(category.rawValue) doesn't exist, creating with 0 values")
+            print(" Category stats for \(category.rawValue) doesn't exist, creating with 0 values")
             try await categoryRef.setData([
                 "category": category.rawValue,
                 "totalCompleted": 0,
@@ -128,7 +122,6 @@ class StatsService {
         }
     }
     
-    // MARK: - Update Daily Progress
     private func updateDailyProgress(userId: String, category: TaskCategory, xpEarned: Int) async throws {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -178,7 +171,6 @@ class StatsService {
         }
     }
     
-    // MARK: - Reverse Daily Progress
     private func reverseDailyProgress(userId: String, category: TaskCategory, xpEarned: Int) async throws {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -210,7 +202,6 @@ class StatsService {
         ])
     }
     
-    // MARK: - Update User Level (WITHOUT adding XP)
     private func updateUserLevel(userId: String) async throws {
         let userRef = database.collection("users").document(userId)
         
@@ -230,29 +221,6 @@ class StatsService {
         ])
     }
     
-    // MARK: - Original updateUserXP (for potential future use)
-    // This is kept as a private helper but NOT used in task completion flow
-    
-//    private func updateUserXP(userId: String, xpEarned: Int) async throws {
-//        let userRef = database.collection("users").document(userId)
-//        
-//        // Get current XP to calculate level
-//        let document = try await userRef.getDocument()
-//        guard let currentXP = document.data()?["totalXP"] as? Int else { return }
-//        
-//        let newXP = currentXP + xpEarned
-//        let newLevel = Constants.Levels.getLevel(xp: newXP)
-//        let newTier = Constants.Levels.getTier(xp: newXP)
-//        
-//        try await userRef.updateData([
-//            "totalXP": newXP,
-//            "currentLevel": newLevel,
-//            "currentTier": newTier,
-//            "lastActive": FieldValue.serverTimestamp()
-//        ])
-//    }
-    
-    // MARK: - Update Streak
     private func updateStreak(userId: String) async throws {
         let statsRef = database.collection("stats")
             .document(userId)
@@ -285,10 +253,8 @@ class StatsService {
                 "currentStreak": 1
             ])
         }
-        // If today, streak stays the same
     }
     
-    // MARK: - Fetch Overall Stats
     func fetchOverallStats(userId: String) async throws -> OverallStats {
         let document = try await database.collection("stats")
             .document(userId)
@@ -299,7 +265,6 @@ class StatsService {
         return try document.data(as: OverallStats.self)
     }
     
-    // MARK: - Fetch Category Stats
     func fetchCategoryStats(userId: String) async throws -> [CategoryStats] {
         let snapshot = try await database.collection("stats")
             .document(userId)
@@ -311,7 +276,6 @@ class StatsService {
         }
     }
     
-    // MARK: - Fetch Daily Progress
     func fetchDailyProgress(userId: String, startDate: Date, endDate: Date) async throws -> [DailyProgress] {
         let snapshot = try await database.collection("stats")
             .document(userId)
@@ -328,7 +292,6 @@ class StatsService {
         }
     }
     
-    // MARK: - Fetch Weekly Progress
     func fetchWeeklyProgress(userId: String) async throws -> [DailyProgress] {
         let calendar = Calendar.current
         let today = Date()
@@ -337,7 +300,6 @@ class StatsService {
         return try await fetchDailyProgress(userId: userId, startDate: weekAgo, endDate: today)
     }
     
-    // MARK: - Fetch Monthly Progress
     func fetchMonthlyProgress(userId: String) async throws -> [DailyProgress] {
         let calendar = Calendar.current
         let today = Date()
@@ -346,8 +308,6 @@ class StatsService {
         return try await fetchDailyProgress(userId: userId, startDate: monthAgo, endDate: today)
     }
 }
-
-// MARK: - Radar Chart XP Fetch
 
 extension StatsService {
     

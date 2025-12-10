@@ -8,8 +8,6 @@
 import UIKit
 import FirebaseAuth
 
-// MARK: - UITableViewDelegate & UITableViewDataSource
-
 extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -26,10 +24,8 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         
         let task = tasks[indexPath.row]
         
-        // Configure cell with task data
         cell.configure(with: task, isCompleted: task.isCompleted)
         
-        // Handle checkbox tap with Firebase persistence
         cell.onCheckboxTapped = { [weak self] in
             self?.handleTaskCompletion(task: task, cell: cell)
         }
@@ -41,26 +37,20 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         return 78
     }
     
-    // MARK: - Show Task Detail on Tap
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let task = tasks[indexPath.row]
         print("📋 Task cell tapped: \(task.title)")
         
-        // Show task detail bottom sheet
         showTaskDetail(for: task)
     }
     
-    // MARK: - Swipe-to-Delete (Swipe RIGHT)
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let task = tasks[indexPath.row]
         
-        // ✅ CHECK: Only allow delete for incomplete tasks
         if task.isCompleted {
-            // Completed task - show "Cannot Delete" action (disabled style)
             let cannotDeleteAction = UIContextualAction(style: .normal, title: "Completed") { [weak self] (action, view, completionHandler) in
-                // Show message
                 self?.showCannotDeleteCompletedAlert()
                 completionHandler(false)
             }
@@ -74,7 +64,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
             return configuration
             
         } else {
-            // Incomplete task - allow delete
             let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, view, completionHandler) in
                 self?.confirmDeleteTask(task: task, at: indexPath)
                 completionHandler(true)
@@ -90,7 +79,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    // MARK: - Show Task Detail
     private func showTaskDetail(for task: FitQuestTask) {
         let detailVC = TaskDetailViewController(task: task)
         
@@ -103,7 +91,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         present(detailVC, animated: true)
     }
     
-    // MARK: - Delete Confirmation
     private func confirmDeleteTask(task: FitQuestTask, at indexPath: IndexPath) {
         let alert = UIAlertController(
             title: "Delete Task?",
@@ -120,25 +107,21 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         present(alert, animated: true)
     }
     
-    // MARK: - Delete Task
     private func deleteTask(task: FitQuestTask, at indexPath: IndexPath) {
         guard let taskId = task.id else { return }
         
         Task {
             do {
-                // Delete from Firebase
                 try await TaskService.shared.deleteTask(taskId: taskId)
                 
                 print("🗑️ Task deleted: \(task.title)")
                 
-                // Show confirmation toast
                 await MainActor.run {
                     showXPToast("Task deleted")
                 }
                 
             } catch {
                 await MainActor.run {
-                    // ✅ More specific error message
                     self.showErrorToast("Failed to unmark task")
                 }
                 print("❌ Error deleting task: \(error)")
@@ -146,7 +129,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    // MARK: - Task Completion Handler
     private func handleTaskCompletion(task: FitQuestTask, cell: TaskTableViewCell) {
         guard let taskId = task.id else {
             print("❌ Task ID missing")
@@ -162,9 +144,7 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    // MARK: - Mark Task Complete
     private func markTaskComplete(taskId: String, task: FitQuestTask, cell: TaskTableViewCell) {
-        // Update to completed state (removes overdue styling)
         cell.updateCompletionState(isCompleted: true, isOverdue: false, animated: true)
         
         Task {
@@ -176,10 +156,8 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
                     return
                 }
                 
-                // 1. Mark task complete (awards XP)
                 try await TaskService.shared.completeTask(taskId: taskId)
                 
-                // 2. Update stats (no XP, just stats + level/tier)
                 try await StatsService.shared.updateStatsAfterTaskCompletion(userId: userId, task: task)
                 
                 await MainActor.run {
@@ -188,7 +166,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
                 
             } catch {
                 await MainActor.run {
-                    // Revert to overdue state if was overdue
                     let isOverdue = task.scheduledTime < Date()
                     cell.updateCompletionState(isCompleted: false, isOverdue: isOverdue, animated: true)
                     self.showErrorToast("Failed to complete task")
@@ -197,7 +174,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         }
     }
 
-    // MARK: - Unmark Task
     private func unmarkTask(taskId: String, task: FitQuestTask, cell: TaskTableViewCell) {
         Task {
             do {
@@ -208,14 +184,11 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
                     return
                 }
                 
-                // 1. Unmark task (deducts XP)
                 try await TaskService.shared.unmarkTask(taskId: taskId)
                 
-                // 2. Reverse stats (task counts, category XP, daily progress)
                 try await StatsService.shared.reverseStatsAfterUnmark(userId: userId, task: task)
                 
                 await MainActor.run {
-                    // Check if task is now overdue when unmarking
                     let isOverdue = task.scheduledTime < Date()
                     cell.updateCompletionState(isCompleted: false, isOverdue: isOverdue, animated: true)
                     showXPToast("-\(task.xpValue) XP")
@@ -224,13 +197,11 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
             } catch let error as NSError {
                 if error.code == -2 {
                     await MainActor.run {
-                        // Revert to completed state
                         cell.updateCompletionState(isCompleted: true, isOverdue: false, animated: true)
                         showCannotUnmarkAlert()
                     }
                 } else {
                     await MainActor.run {
-                        // Revert to completed state
                         cell.updateCompletionState(isCompleted: true, isOverdue: false, animated: true)
                         self.showErrorToast("Failed to unmark task")
                     }
@@ -239,7 +210,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    // MARK: - UI Helpers
     private func showCannotUnmarkAlert() {
         let alert = UIAlertController(
             title: "Cannot Undo",
@@ -250,7 +220,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         present(alert, animated: true)
     }
     
-    // Cannot Delete Completed Task Alert
     private func showCannotDeleteCompletedAlert() {
         let alert = UIAlertController(
             title: "Cannot Delete",

@@ -13,13 +13,11 @@ protocol CategoryFilterDelegate: AnyObject {
 
 class CategoryFilterViewController: UIViewController {
     
-    // MARK: - Properties
     weak var delegate: CategoryFilterDelegate?
     var selectedCategory: TaskCategory?
     
     private let categories: [TaskCategory?] = [nil, .mental, .physical, .social, .creativity, .miscellaneous]
     
-    // MARK: - UI Components
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Filter by Category"
@@ -38,13 +36,11 @@ class CategoryFilterViewController: UIViewController {
         return table
     }()
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
     
-    // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = UIColor(red: 0.08, green: 0.15, blue: 0.25, alpha: 1.0)
         
@@ -68,7 +64,6 @@ class CategoryFilterViewController: UIViewController {
     }
 }
 
-// MARK: - UITableViewDelegate & DataSource
 extension CategoryFilterViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -99,12 +94,10 @@ extension CategoryFilterViewController: UITableViewDelegate, UITableViewDataSour
     }
 }
 
-// MARK: - Custom Cell with SF Symbol Icons
 class CategoryFilterCell: UITableViewCell {
     
     static let identifier = "CategoryFilterCell"
     
-    // MARK: - UI Components
     private let iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -131,7 +124,6 @@ class CategoryFilterCell: UITableViewCell {
         return imageView
     }()
     
-    // MARK: - Initialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -141,7 +133,6 @@ class CategoryFilterCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Setup
     private func setupUI() {
         backgroundColor = .clear
         selectionStyle = .none
@@ -167,7 +158,6 @@ class CategoryFilterCell: UITableViewCell {
         ])
     }
     
-    // MARK: - Configuration
     func configure(category: TaskCategory?, isSelected: Bool) {
         if let category = category {
             iconImageView.image = UIImage(systemName: getCategoryIcon(for: category))
@@ -180,7 +170,6 @@ class CategoryFilterCell: UITableViewCell {
         checkmarkImageView.isHidden = !isSelected
     }
     
-    // MARK: - Helper
     private func getCategoryIcon(for category: TaskCategory) -> String {
         switch category {
         case .physical:

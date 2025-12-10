@@ -16,23 +16,14 @@ class CalendarScreenViewController: UIViewController {
     var currentWeekDates: [Date] = []
     
     // Real task data from Firebase
-    var tasks: [FitQuestTask] = [] // Replaces dummyTasks
-    private var taskListener: ListenerRegistration? // Real-time listener
+    var tasks: [FitQuestTask] = []
+    private var taskListener: ListenerRegistration?
     
     // Loading indicator
     private var loadingIndicator: UIActivityIndicatorView!
     
     // Refresh control
     private var refreshControl: UIRefreshControl!
-    
-    // ✅ Keep dummy data temporarily for reference (we'll remove this later)
-    var dummyTasks: [(name: String, category: String, time: String, completion: String)] = [
-        ("Read 20 pages", "Mental", "Today 5:00 PM", "1/1"),
-        ("Morning run", "Physical", "Today 7:00 PM", "0/1"),
-        ("Meditate", "Mental", "Tomorrow 8:00 AM", "0/1"),
-        ("Good diet", "Physical", "Today", "0/2"),
-        ("Daily journal", "Creativity", "Today", "1/1")
-    ]
     
     // Store date picker reference
     var tempDatePicker: UIDatePicker?
@@ -46,42 +37,30 @@ class CalendarScreenViewController: UIViewController {
         
         navigationController?.setNavigationBarHidden(true, animated: false)
         
-        // Set up table view
         calendarView.tasksTableView.delegate = self
         calendarView.tasksTableView.dataSource = self
-        
         calendarView.tasksTableView.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.identifier)
-        
         calendarView.tasksTableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 80, right: 0)
         calendarView.tasksTableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 80, right: 0)
             
         setupLoadingIndicator()
-        
         setupRefreshControl()
         
         calendarView.previousWeekButton.addTarget(self, action: #selector(onPreviousWeekTapped), for: .touchUpInside)
         calendarView.nextWeekButton.addTarget(self, action: #selector(onNextWeekTapped), for: .touchUpInside)
-        
         calendarView.backButton.addTarget(self, action: #selector(onBackTapped), for: .touchUpInside)
-        
-        // Set up collection view
         calendarView.weekCollectionView.delegate = self
         calendarView.weekCollectionView.dataSource = self
         
-        // Initialize current week
         loadCurrentWeek()
         
-        // Fetch tasks for today
         fetchTasks(for: selectedDate)
         
-        // Add button actions
         calendarView.addTaskButton.addTarget(self, action: #selector(onAddTaskTapped), for: .touchUpInside)
         
-        // Logo tap gesture (no longer needed for back, but harmless)
         let logoTapGesture = UITapGestureRecognizer(target: self, action: #selector(onLogoTapped))
         calendarView.logoImageView.addGestureRecognizer(logoTapGesture)
         
-        // Month/Year tap gesture
         let monthTapGesture = UITapGestureRecognizer(target: self, action: #selector(onMonthYearTapped))
         calendarView.monthYearLabel.addGestureRecognizer(monthTapGesture)
     }
@@ -101,23 +80,18 @@ class CalendarScreenViewController: UIViewController {
         // Remove Firebase listener
         taskListener?.remove()
     }
-    
-    // MARK: - Week Management
-    
+        
     func loadCurrentWeek() {
         currentWeekDates = getWeekDates(for: selectedDate)
         calendarView.weekCollectionView.reloadData()
         updateMonthYearLabel()
         
-        // Fetch tasks when week changes
         fetchTasks(for: selectedDate)
     }
     
-    // MARK: - Firebase Methods
-
     func fetchTasks(for date: Date) {
         guard let userId = Auth.auth().currentUser?.uid else {
-                print("❌ No user logged in")
+                print("No user logged in")
                 // Show error to user
                 showErrorAlert(
                     title: "Authentication Error",
@@ -127,10 +101,8 @@ class CalendarScreenViewController: UIViewController {
                 return
             }
         
-        // Remove existing listener if any
         taskListener?.remove()
         
-        // ✅ Show loading indicator
         showLoading(true)
         
         // Clear tasks immediately when date changes
@@ -160,14 +132,14 @@ class CalendarScreenViewController: UIViewController {
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self = self else { return }
                 
-                // ✅ Hide loading indicator on any response
+                // Hide loading indicator on any response
                 self.showLoading(false)
                 
                 if let error = error {
-                    print("❌ Error fetching tasks: \(error.localizedDescription)")
+                    print("Error fetching tasks: \(error.localizedDescription)")
                     self.tasks = []
                     
-                    // ✅ Show user-friendly error
+                    // Show user-friendly error
                     let errorMessage = self.getErrorMessage(for: error)
                     self.showErrorToast(errorMessage)
                     
@@ -179,7 +151,7 @@ class CalendarScreenViewController: UIViewController {
                 }
                 
                 guard let snapshot = snapshot else {
-                    print("⚠️ No snapshot received")
+                    print("No snapshot received")
                     return
                 }
                 
@@ -189,22 +161,22 @@ class CalendarScreenViewController: UIViewController {
                     return
                 }
                 
-                let source = snapshot.metadata.isFromCache ? "📦 CACHE" : "☁️ SERVER"
-                print("\n🔄 Snapshot received [\(source)] with \(snapshot.documents.count) documents")
+                let source = snapshot.metadata.isFromCache ? "CACHE" : "SERVER"
+                print("\n Snapshot received [\(source)] with \(snapshot.documents.count) documents")
                 
                 for change in snapshot.documentChanges {
                     switch change.type {
                     case .added:
-                        print("   ➕ Added: \(change.document.documentID)")
+                        print("   Added: \(change.document.documentID)")
                     case .modified:
-                        print("   ✏️ Modified: \(change.document.documentID)")
+                        print("    Modified: \(change.document.documentID)")
                     case .removed:
-                        print("   ➖ Removed: \(change.document.documentID)")
+                        print("    Removed: \(change.document.documentID)")
                     }
                 }
                 
                 if snapshot.documents.isEmpty {
-                    print("📭 No tasks found for this date")
+                    print(" No tasks found for this date")
                     self.tasks = []
                     DispatchQueue.main.async {
                         self.calendarView.tasksTableView.reloadData()
@@ -228,7 +200,7 @@ class CalendarScreenViewController: UIViewController {
                           let xpValue = data["xpValue"] as? Int,
                           let isCompleted = data["isCompleted"] as? Bool,
                           let createdAtTimestamp = data["createdAt"] as? Timestamp else {
-                        print("⚠️ Failed to parse task: \(document.documentID)")
+                        print(" Failed to parse task: \(document.documentID)")
                         return nil
                     }
                     
@@ -261,12 +233,12 @@ class CalendarScreenViewController: UIViewController {
                 
                 self.tasks.sort { $0.scheduledTime < $1.scheduledTime }
                 
-                print("✅ Successfully parsed \(self.tasks.count) tasks")
+                print(" Successfully parsed \(self.tasks.count) tasks")
                 
                 DispatchQueue.main.async {
                     self.calendarView.tasksTableView.reloadData()
                     self.showEmptyState(show: false)
-                    print("🔄 Table view reloaded with \(self.tasks.count) tasks\n")
+                    print(" Table view reloaded with \(self.tasks.count) tasks\n")
                 }
             }
     }
@@ -295,8 +267,7 @@ class CalendarScreenViewController: UIViewController {
     }
     
     func showEmptyState() {
-        // TODO: Add empty state view
-        print("📭 No tasks for this date")
+        print("No tasks for this date")
     }
     
     func getWeekDates(for date: Date) -> [Date] {
@@ -313,9 +284,7 @@ class CalendarScreenViewController: UIViewController {
         }
         return dates
     }
-    
-    // MARK: - Actions
-    
+        
     @objc func onPreviousWeekTapped() {
         guard let newDate = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: selectedDate) else { return }
         selectedDate = newDate
@@ -365,7 +334,6 @@ class CalendarScreenViewController: UIViewController {
         let pickerVC = UIViewController()
         pickerVC.view.backgroundColor = UIColor(red: 0.08, green: 0.15, blue: 0.25, alpha: 1.0)
         
-        // Title
         let titleLabel = UILabel()
         titleLabel.text = "Select Date"
         titleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
@@ -373,8 +341,7 @@ class CalendarScreenViewController: UIViewController {
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         pickerVC.view.addSubview(titleLabel)
-        
-        // Date picker
+
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .inline
@@ -384,10 +351,8 @@ class CalendarScreenViewController: UIViewController {
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         pickerVC.view.addSubview(datePicker)
         
-        // Store reference
         tempDatePicker = datePicker
         
-        // Done button
         let doneButton = UIButton(type: .system)
         doneButton.setTitle("Done", for: .normal)
         doneButton.setTitleColor(.white, for: .normal)
@@ -398,7 +363,6 @@ class CalendarScreenViewController: UIViewController {
         doneButton.addTarget(self, action: #selector(onDatePickerDone), for: .touchUpInside)
         pickerVC.view.addSubview(doneButton)
         
-        // Cancel button
         let cancelButton = UIButton(type: .system)
         cancelButton.setTitle("Cancel", for: .normal)
         cancelButton.setTitleColor(.lightGray, for: .normal)
@@ -469,24 +433,19 @@ class CalendarScreenViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-    // MARK: - Empty State
-
     func showEmptyState(show: Bool) {
         if show {
-            // Create empty state view
             let emptyStateView = UIView()
             emptyStateView.backgroundColor = .clear
             emptyStateView.tag = 999 // Tag to find and remove later
             emptyStateView.translatesAutoresizingMaskIntoConstraints = false
             
-            // Icon
             let iconImageView = UIImageView()
             iconImageView.image = UIImage(systemName: "calendar.badge.clock")
             iconImageView.tintColor = UIColor.lightGray.withAlphaComponent(0.5)
             iconImageView.contentMode = .scaleAspectFit
             iconImageView.translatesAutoresizingMaskIntoConstraints = false
             
-            // Title
             let titleLabel = UILabel()
             titleLabel.text = "No tasks for this date"
             titleLabel.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
@@ -494,7 +453,6 @@ class CalendarScreenViewController: UIViewController {
             titleLabel.textAlignment = .center
             titleLabel.translatesAutoresizingMaskIntoConstraints = false
             
-            // Subtitle
             let subtitleLabel = UILabel()
             subtitleLabel.text = "Tap + to create a new task"
             subtitleLabel.font = UIFont.systemFont(ofSize: 14, weight: .regular)
@@ -529,7 +487,6 @@ class CalendarScreenViewController: UIViewController {
             ])
             
         } else {
-            // Remove empty state view
             calendarView.tasksTableView.subviews.forEach { subview in
                 if subview.tag == 999 {
                     subview.removeFromSuperview()
@@ -538,11 +495,9 @@ class CalendarScreenViewController: UIViewController {
         }
     }
     
-    // MARK: - Loading Indicator
-
     func setupLoadingIndicator() {
         loadingIndicator = UIActivityIndicatorView(style: .large)
-        loadingIndicator.color = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0) // Blue color
+        loadingIndicator.color = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
         loadingIndicator.hidesWhenStopped = true
         
@@ -564,8 +519,6 @@ class CalendarScreenViewController: UIViewController {
         }
     }
     
-    // MARK: - Error Handling
-
     func showErrorAlert(title: String, message: String, retryAction: (() -> Void)? = nil) {
         DispatchQueue.main.async {
             let alert = UIAlertController(
@@ -574,10 +527,8 @@ class CalendarScreenViewController: UIViewController {
                 preferredStyle: .alert
             )
             
-            // Always add OK button
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             
-            // Add Retry button if retry action provided
             if let retryAction = retryAction {
                 alert.addAction(UIAlertAction(title: "Retry", style: .default) { _ in
                     retryAction()
@@ -624,8 +575,6 @@ class CalendarScreenViewController: UIViewController {
         }
     }
     
-    // MARK: - Pull to Refresh
-
     private func setupRefreshControl() {
         refreshControl = UIRefreshControl()
         refreshControl.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0) // Blue color
@@ -635,7 +584,7 @@ class CalendarScreenViewController: UIViewController {
     }
 
     @objc private func handleRefresh() {
-        print("🔄 Manual refresh triggered")
+        print("Manual refresh triggered")
         
         // Re-fetch tasks for current date
         fetchTasks(for: selectedDate)

@@ -13,15 +13,12 @@ import FirebaseStorage
 
 class ProfileViewController: UIViewController {
     
-    // MARK: - Properties
     private let profileView = ProfileView()
     private let authService = AuthService.shared
     private let firestoreService = FirestoreService.shared
     private let database = Firestore.firestore()
-    
     private var currentUser: User?
     
-    // MARK: - Lifecycle
     override func loadView() {
         view = profileView
     }
@@ -42,7 +39,6 @@ class ProfileViewController: UIViewController {
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
-    // MARK: - Setup
     private func setupViewController() {
         navigationItem.hidesBackButton = true
     }
@@ -55,7 +51,6 @@ class ProfileViewController: UIViewController {
         profileView.deleteAccountButton.addTarget(self, action: #selector(handleDeleteAccount), for: .touchUpInside)
     }
     
-    // MARK: - Load User Data
     private func loadUserData() {
         guard let userId = authService.currentUserId else {
             showAlert(title: "Error", message: "No user logged in")
@@ -87,17 +82,14 @@ class ProfileViewController: UIViewController {
     }
     
     private func displayUserData(data: [String: Any]) {
-        // Name
         if let name = data["name"] as? String {
             profileView.nameValueLabel.text = name
         }
         
-        // Email
         if let email = data["email"] as? String {
             profileView.emailValueLabel.text = email
         }
         
-        // Date of Birth
         if let dobTimestamp = data["dateOfBirth"] as? Timestamp {
             let dob = dobTimestamp.dateValue()
             profileView.dobValueLabel.text = DateFormatter.dayMonthYear.string(from: dob)
@@ -105,29 +97,23 @@ class ProfileViewController: UIViewController {
             profileView.dobValueLabel.text = "Not set"
         }
         
-        // XP
         if let xp = data["totalXP"] as? Int {
             profileView.xpValueLabel.text = "\(xp)"
         }
         
-        // Level
         if let level = data["currentLevel"] as? Int {
             profileView.levelValueLabel.text = "\(level)"
         }
         
-        // Tier
         if let tier = data["currentTier"] as? Int {
             let tierText = tier == 1 ? "I" : tier == 2 ? "II" : "III"
             profileView.tierValueLabel.text = tierText
         }
         
-        // Profile Image
         if let imageURL = data["profileImageURL"] as? String, !imageURL.isEmpty {
             loadProfileImage(from: imageURL)
         }
         
-        // AI Avatar (placeholder for now)
-        // TODO: Generate AI avatar based on user data
         generateAIAvatar()
     }
     
@@ -201,11 +187,10 @@ class ProfileViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    // MARK: - Logout
     private func performLogout() {
         guard let userId = authService.currentUserId else { return }
         
-        // 🔥 Clear notification read states
+        // Clear notification read states
         NotificationStateManager.shared.clearAllReadStates(userId: userId)
         
         do {
@@ -344,7 +329,6 @@ class ProfileViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    // MARK: - Edit User Fields
     private func updateUserField(field: String, value: Any) {
         guard let userId = authService.currentUserId else { return }
         
@@ -372,8 +356,7 @@ class ProfileViewController: UIViewController {
         }
     }
     
-    // MARK: - Edit Alerts
-    private func showEditAlert(title: String, message: String, currentValue: String, 
+    private func showEditAlert(title: String, message: String, currentValue: String,
                               fieldType: UITextContentType, completion: @escaping (String) -> Void) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         
@@ -425,7 +408,7 @@ class ProfileViewController: UIViewController {
         guard let name = profileView.nameValueLabel.text else { return }
         
         Task {
-            // 🔥 Use shared avatar generator (same as home screen)
+            // Use shared avatar generator (same as home screen)
             let avatar = await AvatarGenerator.shared.getAIAvatar(name: name, size: 120)
             
             await MainActor.run {
@@ -435,7 +418,6 @@ class ProfileViewController: UIViewController {
     }
 }
 
-// MARK: - Alert Protocol
 extension ProfileViewController: AlertProtocol {
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -444,7 +426,6 @@ extension ProfileViewController: AlertProtocol {
     }
 }
 
-// MARK: - Loading Indicator Protocol
 extension ProfileViewController: LoadingIndicatorProtocol {
     func showLoadingIndicator() {
         hideLoadingIndicator()

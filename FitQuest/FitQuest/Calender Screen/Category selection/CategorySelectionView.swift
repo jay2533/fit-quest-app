@@ -38,7 +38,6 @@ class CategorySelectionView: UIView {
     }
     
     func setupCategoryButtons() {
-        // Create vertical stack view
         categoryStackView = UIStackView()
         categoryStackView.axis = .vertical
         categoryStackView.spacing = 16
@@ -46,7 +45,6 @@ class CategorySelectionView: UIView {
         categoryStackView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(categoryStackView)
         
-        // Create buttons for each category
         for (index, category) in TaskCategory.allCases.enumerated() {
             let button = createCategoryButton(for: category, tag: index)
             categoryButtons.append(button)
@@ -58,7 +56,6 @@ class CategorySelectionView: UIView {
         let button = UIButton(type: .custom)
         button.tag = tag
         
-        // Container stack view (horizontal: icon + label)
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 16
@@ -66,14 +63,12 @@ class CategorySelectionView: UIView {
         stackView.isUserInteractionEnabled = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Icon
         let iconConfig = UIImage.SymbolConfiguration(pointSize: 32, weight: .medium)
         let iconImageView = UIImageView(image: UIImage(systemName: category.icon, withConfiguration: iconConfig))
         iconImageView.tintColor = .white
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Label
         let label = UILabel()
         label.text = category.displayName
         label.font = .systemFont(ofSize: 18, weight: .semibold)
@@ -85,7 +80,6 @@ class CategorySelectionView: UIView {
         
         button.addSubview(stackView)
         
-        // Button styling
         button.backgroundColor = UIColor.white.withAlphaComponent(0.1)
         button.layer.cornerRadius = 16
         button.layer.borderWidth = 1.5
@@ -118,7 +112,6 @@ class CategorySelectionView: UIView {
         ])
     }
     
-    // Helper: Convert hex string to UIColor
     func hexStringToUIColor(hex: String) -> UIColor {
         var cString: String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         

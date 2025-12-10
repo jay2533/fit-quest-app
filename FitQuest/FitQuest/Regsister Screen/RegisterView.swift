@@ -60,10 +60,7 @@ class RegisterView: UIView {
     func setupLogoImageView() {
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
-        // Using SF Symbol as placeholder
-        let config = UIImage.SymbolConfiguration(pointSize: 70, weight: .medium)
-        logoImageView.image = UIImage(systemName: "arrow.up.heart.fill", withConfiguration: config)
-        logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
+        logoImageView.image = UIImage(named: "fitquest_logo")?.withRenderingMode(.alwaysOriginal)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(logoImageView)
     }
@@ -90,14 +87,11 @@ class RegisterView: UIView {
     
     func setupProfileImageButton() {
         profileImageButton = UIButton(type: .system)
-        
-        // Default profile image
         let config = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular)
         let profileImage = UIImage(systemName: "person.circle.fill", withConfiguration: config)
         profileImageButton.setImage(profileImage, for: .normal)
         profileImageButton.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         
-        // Styling
         profileImageButton.backgroundColor = UIColor.white.withAlphaComponent(0.1)
         profileImageButton.layer.cornerRadius = 60
         profileImageButton.layer.borderWidth = 2
@@ -105,7 +99,6 @@ class RegisterView: UIView {
         profileImageButton.clipsToBounds = true
         profileImageButton.imageView?.contentMode = .scaleAspectFill
         
-        // Show menu on tap
         profileImageButton.showsMenuAsPrimaryAction = true
         
         profileImageButton.translatesAutoresizingMaskIntoConstraints = false

@@ -16,7 +16,6 @@ class StorageService {
     
     private init() {}
     
-    // MARK: - Upload Profile Image
     func uploadProfileImage(_ image: UIImage) async throws -> URL {
         guard let jpegData = image.jpegData(compressionQuality: 0.5) else {
             throw NSError(domain: "StorageService", code: -1,
@@ -32,7 +31,6 @@ class StorageService {
         return downloadURL
     }
     
-    // MARK: - Delete Profile Image
     func deleteProfileImage(url: String) async throws {
         let storageRef = storage.reference(forURL: url)
         try await storageRef.delete()

@@ -39,7 +39,6 @@ class ViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
-    // MARK: - Setup
     private func setupViewController() {
         navigationItem.hidesBackButton = true
         navigationController?.setNavigationBarHidden(true, animated: false)
@@ -56,7 +55,6 @@ class ViewController: UIViewController {
         loginView.passwordTextField.delegate = self
     }
     
-    // MARK: - Actions
     @objc private func handleSignIn() {
         view.endEditing(true)
         
@@ -88,7 +86,6 @@ class ViewController: UIViewController {
         navigationController?.pushViewController(registerVC, animated: true)
     }
     
-    // MARK: - Firebase Operations
     private func signIn(email: String, password: String) {
         showLoadingIndicator()
         
@@ -129,7 +126,6 @@ class ViewController: UIViewController {
         }
     }
     
-    // MARK: - Navigation
     private func navigateToMainScreen() {
         loginView.emailTextField.text = ""
         loginView.passwordTextField.text = ""
@@ -141,7 +137,6 @@ class ViewController: UIViewController {
     }
 }
 
-// MARK: - UITextFieldDelegate
 extension ViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == loginView.emailTextField {
@@ -154,8 +149,6 @@ extension ViewController: UITextFieldDelegate {
     }
 }
 
-
-// MARK: - Keyboard Protocol
 extension ViewController: KeyboardProtocol {
     func hideKeyboardOnTapOutside() {
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboardOnTap))
@@ -168,8 +161,6 @@ extension ViewController: KeyboardProtocol {
     }
 }
 
-
-// MARK: - Alert Protocol
 extension ViewController: AlertProtocol {
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -178,10 +169,8 @@ extension ViewController: AlertProtocol {
     }
 }
 
-// MARK: - Loading Indicator Protocol
 extension ViewController: LoadingIndicatorProtocol {
     func showLoadingIndicator() {
-        // Remove any existing indicator first
         hideLoadingIndicator()
         
         let indicator = UIActivityIndicatorView(style: .large)

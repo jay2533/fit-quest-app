@@ -27,7 +27,6 @@ class NotificationDrawerViewController: UIViewController {
         setupTableView()
         loadNotifications()
         
-        // Show drawer with animation
         drawerView.showDrawer()
     }
     
@@ -35,7 +34,6 @@ class NotificationDrawerViewController: UIViewController {
         drawerView.closeButton.addTarget(self, action: #selector(handleClose), for: .touchUpInside)
         drawerView.markAllReadButton.addTarget(self, action: #selector(handleMarkAllRead), for: .touchUpInside)
         
-        // Tap background to dismiss
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleBackgroundTap))
         drawerView.backgroundOverlay.addGestureRecognizer(tapGesture)
     }
@@ -45,7 +43,6 @@ class NotificationDrawerViewController: UIViewController {
         drawerView.tableView.dataSource = self
     }
     
-    // MARK: - Load Notifications
     private func loadNotifications() {
         guard let userId = authService.currentUserId else { return }
         
@@ -60,7 +57,7 @@ class NotificationDrawerViewController: UIViewController {
                 // Combine both
                 var allNotifications = storedNotifications + generatedNotifications
                 
-                // 🔥 Sort by priority first, then by date
+                // Sort by priority first, then by date
                 allNotifications.sort { notification1, notification2 in
                     if notification1.type.priority != notification2.type.priority {
                         return notification1.type.priority < notification2.type.priority
@@ -73,7 +70,7 @@ class NotificationDrawerViewController: UIViewController {
                     self.updateEmptyState()
                     self.drawerView.tableView.reloadData()
                     
-                    print("📬 Loaded \(allNotifications.count) total notifications")
+                    print(" Loaded \(allNotifications.count) total notifications")
                 }
             } catch {
                 print("Failed to load notifications: \(error.localizedDescription)")
@@ -81,7 +78,7 @@ class NotificationDrawerViewController: UIViewController {
         }
     }
     
-    // 🔥 Generate Notifications from Active Tasks
+    // Generate Notifications from Active Tasks
     private func generateNotificationsFromTasks(userId: String) async throws -> [AppNotification] {
         let tasks = try await taskService.fetchActiveTasks(userId: userId)
         let stateManager = NotificationStateManager.shared
@@ -96,7 +93,7 @@ class NotificationDrawerViewController: UIViewController {
             let taskDate = task.scheduledDate
             let timeString = DateFormatter.timeOnly.string(from: task.scheduledTime)
             
-            // 🔥 Check if this task's notification has been marked as read
+            // Check if this task's notification has been marked as read
             let isRead = stateManager.isTaskNotificationRead(userId: userId, taskId: taskId)
             
             // 1. OVERDUE TASKS
@@ -107,10 +104,10 @@ class NotificationDrawerViewController: UIViewController {
                     id: "task_overdue_\(taskId)",
                     userId: userId,
                     type: .taskReminder,
-                    title: "⚠️ Overdue: \(task.title)",
+                    title: "Overdue: \(task.title)",
                     message: "\(daysOverdue) day(s) overdue - \(task.category.rawValue) category",
                     relatedTaskId: taskId,
-                    isRead: isRead,  // 🔥 Use stored read state
+                    isRead: isRead,
                     createdAt: task.scheduledDate
                 )
                 
@@ -122,10 +119,10 @@ class NotificationDrawerViewController: UIViewController {
                     id: "task_today_\(taskId)",
                     userId: userId,
                     type: .taskDue,
-                    title: "📌 Due Today: \(task.title)",
+                    title: " Due Today: \(task.title)",
                     message: "Scheduled for \(timeString) - \(task.category.rawValue) category",
                     relatedTaskId: taskId,
-                    isRead: isRead,  // 🔥 Use stored read state
+                    isRead: isRead,
                     createdAt: task.scheduledDate
                 )
                 
@@ -137,10 +134,10 @@ class NotificationDrawerViewController: UIViewController {
                     id: "task_tomorrow_\(taskId)",
                     userId: userId,
                     type: .taskReminder,
-                    title: "📅 Tomorrow: \(task.title)",
+                    title: "Tomorrow: \(task.title)",
                     message: "Scheduled for \(timeString) - \(task.category.rawValue) category",
                     relatedTaskId: taskId,
-                    isRead: isRead,  // 🔥 Use stored read state
+                    isRead: isRead,
                     createdAt: task.scheduledDate
                 )
                 
@@ -158,10 +155,10 @@ class NotificationDrawerViewController: UIViewController {
                     id: "task_week_\(taskId)",
                     userId: userId,
                     type: .taskReminder,
-                    title: "📆 Upcoming: \(task.title)",
+                    title: "Upcoming: \(task.title)",
                     message: "\(dateString) at \(timeString) - \(task.category.rawValue) category",
                     relatedTaskId: taskId,
-                    isRead: isRead,  // 🔥 Use stored read state
+                    isRead: isRead,
                     createdAt: task.scheduledDate
                 )
                 
@@ -195,14 +192,14 @@ class NotificationDrawerViewController: UIViewController {
                 notification.isRead = true
                 notifications[index] = notification
                 
-                // 🔥 Persist read state for task notifications
+                // Persist read state for task notifications
                 if let taskId = notification.relatedTaskId {
                     NotificationStateManager.shared.markTaskNotificationAsRead(userId: userId, taskId: taskId)
                 }
             }
         }
         
-        // 🔥 Also mark stored notifications as read in Firestore
+        // Also mark stored notifications as read in Firestore
         Task {
             try? await notificationService.markAllAsRead(userId: userId)
         }
@@ -220,7 +217,6 @@ class NotificationDrawerViewController: UIViewController {
     }
 }
 
-// MARK: - UITableViewDelegate & DataSource
 extension NotificationDrawerViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -256,13 +252,13 @@ extension NotificationDrawerViewController: UITableViewDelegate, UITableViewData
             notification.isRead = true
             notifications[indexPath.row] = notification
             
-            // 🔥 If it's a task notification, persist the read state
+            // If it's a task notification, persist the read state
             if let taskId = notification.relatedTaskId,
                let userId = authService.currentUserId {
                 NotificationStateManager.shared.markTaskNotificationAsRead(userId: userId, taskId: taskId)
             }
             
-            // 🔥 If it's a stored notification, update in Firestore
+            // If it's a stored notification, update in Firestore
             if let notificationId = notification.id, !notificationId.hasPrefix("task_") {
                 Task {
                     try? await notificationService.markAsRead(notificationId: notificationId)
@@ -273,7 +269,6 @@ extension NotificationDrawerViewController: UITableViewDelegate, UITableViewData
             onDismiss?() // Update badge
         }
         
-        // TODO: Navigate to related task
         if let taskId = notification.relatedTaskId {
             print("Navigate to task: \(taskId)")
         }
