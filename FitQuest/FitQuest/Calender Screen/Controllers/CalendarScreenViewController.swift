@@ -62,6 +62,8 @@ class CalendarScreenViewController: UIViewController {
         calendarView.previousWeekButton.addTarget(self, action: #selector(onPreviousWeekTapped), for: .touchUpInside)
         calendarView.nextWeekButton.addTarget(self, action: #selector(onNextWeekTapped), for: .touchUpInside)
         
+        calendarView.backButton.addTarget(self, action: #selector(onBackTapped), for: .touchUpInside)
+        
         // Set up collection view
         calendarView.weekCollectionView.delegate = self
         calendarView.weekCollectionView.dataSource = self
@@ -75,7 +77,7 @@ class CalendarScreenViewController: UIViewController {
         // Add button actions
         calendarView.addTaskButton.addTarget(self, action: #selector(onAddTaskTapped), for: .touchUpInside)
         
-        // Logo tap gesture
+        // Logo tap gesture (no longer needed for back, but harmless)
         let logoTapGesture = UITapGestureRecognizer(target: self, action: #selector(onLogoTapped))
         calendarView.logoImageView.addGestureRecognizer(logoTapGesture)
         
@@ -459,6 +461,11 @@ class CalendarScreenViewController: UIViewController {
     
     @objc func onLogoTapped() {
         print("Calendar logo tapped - going back")
+        navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func onBackTapped() {
+        print("Calendar back button tapped - going back")
         navigationController?.popViewController(animated: true)
     }
     

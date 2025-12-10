@@ -54,7 +54,14 @@ class LeaderboardViewController: UIViewController {
             return
         }
         
-        Task {
+        Task { [weak self] in
+            guard let self = self else { return }
+            
+            // Show loading overlay
+            await MainActor.run {
+                self.leaderboardView.setLoading(true)
+            }
+            
             do {
                 let (top, currentUserEntry) = try await leaderboardService.fetchLeaderboard(
                     userId: userId,
@@ -69,7 +76,7 @@ class LeaderboardViewController: UIViewController {
                     allEntries.append(currentUserEntry)
                 }
                 
-                await loadAvatars(for: allEntries)
+                await self.loadAvatars(for: allEntries)
                 
                 await MainActor.run {
                     self.leaderboardView.leaderboardTableView.reloadData()
@@ -86,8 +93,14 @@ class LeaderboardViewController: UIViewController {
                         entry: currentUserEntry,
                         avatar: currentAvatar
                     )
+                    
+                    // Hide loading overlay
+                    self.leaderboardView.setLoading(false)
                 }
             } catch {
+                await MainActor.run {
+                    self.leaderboardView.setLoading(false)
+                }
                 print("❌ Failed to load leaderboard: \(error)")
             }
         }

@@ -13,6 +13,7 @@ class HistoryScreenView: UIView {
     var logoImageView: UIImageView!
     var titleLabel: UILabel!
     var filterButton: UIButton!
+    var backButton: UIButton!
     
     // MARK: - Filter Badge (shows active filter)
     var filterBadgeView: UIView!
@@ -40,15 +41,23 @@ class HistoryScreenView: UIView {
     // MARK: - Setup Methods
         
     func setupHeader() {
-        // Logo (back button)
+        // Logo (center, decorative)
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
         let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .medium)
         logoImageView.image = UIImage(systemName: "arrow.up.heart.fill", withConfiguration: config)
         logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
-        logoImageView.isUserInteractionEnabled = true
+        logoImageView.isUserInteractionEnabled = false
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(logoImageView)
+        
+        // Back button (same style as leaderboard/calendar)
+        backButton = UIButton(type: .system)
+        let backConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
+        backButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: backConfig), for: .normal)
+        backButton.tintColor = UIColor(red: 0.62, green: 0.79, blue: 0.97, alpha: 1.0)
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(backButton)
         
         // Title
         titleLabel = UILabel()
@@ -59,7 +68,7 @@ class HistoryScreenView: UIView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(titleLabel)
         
-        // Filter Button (NEW)
+        // Filter Button
         filterButton = UIButton(type: .system)
         let filterConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
         filterButton.setImage(UIImage(systemName: "line.3.horizontal.decrease.circle", withConfiguration: filterConfig), for: .normal)
@@ -129,24 +138,31 @@ class HistoryScreenView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Logo (top left)
-            logoImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-            logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 10),
-            logoImageView.widthAnchor.constraint(equalToConstant: 35),
-            logoImageView.heightAnchor.constraint(equalToConstant: 35),
+            // Logo centered at top
+            logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 16),
+            logoImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 40),
+            logoImageView.heightAnchor.constraint(equalToConstant: 40),
             
-            // Title (center)
-            titleLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
+            // Back button on the left
+            backButton.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
+            backButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
+            backButton.widthAnchor.constraint(equalToConstant: 32),
+            backButton.heightAnchor.constraint(equalToConstant: 32),
             
-            // Filter Button (between title and profile)
-            filterButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            // Filter Button on the right
             filterButton.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
+            filterButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             filterButton.widthAnchor.constraint(equalToConstant: 32),
             filterButton.heightAnchor.constraint(equalToConstant: 32),
             
-            // Filter Badge (below header, centered)
-            filterBadgeView.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 8),
+            // Title below logo
+            titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 8),
+            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 40),
+            titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -40),
+            
+            // Filter Badge (below title, centered)
+            filterBadgeView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
             filterBadgeView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             filterBadgeView.heightAnchor.constraint(equalToConstant: 40),
             

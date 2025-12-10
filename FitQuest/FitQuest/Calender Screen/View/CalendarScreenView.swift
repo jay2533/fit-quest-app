@@ -11,6 +11,7 @@ class CalendarScreenView: UIView {
 
     var logoImageView: UIImageView!
     var titleLabel: UILabel!
+    var backButton: UIButton!
     
     var monthYearLabel: UILabel!
     
@@ -44,15 +45,23 @@ class CalendarScreenView: UIView {
     // MARK: - Setup Methods
     
     func setupHeader() {
-        // Logo
+        // Logo (center, decorative – not a button anymore)
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
         let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .medium)
         logoImageView.image = UIImage(systemName: "arrow.up.heart.fill", withConfiguration: config)
         logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        logoImageView.isUserInteractionEnabled = true
+        logoImageView.isUserInteractionEnabled = false
         self.addSubview(logoImageView)
+        
+        // Back button (same style as LeaderboardView)
+        backButton = UIButton(type: .system)
+        let backConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
+        backButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: backConfig), for: .normal)
+        backButton.tintColor = UIColor(red: 0.62, green: 0.79, blue: 0.97, alpha: 1.0)
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(backButton)
         
         // Title
         titleLabel = UILabel()
@@ -62,7 +71,6 @@ class CalendarScreenView: UIView {
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(titleLabel)
-        
     }
     
     func setupMonthYearLabel() {
@@ -147,20 +155,33 @@ class CalendarScreenView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Logo (top left)
-            logoImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-            logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 10),
-            logoImageView.widthAnchor.constraint(equalToConstant: 35),
-            logoImageView.heightAnchor.constraint(equalToConstant: 35),
+            // Logo centered at top (like leaderboard)
+            logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 16),
+            logoImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 40),
+            logoImageView.heightAnchor.constraint(equalToConstant: 40),
             
-            // Title (center)
-            titleLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            titleLabel.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
+            // Back button on left, same row as logo
+            backButton.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
+            backButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
+            backButton.widthAnchor.constraint(equalToConstant: 32),
+            backButton.heightAnchor.constraint(equalToConstant: 32),
             
-            // Month/Year Label
-            monthYearLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 25),
+            // Title below logo
+            titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 4),
+            titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 40),
+            titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -40),
+            
+            // Month/Year Label below title
+            monthYearLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
             monthYearLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             monthYearLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            
+            // Week Collection View (we reference it earlier in constraints, so it needs a top)
+            weekCollectionView.topAnchor.constraint(equalTo: monthYearLabel.bottomAnchor, constant: 15),
+            weekCollectionView.leadingAnchor.constraint(equalTo: previousWeekButton.trailingAnchor, constant: 8),
+            weekCollectionView.trailingAnchor.constraint(equalTo: nextWeekButton.leadingAnchor, constant: -8),
+            weekCollectionView.heightAnchor.constraint(equalToConstant: 80),
             
             // Previous Week Button
             previousWeekButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15),
@@ -173,12 +194,6 @@ class CalendarScreenView: UIView {
             nextWeekButton.centerYAnchor.constraint(equalTo: weekCollectionView.centerYAnchor),
             nextWeekButton.widthAnchor.constraint(equalToConstant: 40),
             nextWeekButton.heightAnchor.constraint(equalToConstant: 40),
-            
-            // Week Collection View
-            weekCollectionView.topAnchor.constraint(equalTo: monthYearLabel.bottomAnchor, constant: 15),
-            weekCollectionView.leadingAnchor.constraint(equalTo: previousWeekButton.trailingAnchor, constant: 8),
-            weekCollectionView.trailingAnchor.constraint(equalTo: nextWeekButton.leadingAnchor, constant: -8),
-            weekCollectionView.heightAnchor.constraint(equalToConstant: 80),
             
             // Tasks Table View
             tasksTableView.topAnchor.constraint(equalTo: weekCollectionView.bottomAnchor, constant: 25),

@@ -9,6 +9,8 @@ import UIKit
 
 class LeaderboardView: UIView {
     
+    
+    
     // MARK: - Header
     var logoImageView: UIImageView!
     var appNameLabel: UILabel!
@@ -75,7 +77,9 @@ class LeaderboardView: UIView {
         return label
     }()
 
-
+    private var loadingOverlay: UIView!
+    private var loadingIndicator: UIActivityIndicatorView!
+    private var loadingLabel: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -86,11 +90,59 @@ class LeaderboardView: UIView {
         setupPodium()
         setupTable()
         setupCurrentUserCard()
+        setupLoadingOverlay()   // ⬅️ add this
         initConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Setup loading overlay
+    private func setupLoadingOverlay() {
+        loadingOverlay = UIView()
+        loadingOverlay.translatesAutoresizingMaskIntoConstraints = false
+        loadingOverlay.backgroundColor = UIColor(white: 0.0, alpha: 0.4)
+        addSubview(loadingOverlay)
+        
+        loadingIndicator = UIActivityIndicatorView(style: .large)
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.hidesWhenStopped = false
+        loadingOverlay.addSubview(loadingIndicator)
+        
+        loadingLabel = UILabel()
+        loadingLabel.translatesAutoresizingMaskIntoConstraints = false
+        loadingLabel.text = "Loading leaderboard..."
+        loadingLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        loadingLabel.textColor = .white
+        loadingOverlay.addSubview(loadingLabel)
+        
+        NSLayoutConstraint.activate([
+            loadingOverlay.topAnchor.constraint(equalTo: topAnchor),
+            loadingOverlay.bottomAnchor.constraint(equalTo: bottomAnchor),
+            loadingOverlay.leadingAnchor.constraint(equalTo: leadingAnchor),
+            loadingOverlay.trailingAnchor.constraint(equalTo: trailingAnchor),
+            
+            loadingIndicator.centerXAnchor.constraint(equalTo: loadingOverlay.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: loadingOverlay.centerYAnchor, constant: -10),
+            
+            loadingLabel.topAnchor.constraint(equalTo: loadingIndicator.bottomAnchor, constant: 8),
+            loadingLabel.centerXAnchor.constraint(equalTo: loadingOverlay.centerXAnchor)
+        ])
+        
+        // start hidden by default
+        loadingOverlay.isHidden = true
+    }
+
+    func setLoading(_ isLoading: Bool) {
+        loadingOverlay.isHidden = !isLoading
+        if isLoading {
+            loadingIndicator.startAnimating()
+            isUserInteractionEnabled = false
+        } else {
+            loadingIndicator.stopAnimating()
+            isUserInteractionEnabled = true
+        }
     }
     
     // MARK: - Setup Header

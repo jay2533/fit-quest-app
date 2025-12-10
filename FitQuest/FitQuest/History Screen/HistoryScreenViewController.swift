@@ -22,7 +22,6 @@ class HistoryScreenViewController: UIViewController {
     var isLoading = false
     var hasMoreTasks = true
     
-    // ✅ NEW: Separate cursors for pagination
     var lastCompletedTask: DocumentSnapshot?
     var lastMissedTask: DocumentSnapshot?
     var hasMoreCompleted = true
@@ -67,9 +66,7 @@ class HistoryScreenViewController: UIViewController {
     private func setupActions() {
         historyView.filterButton.addTarget(self, action: #selector(onFilterTapped), for: .touchUpInside)
         historyView.clearFilterButton.addTarget(self, action: #selector(onClearFilterTapped), for: .touchUpInside)
-        
-        let logoTapGesture = UITapGestureRecognizer(target: self, action: #selector(onLogoTapped))
-        historyView.logoImageView.addGestureRecognizer(logoTapGesture)
+        historyView.backButton.addTarget(self, action: #selector(onBackTapped), for: .touchUpInside)
     }
     
     // MARK: - Actions
@@ -96,7 +93,8 @@ class HistoryScreenViewController: UIViewController {
         loadTasks()
     }
     
-    @objc func onLogoTapped() {
+    @objc func onBackTapped() {
+        print("History back button tapped - going back")
         navigationController?.popViewController(animated: true)
     }
     
