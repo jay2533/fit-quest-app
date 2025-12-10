@@ -69,8 +69,6 @@ class NotificationDrawerViewController: UIViewController {
                     self.notifications = allNotifications
                     self.updateEmptyState()
                     self.drawerView.tableView.reloadData()
-                    
-                    print(" Loaded \(allNotifications.count) total notifications")
                 }
             } catch {
                 print("Failed to load notifications: \(error.localizedDescription)")
@@ -267,10 +265,6 @@ extension NotificationDrawerViewController: UITableViewDelegate, UITableViewData
             
             tableView.reloadRows(at: [indexPath], with: .automatic)
             onDismiss?() // Update badge
-        }
-        
-        if let taskId = notification.relatedTaskId {
-            print("Navigate to task: \(taskId)")
         }
     }
     

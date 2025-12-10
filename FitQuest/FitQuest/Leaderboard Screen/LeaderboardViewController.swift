@@ -48,7 +48,6 @@ class LeaderboardViewController: UIViewController {
         
     private func loadLeaderboard() {
         guard let userId = authService.currentUserId else {
-            print(" No user logged in for leaderboard")
             return
         }
         
@@ -99,7 +98,6 @@ class LeaderboardViewController: UIViewController {
                 await MainActor.run {
                     self.leaderboardView.setLoading(false)
                 }
-                print(" Failed to load leaderboard: \(error)")
             }
         }
     }
@@ -110,17 +108,23 @@ class LeaderboardViewController: UIViewController {
                 continue
             }
             
-            if let urlString = entry.profileImageURL,
-               !urlString.isEmpty,
-               let url = URL(string: urlString) {
-                do {
-                    let (data, _) = try await URLSession.shared.data(from: url)
-                    if let image = UIImage(data: data) {
-                        avatarCache[entry.userId] = image
-                        continue
+            let aiAvatar = await AvatarGenerator.shared.getAIAvatar(name: entry.name, size: 60)
+            
+            if aiAvatar.size.width > 0 && aiAvatar.size.height > 0 {
+                avatarCache[entry.userId] = aiAvatar
+            } else {
+                if let urlString = entry.profileImageURL,
+                   !urlString.isEmpty,
+                   let url = URL(string: urlString) {
+                    do {
+                        let (data, _) = try await URLSession.shared.data(from: url)
+                        if let image = UIImage(data: data) {
+                            avatarCache[entry.userId] = image
+                            continue
+                        }
+                    } catch {
+                        print("Failed to load profile image for \(entry.userId): \(error.localizedDescription)")
                     }
-                } catch {
-                    print("Failed to load profile image for \(entry.userId): \(error.localizedDescription)")
                 }
             }
             

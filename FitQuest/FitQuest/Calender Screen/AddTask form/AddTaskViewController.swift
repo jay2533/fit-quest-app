@@ -14,9 +14,7 @@ protocol AddTaskDelegate: AnyObject {
 class AddTaskViewController: UIViewController {
     
     let addTaskView = AddTaskView()
-    
     weak var delegate: AddTaskDelegate?
-    
     var taskName: String = ""
     var selectedCategory: TaskCategory
     var selectedDate: Date
@@ -328,13 +326,6 @@ class AddTaskViewController: UIViewController {
                 let taskId = try await TaskService.shared.createTask(task)
                 
                 await MainActor.run {
-                    print("Task created with ID: \(taskId)")
-                    print("  Title: \(task.title)")
-                    print("  Category: \(task.category.displayName)")
-                    print("  Duration: \(task.duration) min")
-                    print("  XP Value: \(task.xpValue)")
-                    print("  Scheduled: \(task.scheduledDate)")
-                    
                     // Create task copy with ID for delegate
                     var taskWithId = task
                     taskWithId.id = taskId

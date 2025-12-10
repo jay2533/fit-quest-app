@@ -9,26 +9,14 @@ import UIKit
 
 class TaskTypeSelectionView: UIView {
     
-    // MARK: - Header
     var closeButton: UIButton!
     var titleContainer: UIStackView!
-    
-    // MARK: - Scroll View
     var scrollView: UIScrollView!
     var contentView: UIView!
-    
-    // MARK: - Section Labels
     var predefinedTasksLabel: UILabel!
-    
-    // MARK: - Predefined Tasks Stack
     var predefinedTasksStackView: UIStackView!
-    
-    // MARK: - Custom Task Button
     var customTaskButton: UIButton!
-    
-    // MARK: - Loading Indicator
     var loadingIndicator: UIActivityIndicatorView!
-    
     var category: TaskCategory
     
     init(frame: CGRect, category: TaskCategory) {
@@ -48,9 +36,7 @@ class TaskTypeSelectionView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Setup Methods
-    
+        
     func setupScrollView() {
         scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = true
@@ -63,15 +49,13 @@ class TaskTypeSelectionView: UIView {
     }
     
     func setupHeader() {
-        // Close button
         closeButton = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .semibold)
         closeButton.setImage(UIImage(systemName: "xmark", withConfiguration: config), for: .normal)
         closeButton.tintColor = .lightGray
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(closeButton)
-        
-        // Title container with icon + text
+    
         titleContainer = UIStackView()
         titleContainer.axis = .horizontal
         titleContainer.spacing = 8
@@ -79,14 +63,12 @@ class TaskTypeSelectionView: UIView {
         titleContainer.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(titleContainer)
         
-        // Category icon
         let iconConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .semibold)
         let iconImageView = UIImageView(image: UIImage(systemName: category.icon, withConfiguration: iconConfig))
         iconImageView.tintColor = .white
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Title label
         let titleLabel = UILabel()
         titleLabel.text = "\(category.displayName) Tasks"
         titleLabel.font = .systemFont(ofSize: 24, weight: .bold)
@@ -103,7 +85,6 @@ class TaskTypeSelectionView: UIView {
     }
     
     func setupPredefinedTasksSection() {
-        // Section label
         predefinedTasksLabel = UILabel()
         predefinedTasksLabel.text = "PREDEFINED TASKS"
         predefinedTasksLabel.font = .systemFont(ofSize: 13, weight: .semibold)
@@ -111,7 +92,6 @@ class TaskTypeSelectionView: UIView {
         predefinedTasksLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(predefinedTasksLabel)
         
-        // Stack view for predefined task cards
         predefinedTasksStackView = UIStackView()
         predefinedTasksStackView.axis = .vertical
         predefinedTasksStackView.spacing = 12
@@ -122,7 +102,6 @@ class TaskTypeSelectionView: UIView {
     func setupCustomTaskButton() {
         customTaskButton = UIButton(type: .system)
         
-        // Container stack view (horizontal: + icon + label)
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 12
@@ -130,14 +109,12 @@ class TaskTypeSelectionView: UIView {
         stackView.isUserInteractionEnabled = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Plus icon
         let iconConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .semibold)
         let iconImageView = UIImageView(image: UIImage(systemName: "plus.circle.fill", withConfiguration: iconConfig))
         iconImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Label
         let label = UILabel()
         label.text = "Create Custom Task"
         label.font = .systemFont(ofSize: 18, weight: .semibold)
@@ -149,7 +126,6 @@ class TaskTypeSelectionView: UIView {
         
         customTaskButton.addSubview(stackView)
         
-        // Button styling
         customTaskButton.backgroundColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 0.2)
         customTaskButton.layer.cornerRadius = 16
         customTaskButton.layer.borderWidth = 2
@@ -176,58 +152,47 @@ class TaskTypeSelectionView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Scroll view
             scrollView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
-            // Content view
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            // Close button
             closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
             closeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             closeButton.widthAnchor.constraint(equalToConstant: 44),
             closeButton.heightAnchor.constraint(equalToConstant: 44),
             
-            // Title Container
             titleContainer.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             titleContainer.centerYAnchor.constraint(equalTo: closeButton.centerYAnchor),
             
-            // Predefined Tasks Label
             predefinedTasksLabel.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 24),
             predefinedTasksLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             
-            // Predefined Tasks Stack
             predefinedTasksStackView.topAnchor.constraint(equalTo: predefinedTasksLabel.bottomAnchor, constant: 12),
             predefinedTasksStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             predefinedTasksStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            // Custom Task Button
             customTaskButton.topAnchor.constraint(equalTo: predefinedTasksStackView.bottomAnchor, constant: 24),
             customTaskButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             customTaskButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             customTaskButton.heightAnchor.constraint(equalToConstant: 70),
             customTaskButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40),
             
-            // Loading Indicator
             loadingIndicator.centerXAnchor.constraint(equalTo: predefinedTasksStackView.centerXAnchor),
             loadingIndicator.topAnchor.constraint(equalTo: predefinedTasksLabel.bottomAnchor, constant: 40)
         ])
     }
-    
-    // MARK: - Public Methods
-    
+        
     func addPredefinedTaskCard(task: PredefinedTask, tag: Int) -> UIButton {
         let button = UIButton(type: .custom)
         button.tag = tag
         
-        // Container stack view (horizontal layout)
         let containerStack = UIStackView()
         containerStack.axis = .horizontal
         containerStack.spacing = 16
@@ -235,14 +200,12 @@ class TaskTypeSelectionView: UIView {
         containerStack.isUserInteractionEnabled = false
         containerStack.translatesAutoresizingMaskIntoConstraints = false
         
-        // Icon
         let iconConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
         let iconImageView = UIImageView(image: UIImage(systemName: task.iconName, withConfiguration: iconConfig))
         iconImageView.tintColor = .white
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Text stack (vertical: title + duration)
         let textStack = UIStackView()
         textStack.axis = .vertical
         textStack.spacing = 4
@@ -261,7 +224,6 @@ class TaskTypeSelectionView: UIView {
         textStack.addArrangedSubview(titleLabel)
         textStack.addArrangedSubview(durationLabel)
         
-        // Chevron
         let chevronConfig = UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
         let chevronImageView = UIImageView(image: UIImage(systemName: "chevron.right", withConfiguration: chevronConfig))
         chevronImageView.tintColor = .lightGray
@@ -274,7 +236,6 @@ class TaskTypeSelectionView: UIView {
         
         button.addSubview(containerStack)
         
-        // Button styling
         button.backgroundColor = UIColor.white.withAlphaComponent(0.05)
         button.layer.cornerRadius = 12
         button.layer.borderWidth = 1

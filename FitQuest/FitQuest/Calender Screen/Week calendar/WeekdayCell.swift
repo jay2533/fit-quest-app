@@ -25,7 +25,6 @@ class WeekDayCell: UICollectionViewCell {
     }
     
     func setupUI() {
-        // Container view
         containerView = UIView()
         containerView.backgroundColor = UIColor.white.withAlphaComponent(0.05)
         containerView.layer.cornerRadius = 12
@@ -34,7 +33,6 @@ class WeekDayCell: UICollectionViewCell {
         containerView.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(containerView)
         
-        // Day label (S, M, T, W, etc.)
         dayLabel = UILabel()
         dayLabel.font = .systemFont(ofSize: 12, weight: .medium)
         dayLabel.textColor = .lightGray
@@ -42,7 +40,6 @@ class WeekDayCell: UICollectionViewCell {
         dayLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(dayLabel)
         
-        // Date label (7, 8, 9, etc.)
         dateLabel = UILabel()
         dateLabel.font = .systemFont(ofSize: 18, weight: .semibold)
         dateLabel.textColor = .white
@@ -70,7 +67,6 @@ class WeekDayCell: UICollectionViewCell {
         dateLabel.text = date
         
         if isSelected {
-            // Selected state
             if isPast {
                 // Past date selected - subtle gray highlight
                 containerView.backgroundColor = UIColor.white.withAlphaComponent(0.1)

@@ -80,7 +80,6 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
         // Load more when user scrolls to 80% of content
         if offsetY > contentHeight - height * 1.2 {
             if !isLoading && hasMoreTasks {
-                print("Loading more tasks...")
                 loadTasks(isLoadingMore: true)
             }
         }

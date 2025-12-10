@@ -84,7 +84,6 @@ class HistoryScreenViewController: UIViewController {
     }
     
     @objc func onBackTapped() {
-        print("History back button tapped - going back")
         navigationController?.popViewController(animated: true)
     }
         
@@ -117,8 +116,6 @@ class HistoryScreenViewController: UIViewController {
                     self.historyView.tasksTableView.reloadData()
                     self.historyView.loadingIndicator.stopAnimating()
                     self.isLoading = false
-                    
-                    print(" Loaded \(tasks.count) tasks (Total: \(self.allTasks.count))")
                 }
                 
             } catch {
@@ -127,7 +124,6 @@ class HistoryScreenViewController: UIViewController {
                     self.historyView.loadingIndicator.stopAnimating()
                     self.isLoading = false
                 }
-                print("Error loading tasks: \(error)")
             }
         }
     }
@@ -135,11 +131,7 @@ class HistoryScreenViewController: UIViewController {
     private func fetchHistoryTasks(userId: String, category: TaskCategory?) async throws -> [FitQuestTask] {
         let db = Firestore.firestore()
         let now = Date()
-        
-        print(" Fetching history tasks (completed OR missed)")
-        if let category = category {
-            print("🔍 Filtering by category: \(category.displayName)")
-        }
+
         
         var completedTasks: [FitQuestTask] = []
         var missedTasks: [FitQuestTask] = []
@@ -175,7 +167,6 @@ class HistoryScreenViewController: UIViewController {
             } else {
                 lastCompletedTask = completedSnapshot.documents.last
                 completedTasks = completedSnapshot.documents.compactMap { parseTask(from: $0) }
-                print("  Fetched \(completedTasks.count) completed tasks")
             }
         }
         
@@ -212,12 +203,11 @@ class HistoryScreenViewController: UIViewController {
             } else {
                 lastMissedTask = missedSnapshot.documents.last
                 missedTasks = missedSnapshot.documents.compactMap { parseTask(from: $0) }
-                print("  Fetched \(missedTasks.count) missed tasks")
             }
         }
         
         // Merge and deduplicate
-        var allTasks = completedTasks + missedTasks
+        let allTasks = completedTasks + missedTasks
         var uniqueTasks: [FitQuestTask] = []
         var seenIds = Set<String>()
         

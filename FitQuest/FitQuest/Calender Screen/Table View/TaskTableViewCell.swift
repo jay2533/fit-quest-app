@@ -120,51 +120,41 @@ class TaskTableViewCell: UITableViewCell {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // Container View
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
             containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
             containerView.heightAnchor.constraint(equalToConstant: 70),
             
-            // Left Border - ✅ UPDATED: 6pt width instead of 4pt
             leftBorderView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             leftBorderView.topAnchor.constraint(equalTo: containerView.topAnchor),
             leftBorderView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-            leftBorderView.widthAnchor.constraint(equalToConstant: 6), // ✅ Wider border
+            leftBorderView.widthAnchor.constraint(equalToConstant: 6),
             
-            // Category Icon
-            categoryIconImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 18), // ✅ Adjusted for wider border
+            categoryIconImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 18),
             categoryIconImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
             categoryIconImageView.widthAnchor.constraint(equalToConstant: 20),
             categoryIconImageView.heightAnchor.constraint(equalToConstant: 20),
             
-            // Title Label
             titleLabel.leadingAnchor.constraint(equalTo: categoryIconImageView.trailingAnchor, constant: 8),
             titleLabel.centerYAnchor.constraint(equalTo: categoryIconImageView.centerYAnchor),
             
-            // Time Label
             timeLabel.trailingAnchor.constraint(equalTo: checkboxButton.leadingAnchor, constant: -12),
             timeLabel.centerYAnchor.constraint(equalTo: categoryIconImageView.centerYAnchor),
             
-            // Title shouldn't overlap with time
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: timeLabel.leadingAnchor, constant: -8),
             
-            // Checkbox Button
             checkboxButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
             checkboxButton.centerYAnchor.constraint(equalTo: categoryIconImageView.centerYAnchor),
             checkboxButton.widthAnchor.constraint(equalToConstant: 24),
             checkboxButton.heightAnchor.constraint(equalToConstant: 24),
             
-            // Duration Label
             durationLabel.leadingAnchor.constraint(equalTo: categoryIconImageView.leadingAnchor),
             durationLabel.topAnchor.constraint(equalTo: categoryIconImageView.bottomAnchor, constant: 8),
             
-            // Bullet Label
             bulletLabel.leadingAnchor.constraint(equalTo: durationLabel.trailingAnchor),
             bulletLabel.centerYAnchor.constraint(equalTo: durationLabel.centerYAnchor),
             
-            // XP Label
             xpLabel.leadingAnchor.constraint(equalTo: bulletLabel.trailingAnchor),
             xpLabel.centerYAnchor.constraint(equalTo: durationLabel.centerYAnchor),
         ])
@@ -177,10 +167,6 @@ class TaskTableViewCell: UITableViewCell {
     @objc private func checkboxTapped() {
         onCheckboxTapped?()
     }
-    
-    // MARK: - Configuration
-    
-    // MARK: - Configuration
 
     func configure(with task: FitQuestTask, isCompleted: Bool = false) {
         // Store task and state
@@ -232,7 +218,7 @@ class TaskTableViewCell: UITableViewCell {
                 self.leftBorderView.backgroundColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 1.0) // Bright green
                 self.checkboxButton.setImage(UIImage(systemName: "checkmark.square.fill"), for: .normal)
                 self.checkboxButton.tintColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 1.0)
-                self.timeLabel.textColor = UIColor(red: 156/255, green: 163/255, blue: 175/255, alpha: 1.0) // ✅ ADDED: Normal gray
+                self.timeLabel.textColor = UIColor(red: 156/255, green: 163/255, blue: 175/255, alpha: 1.0) // Normal gray
             }
         } else if isOverdue {
             // Overdue state - red tint
@@ -260,9 +246,7 @@ class TaskTableViewCell: UITableViewCell {
             generator.impactOccurred()
         }
     }
-    
-    // MARK: - Helper Methods
-    
+        
     private func getCategoryIcon(for category: TaskCategory) -> String {
         switch category {
         case .physical:
@@ -282,22 +266,7 @@ class TaskTableViewCell: UITableViewCell {
         // All icons same color - pure white
         return UIColor.white
     }
-    
-//    private func getCategoryColor(for category: TaskCategory) -> UIColor {
-//        switch category {
-//        case .physical:
-//            return UIColor(red: 251/255, green: 191/255, blue: 36/255, alpha: 1.0) // Warm amber/orange (energy)
-//        case .mental:
-//            return UIColor(red: 147/255, green: 197/255, blue: 253/255, alpha: 1.0) // Soft blue (calm, focus)
-//        case .social:
-//            return UIColor(red: 251/255, green: 146/255, blue: 60/255, alpha: 1.0) // Coral/peach (warmth, connection)
-//        case .creativity:
-//            return UIColor(red: 196/255, green: 181/255, blue: 253/255, alpha: 1.0) // Soft purple (imagination)
-//        case .miscellaneous:
-//            return UIColor(red: 148/255, green: 163/255, blue: 184/255, alpha: 1.0) // Neutral slate gray
-//        }
-//    }
-    
+
     private func formatDuration(_ minutes: Int) -> String {
         if minutes < 60 {
             return "\(minutes) min"

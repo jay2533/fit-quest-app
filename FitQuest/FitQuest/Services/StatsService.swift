@@ -89,10 +89,8 @@ class StatsService {
             "averageCompletionRate": 0.0  // Only used if creating new document
         ], merge: true)
         
-        print("Updated category stats for \(category.rawValue)")
     }
     
-    // MARK: - Reverse Category Stats (with existence check)
     private func reverseCategoryStats(userId: String, category: TaskCategory, xpEarned: Int) async throws {
         let categoryRef = database.collection("stats")
             .document(userId)
@@ -108,10 +106,8 @@ class StatsService {
                 "totalCompleted": FieldValue.increment(Int64(-1)),
                 "totalXPEarned": FieldValue.increment(Int64(-xpEarned))
             ])
-            print(" Reversed category stats for \(category.rawValue)")
         } else {
             // Document doesn't exist - create it with 0 values (shouldn't happen in normal flow)
-            print(" Category stats for \(category.rawValue) doesn't exist, creating with 0 values")
             try await categoryRef.setData([
                 "category": category.rawValue,
                 "totalCompleted": 0,

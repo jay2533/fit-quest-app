@@ -63,7 +63,6 @@ extension CalendarScreenViewController: UICollectionViewDelegate, UICollectionVi
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.dateFormat = "MMM dd, yyyy"
-        print("📅 Date tapped: \(dateFormatter.string(from: selectedDate))")
         
         let calendar = Calendar.current
         if !calendar.isDate(previousDate, inSameDayAs: selectedDate) {

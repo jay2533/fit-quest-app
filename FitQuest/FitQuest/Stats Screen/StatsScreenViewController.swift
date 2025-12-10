@@ -68,7 +68,6 @@ class StatsScreenViewController: UIViewController {
                                                     percents: percentArray)
                 }
             } catch {
-                print("Failed to load category XP for radar: \(error)")
                 await MainActor.run {
                     self.statsView.radarView.values = [0, 0, 0, 0, 0]
                     self.statsView.updateCategoryPercentLabels([0, 0, 0, 0, 0])

@@ -41,7 +41,6 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         tableView.deselectRow(at: indexPath, animated: true)
         
         let task = tasks[indexPath.row]
-        print("📋 Task cell tapped: \(task.title)")
         
         showTaskDetail(for: task)
     }
@@ -113,9 +112,7 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         Task {
             do {
                 try await TaskService.shared.deleteTask(taskId: taskId)
-                
-                print("🗑️ Task deleted: \(task.title)")
-                
+                                
                 await MainActor.run {
                     showXPToast("Task deleted")
                 }
@@ -124,14 +121,12 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
                 await MainActor.run {
                     self.showErrorToast("Failed to unmark task")
                 }
-                print("❌ Error deleting task: \(error)")
             }
         }
     }
     
     private func handleTaskCompletion(task: FitQuestTask, cell: TaskTableViewCell) {
         guard let taskId = task.id else {
-            print("❌ Task ID missing")
             return
         }
         

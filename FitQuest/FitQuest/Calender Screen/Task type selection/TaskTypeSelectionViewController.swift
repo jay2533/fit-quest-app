@@ -71,7 +71,6 @@ class TaskTypeSelectionViewController: UIViewController {
             } catch {
                 await MainActor.run {
                     self.taskTypeView.hideLoading()
-                    print("Error fetching predefined tasks: \(error)")
                     
                     // Show error or just show custom task option
                     self.showAlert(title: "Error", message: "Could not load predefined tasks. You can still create a custom task.")
@@ -86,22 +85,18 @@ class TaskTypeSelectionViewController: UIViewController {
             button.addTarget(self, action: #selector(onPredefinedTaskTapped(_:)), for: .touchUpInside)
         }
     }
-    
-    // MARK: - Actions
-    
+        
     @objc func onCloseTapped() {
         dismiss(animated: true)
     }
     
     @objc func onCustomTaskTapped() {
-        print("Custom task selected for category: \(category.displayName)")
         delegate?.didSelectCustomTask(category: category, selectedDate: selectedDate)
         dismiss(animated: true)
     }
     
     @objc func onPredefinedTaskTapped(_ sender: UIButton) {
         let task = predefinedTasks[sender.tag]
-        print("Predefined task selected: \(task.title)")
         
         delegate?.didSelectPredefinedTask(task, category: category, selectedDate: selectedDate)
         dismiss(animated: true)

@@ -109,7 +109,6 @@ class HomeScreenViewController: UIViewController {
                 }
                 
             } catch {
-                print("Failed to load user name: \(error.localizedDescription)")
                 await MainActor.run {
                     self.setAIAvatar(name: "User")
                 }
@@ -129,7 +128,6 @@ class HomeScreenViewController: UIViewController {
         
     private func loadDueTasks() {
         guard let userId = authService.currentUserId else {
-            print(" No user logged in")
             return
         }
         
@@ -163,7 +161,6 @@ class HomeScreenViewController: UIViewController {
                 
             } catch {
                 await MainActor.run {
-                    print(" Failed to load tasks: \(error.localizedDescription)")
                     self.allTasks = []
                     self.filteredTasks = []
                     self.homeView.tasksTableView.reloadData()
@@ -321,12 +318,10 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
         
         let task = filteredTasks[indexPath.row]
-        print(" Task tapped: \(task.title)")
         
         showTaskDetail(for: task)
     }
 
-    // MARK: - Show Task Detail
     private func showTaskDetail(for task: FitQuestTask) {
         let detailVC = TaskDetailViewController(task: task)
         
@@ -381,7 +376,6 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
                         cell.updateCompletionState(isCompleted: false, animated: true)
                     }
                 }
-                print(" Error: \(error.localizedDescription)")
             }
         }
     }

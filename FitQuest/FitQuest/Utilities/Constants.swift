@@ -70,4 +70,14 @@ struct Constants {
         static let streakReminderPrefix = "streak_reminder_"
         static let dailySummary = "daily_summary"
     }
+    
+    struct API {
+            static let diceBearBaseURL = "https://api.dicebear.com/7.x"
+            static let avatarStyle = "avataaars"
+            
+            static func getAvatarURL(name: String, size: Int = 120) -> String {
+                let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "user"
+                return "\(diceBearBaseURL)/\(avatarStyle)/png?seed=\(encodedName)&size=\(size)"
+            }
+        }
 }
