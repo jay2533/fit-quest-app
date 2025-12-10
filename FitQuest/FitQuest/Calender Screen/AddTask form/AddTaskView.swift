@@ -288,7 +288,7 @@ class AddTaskView: UIView {
         
         notesTextView = UITextView()
         notesTextView.text = "Add notes here..."
-        notesTextView.textColor = .lightGray  // Placeholder color
+        notesTextView.textColor = .lightGray
         notesTextView.font = .systemFont(ofSize: 16)
         notesTextView.backgroundColor = UIColor.white.withAlphaComponent(0.1)
         notesTextView.layer.cornerRadius = 12
@@ -354,7 +354,7 @@ class AddTaskView: UIView {
             durationPicker.topAnchor.constraint(equalTo: durationButton.bottomAnchor, constant: 8),
             durationPicker.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             durationPicker.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            durationPickerHeightConstraint,  // ← Uses dynamic constraint
+            durationPickerHeightConstraint,  // Uses dynamic constraint
             
             difficultyLabel.topAnchor.constraint(equalTo: durationPicker.bottomAnchor, constant: 24),
             difficultyLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
@@ -375,7 +375,7 @@ class AddTaskView: UIView {
             datePicker.topAnchor.constraint(equalTo: dateButton.bottomAnchor, constant: 8),
             datePicker.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             datePicker.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            datePickerHeightConstraint,  // ← Uses dynamic constraint
+            datePickerHeightConstraint,  // Uses dynamic constraint
             
             timeButton.topAnchor.constraint(equalTo: datePicker.bottomAnchor, constant: 16),
             timeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
@@ -386,7 +386,7 @@ class AddTaskView: UIView {
             timePicker.topAnchor.constraint(equalTo: timeButton.bottomAnchor, constant: 8),
             timePicker.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             timePicker.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            timePickerHeightConstraint,  // ← Uses dynamic constraint
+            timePickerHeightConstraint,  // Uses dynamic constraint
             
             notesLabel.topAnchor.constraint(equalTo: timePicker.bottomAnchor, constant: 24),
             notesLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),

@@ -74,13 +74,9 @@ class TaskService {
             "isCompleted": true,
             "completedAt": FieldValue.serverTimestamp()
         ])
-        
-        print(" Task \(taskId) marked complete")
-        
+
         // 3. Award XP to user
         try await awardXP(userId: task.userId, xp: task.xpValue)
-        
-        print(" Awarded \(task.xpValue) XP to user \(task.userId)")
     }
     
     func unmarkTask(taskId: String) async throws {
@@ -101,13 +97,9 @@ class TaskService {
             "isCompleted": false,
             "completedAt": FieldValue.delete()
         ])
-        
-        print(" Task \(taskId) unmarked")
-        
+
         // 4. Deduct XP from user
         try await deductXP(userId: task.userId, xp: task.xpValue)
-        
-        print("Deducted \(task.xpValue) XP from user \(task.userId)")
     }
     
     func canUnmarkTask(_ task: FitQuestTask) -> Bool {

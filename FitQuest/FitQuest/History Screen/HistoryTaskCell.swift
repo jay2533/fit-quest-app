@@ -125,7 +125,6 @@ class HistoryTaskCell: UITableViewCell {
     }
     
     private func setupConstraints() {
-        // Set priorities BEFORE activating constraints
         timeLabel.setContentHuggingPriority(.required, for: .horizontal)
         timeLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         

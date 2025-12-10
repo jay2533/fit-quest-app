@@ -70,7 +70,7 @@ class HistoryScreenView: UIView {
         filterBadgeView.layer.cornerRadius = 20
         filterBadgeView.layer.borderWidth = 1
         filterBadgeView.layer.borderColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 0.5).cgColor
-        filterBadgeView.isHidden = true // Hidden by default
+        filterBadgeView.isHidden = true
         filterBadgeView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(filterBadgeView)
         

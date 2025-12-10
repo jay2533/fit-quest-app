@@ -223,7 +223,7 @@ class HomeScreenView: UIView {
         customClearButton.setImage(xIcon, for: .normal)
         customClearButton.tintColor = UIColor(red: 0.08, green: 0.15, blue: 0.25, alpha: 1.0)
         
-        customClearButton.alpha = 0  // Hidden initially
+        customClearButton.alpha = 0
         customClearButton.translatesAutoresizingMaskIntoConstraints = false
         
         dueTasksContainer.addSubview(customClearButton)

@@ -36,8 +36,7 @@ class AvatarGenerator {
     }
     
     func generateAPIAvatar(name: String, size: Int = 120) async throws -> UIImage? {
-        let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "user"
-        let avatarURLString = "https://api.dicebear.com/7.x/avataaars/png?seed=\(encodedName)&size=\(size)"
+        let avatarURLString = Constants.API.getAvatarURL(name: name, size: size)
         
         guard let avatarURL = URL(string: avatarURLString) else {
             return nil

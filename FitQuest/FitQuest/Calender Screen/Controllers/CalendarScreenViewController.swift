@@ -91,7 +91,6 @@ class CalendarScreenViewController: UIViewController {
     
     func fetchTasks(for date: Date) {
         guard let userId = Auth.auth().currentUser?.uid else {
-                print("No user logged in")
                 // Show error to user
                 showErrorAlert(
                     title: "Authentication Error",
@@ -121,8 +120,6 @@ class CalendarScreenViewController: UIViewController {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM dd, yyyy HH:mm"
-        print("\n📅 Setting up listener for date: \(dateFormatter.string(from: date))")
-        print("   Range: \(dateFormatter.string(from: startOfDay)) to \(dateFormatter.string(from: endOfDay))")
         
         // Set up real-time listener
         taskListener = db.collection(Constants.Collections.tasks)
@@ -136,7 +133,6 @@ class CalendarScreenViewController: UIViewController {
                 self.showLoading(false)
                 
                 if let error = error {
-                    print("Error fetching tasks: \(error.localizedDescription)")
                     self.tasks = []
                     
                     // Show user-friendly error
@@ -157,26 +153,11 @@ class CalendarScreenViewController: UIViewController {
                 
                 // Skip cache-only updates when switching dates
                 if snapshot.metadata.isFromCache && snapshot.metadata.hasPendingWrites {
-                    print("⏭️ Skipping cache update with pending writes")
+                    print("Skipping cache update with pending writes")
                     return
                 }
                 
-                let source = snapshot.metadata.isFromCache ? "CACHE" : "SERVER"
-                print("\n Snapshot received [\(source)] with \(snapshot.documents.count) documents")
-                
-                for change in snapshot.documentChanges {
-                    switch change.type {
-                    case .added:
-                        print("   Added: \(change.document.documentID)")
-                    case .modified:
-                        print("    Modified: \(change.document.documentID)")
-                    case .removed:
-                        print("    Removed: \(change.document.documentID)")
-                    }
-                }
-                
                 if snapshot.documents.isEmpty {
-                    print(" No tasks found for this date")
                     self.tasks = []
                     DispatchQueue.main.async {
                         self.calendarView.tasksTableView.reloadData()
@@ -200,13 +181,9 @@ class CalendarScreenViewController: UIViewController {
                           let xpValue = data["xpValue"] as? Int,
                           let isCompleted = data["isCompleted"] as? Bool,
                           let createdAtTimestamp = data["createdAt"] as? Timestamp else {
-                        print(" Failed to parse task: \(document.documentID)")
                         return nil
                     }
-                    
-                    let taskDate = scheduledDateTimestamp.dateValue()
-                    print("   📋 Task: \(title) - Scheduled: \(dateFormatter.string(from: taskDate))")
-                    
+                                        
                     let category = TaskCategory(rawValue: categoryString) ?? .miscellaneous
                     let completedAtTimestamp = data["completedAt"] as? Timestamp
                     let notes = data["notes"] as? String
@@ -232,13 +209,10 @@ class CalendarScreenViewController: UIViewController {
                 }
                 
                 self.tasks.sort { $0.scheduledTime < $1.scheduledTime }
-                
-                print(" Successfully parsed \(self.tasks.count) tasks")
-                
+                                
                 DispatchQueue.main.async {
                     self.calendarView.tasksTableView.reloadData()
                     self.showEmptyState(show: false)
-                    print(" Table view reloaded with \(self.tasks.count) tasks\n")
                 }
             }
     }
@@ -266,10 +240,6 @@ class CalendarScreenViewController: UIViewController {
         }
     }
     
-    func showEmptyState() {
-        print("No tasks for this date")
-    }
-    
     func getWeekDates(for date: Date) -> [Date] {
         let calendar = Calendar.current
         let startOfWeek = calendar.date(
@@ -289,14 +259,12 @@ class CalendarScreenViewController: UIViewController {
         guard let newDate = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: selectedDate) else { return }
         selectedDate = newDate
         loadCurrentWeek()
-        print("Previous week - now showing week of: \(selectedDate)")
     }
 
     @objc func onNextWeekTapped() {
         guard let newDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: selectedDate) else { return }
         selectedDate = newDate
         loadCurrentWeek()
-        print("Next week - now showing week of: \(selectedDate)")
     }
     
     @objc func onAddTaskTapped() {
@@ -311,9 +279,7 @@ class CalendarScreenViewController: UIViewController {
             )
             return
         }
-        
-        print("Add task button tapped - Opening Category Selection")
-        
+                
         let categorySelectionVC = CategorySelectionViewController(selectedDate: selectedDate)
         categorySelectionVC.delegate = self
         
@@ -326,7 +292,6 @@ class CalendarScreenViewController: UIViewController {
     }
     
     @objc func onMonthYearTapped() {
-        print("Month/Year tapped - showing date picker")
         showMonthYearPicker()
     }
     
@@ -424,12 +389,10 @@ class CalendarScreenViewController: UIViewController {
     }
     
     @objc func onLogoTapped() {
-        print("Calendar logo tapped - going back")
         navigationController?.popViewController(animated: true)
     }
     
     @objc func onBackTapped() {
-        print("Calendar back button tapped - going back")
         navigationController?.popViewController(animated: true)
     }
     
@@ -437,7 +400,7 @@ class CalendarScreenViewController: UIViewController {
         if show {
             let emptyStateView = UIView()
             emptyStateView.backgroundColor = .clear
-            emptyStateView.tag = 999 // Tag to find and remove later
+            emptyStateView.tag = 999
             emptyStateView.translatesAutoresizingMaskIntoConstraints = false
             
             let iconImageView = UIImageView()
@@ -583,9 +546,7 @@ class CalendarScreenViewController: UIViewController {
         calendarView.tasksTableView.refreshControl = refreshControl
     }
 
-    @objc private func handleRefresh() {
-        print("Manual refresh triggered")
-        
+    @objc private func handleRefresh() {        
         // Re-fetch tasks for current date
         fetchTasks(for: selectedDate)
         

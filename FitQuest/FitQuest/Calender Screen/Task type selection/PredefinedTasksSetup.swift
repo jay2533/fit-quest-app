@@ -23,14 +23,11 @@ class PredefinedTasksSetup {
             let taskData = try Firestore.Encoder().encode(task)
             try await database.collection("predefinedTasks").addDocument(data: taskData)
         }
-        
-        print("✅ Successfully added \(tasks.count) predefined tasks to Firebase!")
     }
     
     private func getAllPredefinedTasks() -> [PredefinedTask] {
         var tasks: [PredefinedTask] = []
         
-        // MARK: - Physical Tasks
         tasks.append(PredefinedTask(
             title: "Running",
             description: "Go for a run today",
@@ -61,7 +58,6 @@ class PredefinedTasksSetup {
             difficulty: .easy
         ))
         
-        // MARK: - Mental Tasks
         tasks.append(PredefinedTask(
             title: "Reading",
             description: "Read few pages from a book",
@@ -92,7 +88,6 @@ class PredefinedTasksSetup {
             difficulty: .easy
         ))
         
-        // MARK: - Social Tasks
         tasks.append(PredefinedTask(
             title: "Coffee with Friend",
             description: "Quality time with someone you care about",
@@ -123,7 +118,6 @@ class PredefinedTasksSetup {
             difficulty: .hard
         ))
         
-        // MARK: - Creativity Tasks
         tasks.append(PredefinedTask(
             title: "Creative Writing",
             description: "Write stories, poems, or journal",
@@ -154,7 +148,6 @@ class PredefinedTasksSetup {
             difficulty: .medium
         ))
         
-        // MARK: - Miscellaneous Tasks
         tasks.append(PredefinedTask(
             title: "Organize Space",
             description: "Clean and declutter your environment",

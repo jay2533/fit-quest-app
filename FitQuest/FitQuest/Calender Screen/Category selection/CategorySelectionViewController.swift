@@ -41,14 +41,13 @@ class CategorySelectionViewController: UIViewController {
     }
     
     func setupActions() {
-        for (index, button) in categoryView.categoryButtons.enumerated() {
+        for (_, button) in categoryView.categoryButtons.enumerated() {
             button.addTarget(self, action: #selector(onCategoryTapped(_:)), for: .touchUpInside)
         }
     }
     
     @objc func onCategoryTapped(_ sender: UIButton) {
         let category = TaskCategory.allCases[sender.tag]
-        print("Category selected: \(category.displayName)")
         
         dismiss(animated: true) {
             self.delegate?.didSelectCategory(category, selectedDate: self.selectedDate)

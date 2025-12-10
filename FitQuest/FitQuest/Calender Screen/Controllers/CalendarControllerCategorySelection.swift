@@ -8,7 +8,6 @@ import UIKit
 
 extension CalendarScreenViewController: CategorySelectionDelegate {
     func didSelectCategory(_ category: TaskCategory, selectedDate: Date) {
-        print("Category selected: \(category.displayName) for date: \(selectedDate)")
         
         let taskTypeVC = TaskTypeSelectionViewController(category: category, selectedDate: selectedDate)
         taskTypeVC.delegate = self
@@ -24,7 +23,6 @@ extension CalendarScreenViewController: CategorySelectionDelegate {
 
 extension CalendarScreenViewController: TaskTypeSelectionDelegate {
     func didSelectCustomTask(category: TaskCategory, selectedDate: Date) {
-        print("Custom task selected for category: \(category.displayName)")
         
         if let presentedVC = self.presentedViewController {
             presentedVC.dismiss(animated: true) {
@@ -36,7 +34,6 @@ extension CalendarScreenViewController: TaskTypeSelectionDelegate {
     }
     
     func didSelectPredefinedTask(_ task: PredefinedTask, category: TaskCategory, selectedDate: Date) {
-        print("Predefined task selected: \(task.title)")
         
         if let presentedVC = self.presentedViewController {
             presentedVC.dismiss(animated: true) {
@@ -62,7 +59,7 @@ extension CalendarScreenViewController: TaskTypeSelectionDelegate {
         }
         
         present(addTaskVC, animated: true) {
-            print("✅ AddTaskViewController presented")
+            print("AddTaskViewController presented")
         }
     }
 }

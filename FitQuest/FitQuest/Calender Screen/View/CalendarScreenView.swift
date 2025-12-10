@@ -156,41 +156,34 @@ class CalendarScreenView: UIView {
             backButton.widthAnchor.constraint(equalToConstant: 32),
             backButton.heightAnchor.constraint(equalToConstant: 32),
             
-            // Title below logo
             titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 4),
             titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 40),
             titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -40),
             
-            // Month/Year Label below title
             monthYearLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
             monthYearLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             monthYearLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
-            // Week Collection View (we reference it earlier in constraints, so it needs a top)
             weekCollectionView.topAnchor.constraint(equalTo: monthYearLabel.bottomAnchor, constant: 15),
             weekCollectionView.leadingAnchor.constraint(equalTo: previousWeekButton.trailingAnchor, constant: 8),
             weekCollectionView.trailingAnchor.constraint(equalTo: nextWeekButton.leadingAnchor, constant: -8),
             weekCollectionView.heightAnchor.constraint(equalToConstant: 80),
             
-            // Previous Week Button
             previousWeekButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 15),
             previousWeekButton.centerYAnchor.constraint(equalTo: weekCollectionView.centerYAnchor),
             previousWeekButton.widthAnchor.constraint(equalToConstant: 40),
             previousWeekButton.heightAnchor.constraint(equalToConstant: 40),
 
-            // Next Week Button
             nextWeekButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -15),
             nextWeekButton.centerYAnchor.constraint(equalTo: weekCollectionView.centerYAnchor),
             nextWeekButton.widthAnchor.constraint(equalToConstant: 40),
             nextWeekButton.heightAnchor.constraint(equalToConstant: 40),
             
-            // Tasks Table View
             tasksTableView.topAnchor.constraint(equalTo: weekCollectionView.bottomAnchor, constant: 25),
             tasksTableView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             tasksTableView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             tasksTableView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
             
-            // Add Task Button (floating bottom right)
             addTaskButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -25),
             addTaskButton.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -25),
             addTaskButton.widthAnchor.constraint(equalToConstant: 56),
