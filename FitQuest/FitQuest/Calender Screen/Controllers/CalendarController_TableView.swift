@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 // MARK: - UITableViewDelegate & UITableViewDataSource
 
@@ -168,10 +169,18 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         
         Task {
             do {
+                guard let userId = Auth.auth().currentUser?.uid else {
+                    await MainActor.run {
+                        self.showErrorToast("User not logged in")
+                    }
+                    return
+                }
+                
+                // 1. Mark task complete (awards XP)
                 try await TaskService.shared.completeTask(taskId: taskId)
                 
-                print("✅ Task completed: \(task.title)")
-                print("💰 Awarded \(task.xpValue) XP")
+                // 2. Update stats (no XP, just stats + level/tier)
+                try await StatsService.shared.updateStatsAfterTaskCompletion(userId: userId, task: task)
                 
                 await MainActor.run {
                     showXPToast("+\(task.xpValue) XP")
@@ -184,16 +193,26 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
                     cell.updateCompletionState(isCompleted: false, isOverdue: isOverdue, animated: true)
                     self.showErrorToast("Failed to complete task")
                 }
-                print("❌ Error completing task: \(error)")
             }
         }
     }
-    
+
     // MARK: - Unmark Task
     private func unmarkTask(taskId: String, task: FitQuestTask, cell: TaskTableViewCell) {
         Task {
             do {
+                guard let userId = Auth.auth().currentUser?.uid else {
+                    await MainActor.run {
+                        self.showErrorToast("User not logged in")
+                    }
+                    return
+                }
+                
+                // 1. Unmark task (deducts XP)
                 try await TaskService.shared.unmarkTask(taskId: taskId)
+                
+                // 2. Reverse stats (task counts, category XP, daily progress)
+                try await StatsService.shared.reverseStatsAfterUnmark(userId: userId, task: task)
                 
                 await MainActor.run {
                     // Check if task is now overdue when unmarking
@@ -202,20 +221,20 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
                     showXPToast("-\(task.xpValue) XP")
                 }
                 
-                print("⭕️ Task unmarked: \(task.title)")
-                print("💸 Deducted \(task.xpValue) XP")
-                
             } catch let error as NSError {
                 if error.code == -2 {
                     await MainActor.run {
+                        // Revert to completed state
+                        cell.updateCompletionState(isCompleted: true, isOverdue: false, animated: true)
                         showCannotUnmarkAlert()
                     }
                 } else {
                     await MainActor.run {
+                        // Revert to completed state
+                        cell.updateCompletionState(isCompleted: true, isOverdue: false, animated: true)
                         self.showErrorToast("Failed to unmark task")
                     }
                 }
-                print("❌ Error unmarking task: \(error)")
             }
         }
     }

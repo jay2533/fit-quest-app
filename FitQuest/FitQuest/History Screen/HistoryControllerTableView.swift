@@ -58,7 +58,7 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 90 // Adjusted for new cell design
+        return 90
     }
     
     // MARK: - Selection
@@ -98,15 +98,11 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
         }
     }
     
-    // MARK: - Task Deletion Handler
+    // MARK: - Task Deletion Handler - ✅ UPDATED
     
     private func handleTaskDeleted() {
-        // Remove deleted task and reload
-        allTasks = []
-        groupedTasks = []
-        lastLoadedDate = nil
-        hasMoreTasks = true
-        
+        // Reset pagination and reload
+        resetPagination()
         loadTasks()
     }
     

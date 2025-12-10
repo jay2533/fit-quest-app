@@ -14,7 +14,7 @@ class HistoryScreenViewController: UIViewController {
 
     let historyView = HistoryScreenView()
     
-    // MARK: - Data Properties (Changed from private to internal)
+    // MARK: - Data Properties
     var allTasks: [FitQuestTask] = []
     var groupedTasks: [(date: Date, tasks: [FitQuestTask])] = []
     
@@ -22,9 +22,13 @@ class HistoryScreenViewController: UIViewController {
     var isLoading = false
     var hasMoreTasks = true
     
-    // Pagination
-    var lastLoadedDate: Date?
-    let tasksPerPage = 30 // Load 30 days at a time
+    // ✅ NEW: Separate cursors for pagination
+    var lastCompletedTask: DocumentSnapshot?
+    var lastMissedTask: DocumentSnapshot?
+    var hasMoreCompleted = true
+    var hasMoreMissed = true
+    
+    let tasksPerBatch = 20 // Fetch 20 from each query per load
     
     // MARK: - Lifecycle
     
@@ -88,11 +92,7 @@ class HistoryScreenViewController: UIViewController {
         historyView.hideFilterBadge()
         
         // Reset and reload
-        allTasks = []
-        groupedTasks = []
-        lastLoadedDate = nil
-        hasMoreTasks = true
-        
+        resetPagination()
         loadTasks()
     }
     
@@ -115,7 +115,7 @@ class HistoryScreenViewController: UIViewController {
         
         Task {
             do {
-                let tasks = try await fetchPastTasks(userId: userId, category: selectedCategory, isLoadingMore: isLoadingMore)
+                let tasks = try await fetchHistoryTasks(userId: userId, category: selectedCategory)
                 
                 await MainActor.run {
                     if isLoadingMore {
@@ -124,9 +124,8 @@ class HistoryScreenViewController: UIViewController {
                         self.allTasks = tasks
                     }
                     
-                    if tasks.count < self.tasksPerPage {
-                        self.hasMoreTasks = false
-                    }
+                    // Check if we have more tasks to load
+                    self.hasMoreTasks = self.hasMoreCompleted || self.hasMoreMissed
                     
                     self.groupTasksByDate()
                     self.historyView.tasksTableView.reloadData()
@@ -147,98 +146,163 @@ class HistoryScreenViewController: UIViewController {
         }
     }
     
-    // MARK: - Firebase Fetch
+    // MARK: - Firebase Fetch (PAGINATED HYBRID)
     
-    private func fetchPastTasks(userId: String, category: TaskCategory?, isLoadingMore: Bool) async throws -> [FitQuestTask] {
+    private func fetchHistoryTasks(userId: String, category: TaskCategory?) async throws -> [FitQuestTask] {
         let db = Firestore.firestore()
-        
-        // Calculate date range
         let now = Date()
-        let endDate = lastLoadedDate ?? now
         
-        let calendar = Calendar.current
-        let startDate = calendar.date(byAdding: .day, value: -tasksPerPage, to: endDate) ?? endDate
-        
-        print("📅 Fetching tasks from \(startDate) to \(endDate)")
+        print("📅 Fetching history tasks (completed OR missed)")
         if let category = category {
             print("🔍 Filtering by category: \(category.displayName)")
         }
         
-        // ✅ FIXED: Build query differently based on category filter
-        var query: Query
+        var completedTasks: [FitQuestTask] = []
+        var missedTasks: [FitQuestTask] = []
         
-        if let category = category {
-            // WITH CATEGORY FILTER (requires different index)
-            query = db.collection(Constants.Collections.tasks)
-                .whereField("userId", isEqualTo: userId)
-                .whereField("category", isEqualTo: category.rawValue)
-                .whereField("scheduledTime", isLessThanOrEqualTo: Timestamp(date: endDate))
-                .whereField("scheduledTime", isGreaterThan: Timestamp(date: startDate))
-                .order(by: "scheduledTime", descending: true)
-        } else {
-            // WITHOUT CATEGORY FILTER (uses existing index)
-            query = db.collection(Constants.Collections.tasks)
-                .whereField("userId", isEqualTo: userId)
-                .whereField("scheduledTime", isLessThanOrEqualTo: Timestamp(date: endDate))
-                .whereField("scheduledTime", isGreaterThan: Timestamp(date: startDate))
-                .order(by: "scheduledTime", descending: true)
-        }
-        
-        let snapshot = try await query.getDocuments()
-        
-        print("✅ Fetched \(snapshot.documents.count) tasks")
-        
-        // Update last loaded date for pagination
-        if let lastTask = snapshot.documents.last {
-            let data = lastTask.data()
-            if let scheduledTimeTimestamp = data["scheduledTime"] as? Timestamp {
-                lastLoadedDate = scheduledTimeTimestamp.dateValue()
+        // ✅ QUERY 1: Fetch completed tasks (if more available)
+        if hasMoreCompleted {
+            var completedQuery: Query
+            
+            if let category = category {
+                completedQuery = db.collection(Constants.Collections.tasks)
+                    .whereField("userId", isEqualTo: userId)
+                    .whereField("category", isEqualTo: category.rawValue)
+                    .whereField("isCompleted", isEqualTo: true)
+                    .order(by: "completedAt", descending: true)
+                    .limit(to: tasksPerBatch)
+            } else {
+                completedQuery = db.collection(Constants.Collections.tasks)
+                    .whereField("userId", isEqualTo: userId)
+                    .whereField("isCompleted", isEqualTo: true)
+                    .order(by: "completedAt", descending: true)
+                    .limit(to: tasksPerBatch)
+            }
+            
+            // Add pagination cursor
+            if let lastDoc = lastCompletedTask {
+                completedQuery = completedQuery.start(afterDocument: lastDoc)
+            }
+            
+            let completedSnapshot = try await completedQuery.getDocuments()
+            
+            if completedSnapshot.documents.isEmpty {
+                hasMoreCompleted = false
+            } else {
+                lastCompletedTask = completedSnapshot.documents.last
+                completedTasks = completedSnapshot.documents.compactMap { parseTask(from: $0) }
+                print("  ✅ Fetched \(completedTasks.count) completed tasks")
             }
         }
         
-        // Parse tasks (same as before)
-        let tasks = snapshot.documents.compactMap { document -> FitQuestTask? in
-            let data = document.data()
+        // ✅ QUERY 2: Fetch missed tasks (if more available)
+        if hasMoreMissed {
+            var missedQuery: Query
             
-            guard let userId = data["userId"] as? String,
-                  let title = data["title"] as? String,
-                  let categoryString = data["category"] as? String,
-                  let isCustom = data["isCustom"] as? Bool,
-                  let duration = data["duration"] as? Int,
-                  let scheduledDateTimestamp = data["scheduledDate"] as? Timestamp,
-                  let scheduledTimeTimestamp = data["scheduledTime"] as? Timestamp,
-                  let notificationTimeTimestamp = data["notificationTime"] as? Timestamp,
-                  let xpValue = data["xpValue"] as? Int,
-                  let isCompleted = data["isCompleted"] as? Bool,
-                  let createdAtTimestamp = data["createdAt"] as? Timestamp else {
-                return nil
+            if let category = category {
+                missedQuery = db.collection(Constants.Collections.tasks)
+                    .whereField("userId", isEqualTo: userId)
+                    .whereField("category", isEqualTo: category.rawValue)
+                    .whereField("isCompleted", isEqualTo: false)
+                    .whereField("scheduledTime", isLessThan: Timestamp(date: now))
+                    .order(by: "scheduledTime", descending: true)
+                    .limit(to: tasksPerBatch)
+            } else {
+                missedQuery = db.collection(Constants.Collections.tasks)
+                    .whereField("userId", isEqualTo: userId)
+                    .whereField("isCompleted", isEqualTo: false)
+                    .whereField("scheduledTime", isLessThan: Timestamp(date: now))
+                    .order(by: "scheduledTime", descending: true)
+                    .limit(to: tasksPerBatch)
             }
             
-            let category = TaskCategory(rawValue: categoryString) ?? .miscellaneous
-            let completedAtTimestamp = data["completedAt"] as? Timestamp
-            let notes = data["notes"] as? String
-            let imageURL = data["imageURL"] as? String
+            // Add pagination cursor
+            if let lastDoc = lastMissedTask {
+                missedQuery = missedQuery.start(afterDocument: lastDoc)
+            }
             
-            return FitQuestTask(
-                id: document.documentID,
-                userId: userId,
-                title: title,
-                category: category,
-                isCustom: isCustom,
-                duration: duration,
-                scheduledDate: scheduledDateTimestamp.dateValue(),
-                scheduledTime: scheduledTimeTimestamp.dateValue(),
-                notificationTime: notificationTimeTimestamp.dateValue(),
-                xpValue: xpValue,
-                isCompleted: isCompleted,
-                completedAt: completedAtTimestamp?.dateValue(),
-                notes: notes,
-                imageURL: imageURL,
-                createdAt: createdAtTimestamp.dateValue()
-            )
+            let missedSnapshot = try await missedQuery.getDocuments()
+            
+            if missedSnapshot.documents.isEmpty {
+                hasMoreMissed = false
+            } else {
+                lastMissedTask = missedSnapshot.documents.last
+                missedTasks = missedSnapshot.documents.compactMap { parseTask(from: $0) }
+                print("  ✅ Fetched \(missedTasks.count) missed tasks")
+            }
         }
         
-        return tasks
+        // ✅ Merge and deduplicate
+        var allTasks = completedTasks + missedTasks
+        var uniqueTasks: [FitQuestTask] = []
+        var seenIds = Set<String>()
+        
+        for task in allTasks {
+            if let id = task.id, !seenIds.contains(id) {
+                uniqueTasks.append(task)
+                seenIds.insert(id)
+            }
+        }
+        
+        // Sort by scheduled time (newest first)
+        uniqueTasks.sort { $0.scheduledTime > $1.scheduledTime }
+        
+        return uniqueTasks
+    }
+    
+    // MARK: - Helper: Parse Task
+    
+    private func parseTask(from document: QueryDocumentSnapshot) -> FitQuestTask? {
+        let data = document.data()
+        
+        guard let userId = data["userId"] as? String,
+              let title = data["title"] as? String,
+              let categoryString = data["category"] as? String,
+              let isCustom = data["isCustom"] as? Bool,
+              let duration = data["duration"] as? Int,
+              let scheduledDateTimestamp = data["scheduledDate"] as? Timestamp,
+              let scheduledTimeTimestamp = data["scheduledTime"] as? Timestamp,
+              let notificationTimeTimestamp = data["notificationTime"] as? Timestamp,
+              let xpValue = data["xpValue"] as? Int,
+              let isCompleted = data["isCompleted"] as? Bool,
+              let createdAtTimestamp = data["createdAt"] as? Timestamp else {
+            return nil
+        }
+        
+        let category = TaskCategory(rawValue: categoryString) ?? .miscellaneous
+        let completedAtTimestamp = data["completedAt"] as? Timestamp
+        let notes = data["notes"] as? String
+        let imageURL = data["imageURL"] as? String
+        
+        return FitQuestTask(
+            id: document.documentID,
+            userId: userId,
+            title: title,
+            category: category,
+            isCustom: isCustom,
+            duration: duration,
+            scheduledDate: scheduledDateTimestamp.dateValue(),
+            scheduledTime: scheduledTimeTimestamp.dateValue(),
+            notificationTime: notificationTimeTimestamp.dateValue(),
+            xpValue: xpValue,
+            isCompleted: isCompleted,
+            completedAt: completedAtTimestamp?.dateValue(),
+            notes: notes,
+            imageURL: imageURL,
+            createdAt: createdAtTimestamp.dateValue()
+        )
+    }
+    
+    // MARK: - Reset Pagination
+    
+    func resetPagination() {
+        allTasks = []
+        groupedTasks = []
+        lastCompletedTask = nil
+        lastMissedTask = nil
+        hasMoreCompleted = true
+        hasMoreMissed = true
+        hasMoreTasks = true
     }
     
     // MARK: - Group Tasks by Date
@@ -307,11 +371,7 @@ extension HistoryScreenViewController: CategoryFilterDelegate {
         }
         
         // Reset and reload with filter
-        allTasks = []
-        groupedTasks = []
-        lastLoadedDate = nil
-        hasMoreTasks = true
-        
+        resetPagination()
         loadTasks()
     }
 }

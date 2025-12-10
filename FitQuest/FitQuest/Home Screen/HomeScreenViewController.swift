@@ -54,7 +54,7 @@ class HomeScreenViewController: UIViewController {
         // Load data
         loadDueTasks()
         checkForUnreadNotifications()
-        loadUserAIAvatar()  // 🔥 Load AI avatar
+        loadUserAIAvatar()
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -68,7 +68,7 @@ class HomeScreenViewController: UIViewController {
         // Reload data
         loadDueTasks()
         checkForUnreadNotifications()
-        loadUserAIAvatar()  // 🔥 Reload AI avatar
+        loadUserAIAvatar()
     }
     
     // MARK: - Setup
@@ -128,7 +128,6 @@ class HomeScreenViewController: UIViewController {
     
     private func setAIAvatar(name: String) {
         Task {
-            // 🔥 Use the SAME avatar generator as profile page
             let avatar = await AvatarGenerator.shared.getAIAvatar(name: name, size: 44)
             
             await MainActor.run {
@@ -343,7 +342,6 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
         let task = filteredTasks[indexPath.row]
         print("📋 Task tapped: \(task.title)")
         
-        // Show task detail bottom sheet
         showTaskDetail(for: task)
     }
 
@@ -351,7 +349,6 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
     private func showTaskDetail(for task: FitQuestTask) {
         let detailVC = TaskDetailViewController(task: task)
         
-        // ✅ Refresh list after deletion
         detailVC.onTaskDeleted = { [weak self] in
             self?.loadDueTasks()
         }
@@ -366,34 +363,30 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     // MARK: - Task Completion
-    
+        
     private func handleTaskCompletion(task: FitQuestTask, at indexPath: IndexPath) {
         guard let taskId = task.id, let userId = authService.currentUserId else { return }
         
         Task {
             do {
-                let newCompletionStatus = !task.isCompleted
+                // 1. Complete task (awards XP)
+                try await taskService.completeTask(taskId: taskId)
                 
-                if newCompletionStatus {
-                    // Mark as complete
-                    try await taskService.completeTask(taskId: taskId)
-                    
-                    // Update stats
-                    try await StatsService.shared.updateStatsAfterTaskCompletion(userId: userId, task: task)
-                    
-                    // Clear read state since task is now complete
-                    NotificationStateManager.shared.clearReadStateForTask(userId: userId, taskId: taskId)
-                } else {
-                    // Mark as incomplete
-                    try await taskService.updateTask(taskId: taskId, updates: [
-                        "isCompleted": false,
-                        "completedAt": NSNull()
-                    ])
+                // 2. Update stats (no XP, just stats + level/tier)
+                try await StatsService.shared.updateStatsAfterTaskCompletion(userId: userId, task: task)
+                
+                // 3. Clear notification read state
+                NotificationStateManager.shared.clearReadStateForTask(userId: userId, taskId: taskId)
+                
+                // 4. Show success toast
+                await MainActor.run {
+                    self.showXPToast("+\(task.xpValue) XP", for: task)
                 }
                 
+                // 5. Update UI (task will disappear from list)
                 await MainActor.run {
                     if let cell = self.homeView.tasksTableView.cellForRow(at: indexPath) as? TaskTableViewCell {
-                        cell.updateCompletionState(isCompleted: newCompletionStatus, animated: true)
+                        cell.updateCompletionState(isCompleted: true, animated: true)
                     }
                     
                     self.loadDueTasks()
@@ -402,10 +395,87 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
                 
             } catch {
                 await MainActor.run {
-                    print("Failed to update task: \(error.localizedDescription)")
+                    self.showAlert(title: "Error", message: "Failed to complete task")
+                    
+                    // Revert cell state
+                    if let cell = self.homeView.tasksTableView.cellForRow(at: indexPath) as? TaskTableViewCell {
+                        cell.updateCompletionState(isCompleted: false, animated: true)
+                    }
                 }
+                print("❌ Error: \(error.localizedDescription)")
             }
         }
+    }
+    
+    // MARK: - XP Toast Helper
+    private func showXPToast(_ message: String, for task: FitQuestTask) {
+        // Create toast with task title
+        let toastContainer = UIView()
+        toastContainer.backgroundColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 0.95)
+        toastContainer.layer.cornerRadius = 12
+        toastContainer.clipsToBounds = true
+        toastContainer.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Task title
+        let titleLabel = UILabel()
+        titleLabel.text = task.title
+        titleLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        titleLabel.textColor = .white
+        titleLabel.textAlignment = .center
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // XP message
+        let xpLabel = UILabel()
+        xpLabel.text = message
+        xpLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        xpLabel.textColor = .white
+        xpLabel.textAlignment = .center
+        xpLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        toastContainer.addSubview(titleLabel)
+        toastContainer.addSubview(xpLabel)
+        view.addSubview(toastContainer)
+        
+        NSLayoutConstraint.activate([
+            toastContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            toastContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            toastContainer.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 40),
+            toastContainer.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -40),
+            toastContainer.heightAnchor.constraint(equalToConstant: 70),
+            
+            titleLabel.topAnchor.constraint(equalTo: toastContainer.topAnchor, constant: 12),
+            titleLabel.leadingAnchor.constraint(equalTo: toastContainer.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: toastContainer.trailingAnchor, constant: -16),
+            
+            xpLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            xpLabel.leadingAnchor.constraint(equalTo: toastContainer.leadingAnchor, constant: 16),
+            xpLabel.trailingAnchor.constraint(equalTo: toastContainer.trailingAnchor, constant: -16),
+            xpLabel.bottomAnchor.constraint(equalTo: toastContainer.bottomAnchor, constant: -12)
+        ])
+        
+        // Animate in
+        toastContainer.alpha = 0
+        toastContainer.transform = CGAffineTransform(translationX: 0, y: 20)
+        
+        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: [], animations: {
+            toastContainer.alpha = 1
+            toastContainer.transform = .identity
+        }) { _ in
+            // Animate out after 2 seconds
+            UIView.animate(withDuration: 0.3, delay: 2.0, options: [], animations: {
+                toastContainer.alpha = 0
+                toastContainer.transform = CGAffineTransform(translationX: 0, y: 20)
+            }) { _ in
+                toastContainer.removeFromSuperview()
+            }
+        }
+    }
+
+    // MARK: - Alert Helper
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 
