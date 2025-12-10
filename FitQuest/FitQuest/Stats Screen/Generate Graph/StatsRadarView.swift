@@ -2,8 +2,8 @@ import UIKit
 
 class StatsRadarView: UIView {
     
-    /// Values for each category, normalized 0.0–1.0.
-    /// Order: Physical, Mental, Social, Creativity, Miscellaneous.
+    // Values for each category, normalized 0.0–1.0.
+    // Order: Physical, Mental, Social, Creativity, Miscellaneous.
     var values: [CGFloat] = [0, 0, 0, 0, 0] {
         didSet {
             if values.count != 5 {

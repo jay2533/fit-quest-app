@@ -9,41 +9,26 @@ import UIKit
 
 class ProfileView: UIView {
     
-    // MARK: - Components
     var scrollView: UIScrollView!
     var contentView: UIView!
-    
-    // Header
     var backButton: UIButton!
     var titleLabel: UILabel!
-    
-    // Profile Images Container
     var imagesContainer: UIView!
     var userImageView: UIImageView!
     var aiAvatarImageView: UIImageView!
     var userImageLabel: UILabel!
-    
-    // User Details Container
     var detailsContainer: UIView!
-    
-    // Name Row
     var nameContainer: UIView!
     var nameLabel: UILabel!
     var nameValueLabel: UILabel!
     var nameEditButton: UIButton!
-    
-    // Email Row
     var emailContainer: UIView!
     var emailLabel: UILabel!
     var emailValueLabel: UILabel!
-    
-    // Date of Birth Row
     var dobContainer: UIView!
     var dobLabel: UILabel!
     var dobValueLabel: UILabel!
     var dobEditButton: UIButton!
-    
-    // Stats Row (XP, Level, Tier)
     var statsContainer: UIView!
     var xpLabel: UILabel!
     var xpValueLabel: UILabel!
@@ -51,8 +36,6 @@ class ProfileView: UIView {
     var levelValueLabel: UILabel!
     var tierLabel: UILabel!
     var tierValueLabel: UILabel!
-    
-    // Action Buttons
     var logoutButton: UIButton!
     var deleteAccountButton: UIButton!
     
@@ -72,9 +55,7 @@ class ProfileView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Setup Methods
-    
+        
     func setupScrollView() {
         scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
@@ -89,7 +70,6 @@ class ProfileView: UIView {
     }
     
     func setupHeader() {
-        // Back Button
         backButton = UIButton(type: .system)
         let backConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .semibold)
         backButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: backConfig), for: .normal)
@@ -97,7 +77,6 @@ class ProfileView: UIView {
         backButton.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(backButton)
         
-        // Title
         titleLabel = UILabel()
         titleLabel.text = "Profile"
         titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
@@ -116,7 +95,6 @@ class ProfileView: UIView {
         imagesContainer.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(imagesContainer)
         
-        // User Profile Image
         userImageView = UIImageView()
         userImageView.contentMode = .scaleAspectFill
         userImageView.clipsToBounds = true
@@ -130,7 +108,6 @@ class ProfileView: UIView {
         userImageView.translatesAutoresizingMaskIntoConstraints = false
         imagesContainer.addSubview(userImageView)
         
-        // AI Avatar Image
         aiAvatarImageView = UIImageView()
         aiAvatarImageView.contentMode = .scaleAspectFill
         aiAvatarImageView.clipsToBounds = true
@@ -144,7 +121,6 @@ class ProfileView: UIView {
         aiAvatarImageView.translatesAutoresizingMaskIntoConstraints = false
         imagesContainer.addSubview(aiAvatarImageView)
         
-        // Single Label for both images
         userImageLabel = UILabel()
         userImageLabel.text = "Your character"
         userImageLabel.font = .systemFont(ofSize: 16, weight: .semibold)
@@ -163,7 +139,6 @@ class ProfileView: UIView {
         detailsContainer.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(detailsContainer)
         
-        // Name Row
         nameContainer = createDetailRow()
         detailsContainer.addSubview(nameContainer)
         
@@ -176,7 +151,6 @@ class ProfileView: UIView {
         nameEditButton = createEditButton()
         nameContainer.addSubview(nameEditButton)
         
-        // Email Row
         emailContainer = createDetailRow()
         detailsContainer.addSubview(emailContainer)
         
@@ -186,7 +160,6 @@ class ProfileView: UIView {
         emailValueLabel = createValueLabel(text: "Loading...")
         emailContainer.addSubview(emailValueLabel)
         
-        // DOB Row
         dobContainer = createDetailRow()
         detailsContainer.addSubview(dobContainer)
         
@@ -199,14 +172,12 @@ class ProfileView: UIView {
         dobEditButton = createEditButton()
         dobContainer.addSubview(dobEditButton)
         
-        // Stats Container
         statsContainer = UIView()
         statsContainer.backgroundColor = UIColor.white.withAlphaComponent(0.08)
         statsContainer.layer.cornerRadius = 12
         statsContainer.translatesAutoresizingMaskIntoConstraints = false
         detailsContainer.addSubview(statsContainer)
         
-        // XP
         xpLabel = createFieldLabel(text: "Total XP")
         statsContainer.addSubview(xpLabel)
         
@@ -215,7 +186,6 @@ class ProfileView: UIView {
         xpValueLabel.font = .systemFont(ofSize: 20, weight: .bold)
         statsContainer.addSubview(xpValueLabel)
         
-        // Level
         levelLabel = createFieldLabel(text: "Level")
         statsContainer.addSubview(levelLabel)
         
@@ -224,7 +194,6 @@ class ProfileView: UIView {
         levelValueLabel.font = .systemFont(ofSize: 20, weight: .bold)
         statsContainer.addSubview(levelValueLabel)
         
-        // Tier
         tierLabel = createFieldLabel(text: "Tier")
         statsContainer.addSubview(tierLabel)
         
@@ -235,7 +204,6 @@ class ProfileView: UIView {
     }
     
     func setupActionButtons() {
-        // Logout Button
         logoutButton = UIButton(type: .system)
         logoutButton.setTitle("Logout", for: .normal)
         logoutButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
@@ -245,7 +213,6 @@ class ProfileView: UIView {
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(logoutButton)
         
-        // Delete Account Button
         deleteAccountButton = UIButton(type: .system)
         deleteAccountButton.setTitle("Delete Account", for: .normal)
         deleteAccountButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
@@ -255,9 +222,7 @@ class ProfileView: UIView {
         deleteAccountButton.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(deleteAccountButton)
     }
-    
-    // MARK: - Helper Methods
-    
+        
     func createDetailRow() -> UIView {
         let view = UIView()
         view.backgroundColor = .clear
@@ -291,12 +256,9 @@ class ProfileView: UIView {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
-    
-    // MARK: - Constraints
-    
+        
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Scroll View
             scrollView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
@@ -308,7 +270,6 @@ class ProfileView: UIView {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            // Header
             backButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             backButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             backButton.widthAnchor.constraint(equalToConstant: 40),
@@ -317,19 +278,16 @@ class ProfileView: UIView {
             titleLabel.centerYAnchor.constraint(equalTo: backButton.centerYAnchor),
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            // Images Container
             imagesContainer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 30),
             imagesContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             imagesContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             imagesContainer.heightAnchor.constraint(equalToConstant: 180),
 
-            // User Image
             userImageView.topAnchor.constraint(equalTo: imagesContainer.topAnchor, constant: 20),
             userImageView.trailingAnchor.constraint(equalTo: imagesContainer.centerXAnchor, constant: -12),
             userImageView.widthAnchor.constraint(equalToConstant: 120),
             userImageView.heightAnchor.constraint(equalToConstant: 120),
             
-            // AI Avatar Image
             aiAvatarImageView.topAnchor.constraint(equalTo: imagesContainer.topAnchor, constant: 20),
             aiAvatarImageView.leadingAnchor.constraint(equalTo: imagesContainer.centerXAnchor, constant: 12),
             aiAvatarImageView.widthAnchor.constraint(equalToConstant: 120),
@@ -339,12 +297,10 @@ class ProfileView: UIView {
             userImageLabel.centerXAnchor.constraint(equalTo: imagesContainer.centerXAnchor),
             userImageLabel.bottomAnchor.constraint(equalTo: imagesContainer.bottomAnchor, constant: -12),
             
-            // Details Container
             detailsContainer.topAnchor.constraint(equalTo: imagesContainer.bottomAnchor, constant: 24),
             detailsContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             detailsContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            // Name Row
             nameContainer.topAnchor.constraint(equalTo: detailsContainer.topAnchor, constant: 20),
             nameContainer.leadingAnchor.constraint(equalTo: detailsContainer.leadingAnchor, constant: 16),
             nameContainer.trailingAnchor.constraint(equalTo: detailsContainer.trailingAnchor, constant: -16),
@@ -361,7 +317,6 @@ class ProfileView: UIView {
             nameEditButton.widthAnchor.constraint(equalToConstant: 24),
             nameEditButton.heightAnchor.constraint(equalToConstant: 24),
             
-            // Email Row
             emailContainer.topAnchor.constraint(equalTo: nameContainer.bottomAnchor, constant: 8),
             emailContainer.leadingAnchor.constraint(equalTo: detailsContainer.leadingAnchor, constant: 16),
             emailContainer.trailingAnchor.constraint(equalTo: detailsContainer.trailingAnchor, constant: -16),
@@ -374,7 +329,6 @@ class ProfileView: UIView {
             emailValueLabel.leadingAnchor.constraint(equalTo: emailContainer.leadingAnchor),
             emailValueLabel.trailingAnchor.constraint(equalTo: emailContainer.trailingAnchor, constant: -8),
             
-            // DOB Row
             dobContainer.topAnchor.constraint(equalTo: emailContainer.bottomAnchor, constant: 8),
             dobContainer.leadingAnchor.constraint(equalTo: detailsContainer.leadingAnchor, constant: 16),
             dobContainer.trailingAnchor.constraint(equalTo: detailsContainer.trailingAnchor, constant: -16),
@@ -391,35 +345,30 @@ class ProfileView: UIView {
             dobEditButton.widthAnchor.constraint(equalToConstant: 24),
             dobEditButton.heightAnchor.constraint(equalToConstant: 24),
             
-            // Stats Container
             statsContainer.topAnchor.constraint(equalTo: dobContainer.bottomAnchor, constant: 20),
             statsContainer.leadingAnchor.constraint(equalTo: detailsContainer.leadingAnchor, constant: 16),
             statsContainer.trailingAnchor.constraint(equalTo: detailsContainer.trailingAnchor, constant: -16),
             statsContainer.heightAnchor.constraint(equalToConstant: 100),
             statsContainer.bottomAnchor.constraint(equalTo: detailsContainer.bottomAnchor, constant: -20),
             
-            // XP (Left)
             xpLabel.topAnchor.constraint(equalTo: statsContainer.topAnchor, constant: 16),
             xpLabel.leadingAnchor.constraint(equalTo: statsContainer.leadingAnchor, constant: 20),
             
             xpValueLabel.topAnchor.constraint(equalTo: xpLabel.bottomAnchor, constant: 4),
             xpValueLabel.centerXAnchor.constraint(equalTo: xpLabel.centerXAnchor),
             
-            // Level (Center)
             levelLabel.topAnchor.constraint(equalTo: statsContainer.topAnchor, constant: 16),
             levelLabel.centerXAnchor.constraint(equalTo: statsContainer.centerXAnchor),
             
             levelValueLabel.topAnchor.constraint(equalTo: levelLabel.bottomAnchor, constant: 4),
             levelValueLabel.centerXAnchor.constraint(equalTo: levelLabel.centerXAnchor),
             
-            // Tier (Right)
             tierLabel.topAnchor.constraint(equalTo: statsContainer.topAnchor, constant: 16),
             tierLabel.trailingAnchor.constraint(equalTo: statsContainer.trailingAnchor, constant: -20),
             
             tierValueLabel.topAnchor.constraint(equalTo: tierLabel.bottomAnchor, constant: 4),
             tierValueLabel.centerXAnchor.constraint(equalTo: tierLabel.centerXAnchor),
             
-            // Action Buttons
             logoutButton.topAnchor.constraint(equalTo: detailsContainer.bottomAnchor, constant: 30),
             logoutButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 40),
             logoutButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -40),

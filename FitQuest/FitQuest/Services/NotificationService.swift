@@ -15,13 +15,11 @@ class NotificationService {
     
     private init() {}
     
-    // MARK: - Create Notification
     func createNotification(_ notification: AppNotification) async throws {
         let notificationData = try Firestore.Encoder().encode(notification)
         try await database.collection("notifications").addDocument(data: notificationData)
     }
     
-    // MARK: - Fetch User Notifications
     func fetchUserNotifications(userId: String, limit: Int = 50) async throws -> [AppNotification] {
         let snapshot = try await database.collection("notifications")
             .whereField("userId", isEqualTo: userId)
@@ -35,8 +33,7 @@ class NotificationService {
             return notification
         }
     }
-    
-    // MARK: - Fetch Unread Count
+
     func fetchUnreadCount(userId: String) async throws -> Int {
         let snapshot = try await database.collection("notifications")
             .whereField("userId", isEqualTo: userId)
@@ -46,14 +43,12 @@ class NotificationService {
         return snapshot.documents.count
     }
     
-    // MARK: - Mark Notification as Read
     func markAsRead(notificationId: String) async throws {
         try await database.collection("notifications")
             .document(notificationId)
             .updateData(["isRead": true])
     }
     
-    // MARK: - Mark All as Read
     func markAllAsRead(userId: String) async throws {
         let snapshot = try await database.collection("notifications")
             .whereField("userId", isEqualTo: userId)
@@ -65,12 +60,10 @@ class NotificationService {
         }
     }
     
-    // MARK: - Delete Notification
     func deleteNotification(notificationId: String) async throws {
         try await database.collection("notifications").document(notificationId).delete()
     }
     
-    // MARK: - Fetch Total Unread Count (Including Generated Notifications)
     func fetchTotalUnreadCount(userId: String) async throws -> Int {
         // 1. Count stored notifications
         let storedUnread = try await fetchUnreadCount(userId: userId)
@@ -87,7 +80,7 @@ class NotificationService {
         for task in activeTasks {
             guard let taskId = task.id else { continue }
             
-            // 🔥 Skip if already marked as read
+            // Skip if already marked as read
             if stateManager.isTaskNotificationRead(userId: userId, taskId: taskId) {
                 continue
             }
@@ -110,7 +103,6 @@ class NotificationService {
         return storedUnread + taskNotificationCount
     }
     
-    // MARK: - Create Task Due Notifications
     func createTaskDueNotifications(userId: String, tasks: [FitQuestTask]) async throws {
         let calendar = Calendar.current
         let now = Date()

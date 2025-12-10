@@ -15,14 +15,12 @@ class TaskService {
     
     private init() {}
     
-    // MARK: - Create Task
     func createTask(_ task: FitQuestTask) async throws -> String {
         let taskData = try Firestore.Encoder().encode(task)
         let docRef = try await database.collection(Constants.Collections.tasks).addDocument(data: taskData)
         return docRef.documentID
     }
     
-    // MARK: - Fetch User's Active Tasks
     func fetchActiveTasks(userId: String) async throws -> [FitQuestTask] {
         let snapshot = try await database.collection(Constants.Collections.tasks)
             .whereField("userId", isEqualTo: userId)
@@ -37,7 +35,6 @@ class TaskService {
         }
     }
     
-    // MARK: - Fetch User's Completed Tasks
     func fetchCompletedTasks(userId: String, limit: Int = 20) async throws -> [FitQuestTask] {
         let snapshot = try await database.collection(Constants.Collections.tasks)
             .whereField("userId", isEqualTo: userId)
@@ -53,7 +50,6 @@ class TaskService {
         }
     }
     
-    // MARK: - Fetch Tasks by Category
     func fetchTasksByCategory(userId: String, category: TaskCategory) async throws -> [FitQuestTask] {
         let snapshot = try await database.collection(Constants.Collections.tasks)
             .whereField("userId", isEqualTo: userId)
@@ -69,7 +65,6 @@ class TaskService {
         }
     }
     
-    // MARK: - ✅ UPDATED: Complete Task (Now with XP Award)
     func completeTask(taskId: String) async throws {
         // 1. Fetch the task to get xpValue and userId
         let task = try await fetchTask(taskId: taskId)
@@ -80,15 +75,14 @@ class TaskService {
             "completedAt": FieldValue.serverTimestamp()
         ])
         
-        print("✅ Task \(taskId) marked complete")
+        print(" Task \(taskId) marked complete")
         
         // 3. Award XP to user
         try await awardXP(userId: task.userId, xp: task.xpValue)
         
-        print("💰 Awarded \(task.xpValue) XP to user \(task.userId)")
+        print(" Awarded \(task.xpValue) XP to user \(task.userId)")
     }
     
-    // MARK: - ✅ NEW: Unmark Task (with 5-minute grace period)
     func unmarkTask(taskId: String) async throws {
         // 1. Fetch task to check completedAt and get xpValue
         let task = try await fetchTask(taskId: taskId)
@@ -108,15 +102,14 @@ class TaskService {
             "completedAt": FieldValue.delete()
         ])
         
-        print("⭕️ Task \(taskId) unmarked")
+        print(" Task \(taskId) unmarked")
         
         // 4. Deduct XP from user
         try await deductXP(userId: task.userId, xp: task.xpValue)
         
-        print("💸 Deducted \(task.xpValue) XP from user \(task.userId)")
+        print("Deducted \(task.xpValue) XP from user \(task.userId)")
     }
     
-    // MARK: - ✅ NEW: Check if Task Can Be Unmarked
     func canUnmarkTask(_ task: FitQuestTask) -> Bool {
         guard let completedAt = task.completedAt else {
             return false // Not completed, can't unmark
@@ -129,7 +122,6 @@ class TaskService {
         return timeSinceCompletion <= fiveMinutesInSeconds
     }
     
-    // MARK: - ✅ NEW: Private XP Helpers
     private func awardXP(userId: String, xp: Int) async throws {
         let userRef = database.collection(Constants.Collections.users).document(userId)
         
@@ -146,12 +138,10 @@ class TaskService {
         ])
     }
     
-    // MARK: - Delete Task
     func deleteTask(taskId: String) async throws {
         try await database.collection(Constants.Collections.tasks).document(taskId).delete()
     }
     
-    // MARK: - Fetch Predefined Tasks
     func fetchPredefinedTasks(category: TaskCategory? = nil) async throws -> [PredefinedTask] {
         var query: Query = database.collection(Constants.Collections.predefinedTasks)
         
@@ -168,12 +158,10 @@ class TaskService {
         }
     }
     
-    // MARK: - Update Task
     func updateTask(taskId: String, updates: [String: Any]) async throws {
         try await database.collection(Constants.Collections.tasks).document(taskId).updateData(updates)
     }
     
-    // MARK: - Fetch Task by ID
     func fetchTask(taskId: String) async throws -> FitQuestTask {
         let document = try await database.collection(Constants.Collections.tasks).document(taskId).getDocument()
         

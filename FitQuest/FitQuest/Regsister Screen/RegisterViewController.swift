@@ -10,7 +10,6 @@ import PhotosUI
 
 class RegisterViewController: UIViewController {
     
-    // MARK: - Properties
     private let registerView = RegisterView()
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -23,7 +22,6 @@ class RegisterViewController: UIViewController {
     private let firestoreService = FirestoreService.shared
     private let storageService = StorageService.shared
     
-    // MARK: - Lifecycle
     override func loadView() {
         view = registerView
     }
@@ -56,7 +54,6 @@ class RegisterViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    // MARK: - Setup
     private func setupViewController() {
         navigationItem.hidesBackButton = true
         navigationController?.setNavigationBarHidden(true, animated: false)
@@ -75,7 +72,6 @@ class RegisterViewController: UIViewController {
         registerView.passwordTextField.delegate = self
         registerView.dateOfBirthTextField.delegate = self
         
-        // Set tint color for all text fields
         [registerView.nameTextField, registerView.emailTextField,
          registerView.passwordTextField, registerView.dateOfBirthTextField].forEach { textField in
             textField?.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
@@ -155,13 +151,11 @@ class RegisterViewController: UIViewController {
         }
     }
     
-    // MARK: - Date Picker
     @objc private func datePickerChanged() {
         let selectedDate = registerView.datePicker.date
         registerView.dateOfBirthTextField.text = dateFormatter.string(from: selectedDate)
     }
     
-    // MARK: - Actions
     @objc private func handleSignUp() {
         view.endEditing(true)
         
@@ -176,7 +170,6 @@ class RegisterViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-    // MARK: - Validation
     private func validateInputs() -> Bool {
         guard let name = registerView.nameTextField.text, ValidationHelper.isValidName(name) else {
             showAlert(title: "Error", message: "Please enter your name.")
@@ -209,7 +202,6 @@ class RegisterViewController: UIViewController {
         return true
     }
     
-    // MARK: - Registration Flow
     private func registerUser() async {
         guard let name = registerView.nameTextField.text,
               let email = registerView.emailTextField.text,
@@ -274,7 +266,6 @@ class RegisterViewController: UIViewController {
         }
     }
     
-    // MARK: - Navigation
     private func showSuccessAndNavigate() {
         let alert = UIAlertController(
             title: "Welcome to FitQuest!",
@@ -305,7 +296,6 @@ class RegisterViewController: UIViewController {
         registerView.dateOfBirthTextField.text = ""
     }
     
-    // MARK: - Image Picker
     private func createImagePickerMenu() -> UIMenu {
         let menuItems = [
             UIAction(title: "Camera", image: UIImage(systemName: "camera")) { [weak self] _ in
@@ -343,7 +333,6 @@ class RegisterViewController: UIViewController {
     }
 }
 
-// MARK: - UITextFieldDelegate
 extension RegisterViewController: UITextFieldDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
@@ -374,7 +363,6 @@ extension RegisterViewController: UITextFieldDelegate {
     }
 }
 
-// MARK: - PHPickerViewControllerDelegate
 extension RegisterViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
@@ -403,7 +391,6 @@ extension RegisterViewController: PHPickerViewControllerDelegate {
     }
 }
 
-// MARK: - UIImagePickerControllerDelegate
 extension RegisterViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController,
                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -421,7 +408,6 @@ extension RegisterViewController: UINavigationControllerDelegate, UIImagePickerC
     }
 }
 
-// MARK: - Keyboard Protocol
 extension RegisterViewController: KeyboardProtocol {
     func hideKeyboardOnTapOutside() {
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboardOnTap))
@@ -434,7 +420,6 @@ extension RegisterViewController: KeyboardProtocol {
     }
 }
 
-// MARK: - Alert Protocol
 extension RegisterViewController: AlertProtocol {
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -443,7 +428,6 @@ extension RegisterViewController: AlertProtocol {
     }
 }
 
-// MARK: - Loading Indicator Protocol
 extension RegisterViewController: LoadingIndicatorProtocol {
     func showLoadingIndicator() {
         hideLoadingIndicator()

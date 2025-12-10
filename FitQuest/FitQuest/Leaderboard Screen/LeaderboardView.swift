@@ -9,17 +9,10 @@ import UIKit
 
 class LeaderboardView: UIView {
     
-    
-    
-    // MARK: - Header
     var logoImageView: UIImageView!
     var appNameLabel: UILabel!
     var backButton: UIButton!
-    
-    // MARK: - Title
     var titleLabel: UILabel!
-    
-    // MARK: - Podium
     var podiumContainer: UIView!
     var firstPodiumView: UIView!
     var secondPodiumView: UIView!
@@ -30,13 +23,8 @@ class LeaderboardView: UIView {
     var firstNameLabel: UILabel!
     var secondNameLabel: UILabel!
     var thirdNameLabel: UILabel!
-
-    
-    // MARK: - Table
     var tableContainer: UIView!
     var leaderboardTableView: UITableView!
-    
-    // MARK: - Current User Rank
     var currentUserContainer: UIView!
     var currentUserAvatarView: UIImageView!
     var currentUserNameLabel: UILabel!
@@ -90,7 +78,7 @@ class LeaderboardView: UIView {
         setupPodium()
         setupTable()
         setupCurrentUserCard()
-        setupLoadingOverlay()   // ⬅️ add this
+        setupLoadingOverlay()
         initConstraints()
     }
     
@@ -98,7 +86,6 @@ class LeaderboardView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: Setup loading overlay
     private func setupLoadingOverlay() {
         loadingOverlay = UIView()
         loadingOverlay.translatesAutoresizingMaskIntoConstraints = false
@@ -130,7 +117,6 @@ class LeaderboardView: UIView {
             loadingLabel.centerXAnchor.constraint(equalTo: loadingOverlay.centerXAnchor)
         ])
         
-        // start hidden by default
         loadingOverlay.isHidden = true
     }
 
@@ -144,15 +130,11 @@ class LeaderboardView: UIView {
             isUserInteractionEnabled = true
         }
     }
-    
-    // MARK: - Setup Header
-    
+        
     private func setupHeader() {
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
-        let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .medium)
-        logoImageView.image = UIImage(systemName: "arrow.up.heart.fill", withConfiguration: config)
-        logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
+        logoImageView.image = UIImage(named: "fitquest_logo")?.withRenderingMode(.alwaysOriginal)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(logoImageView)
         
@@ -174,16 +156,13 @@ class LeaderboardView: UIView {
     
     private func setupTitle() {
         titleLabel = UILabel()
-        titleLabel.text = "Leaderboards"
+        titleLabel.text = "Leaderboard"
         titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
         titleLabel.textColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(titleLabel)
     }
-    
-    
-    // MARK: - Podium
     
     private func setupPodium() {
         podiumContainer = UIView()
@@ -199,7 +178,6 @@ class LeaderboardView: UIView {
         podiumContainer.translatesAutoresizingMaskIntoConstraints = false
         addSubview(podiumContainer)
         
-        // Podium blocks (the actual stand)
         func makePodiumBlock() -> UIView {
             let v = UIView()
             v.backgroundColor = UIColor.white.withAlphaComponent(0.08)
@@ -261,9 +239,6 @@ class LeaderboardView: UIView {
         podiumContainer.addSubview(secondNameLabel)
         podiumContainer.addSubview(thirdNameLabel)
     }
-
-    
-    // MARK: - Table
     
     private func setupTable() {
         tableContainer = UIView()
@@ -281,9 +256,7 @@ class LeaderboardView: UIView {
         leaderboardTableView.isScrollEnabled = true
         tableContainer.addSubview(leaderboardTableView)
     }
-    
-    // MARK: - Current User Card
-    
+        
     private func setupCurrentUserCard() {
         currentUserContainer = UIView()
         currentUserContainer.backgroundColor = UIColor.white.withAlphaComponent(0.08)
@@ -320,12 +293,9 @@ class LeaderboardView: UIView {
         currentUserXPLabel.translatesAutoresizingMaskIntoConstraints = false
         currentUserContainer.addSubview(currentUserXPLabel)
     }
-    
-    // MARK: - Constraints
-    
+        
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Header
             logoImageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
             logoImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
             logoImageView.widthAnchor.constraint(equalToConstant: 40),
@@ -340,18 +310,15 @@ class LeaderboardView: UIView {
             appNameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 40),
             appNameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -40),
             
-            // Title
             titleLabel.topAnchor.constraint(equalTo: appNameLabel.bottomAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 40),
             titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -40),
             
-            // Podium container
             podiumContainer.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             podiumContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             podiumContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             podiumContainer.heightAnchor.constraint(equalToConstant: 170),
             
-            // Table container fills the space above the current user card
             tableContainer.topAnchor.constraint(equalTo: podiumContainer.bottomAnchor, constant: 20),
             tableContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             tableContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
@@ -362,34 +329,28 @@ class LeaderboardView: UIView {
             leaderboardTableView.leadingAnchor.constraint(equalTo: tableContainer.leadingAnchor, constant: 8),
             leaderboardTableView.trailingAnchor.constraint(equalTo: tableContainer.trailingAnchor, constant: -8),
             
-            // Current user card pinned to bottom
             currentUserContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             currentUserContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             currentUserContainer.heightAnchor.constraint(equalToConstant: 72),
             currentUserContainer.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16)
         ])
         
-        // Podium layout: traditional stand (2 - 1 - 3)
         NSLayoutConstraint.activate([
-            // #1 Tallest block
             firstPodiumView.centerXAnchor.constraint(equalTo: podiumContainer.centerXAnchor),
             firstPodiumView.bottomAnchor.constraint(equalTo: podiumContainer.bottomAnchor, constant: -20),
             firstPodiumView.widthAnchor.constraint(equalToConstant: 70),
             firstPodiumView.heightAnchor.constraint(equalToConstant: 70),
 
-            // #2 Medium height (left)
             secondPodiumView.trailingAnchor.constraint(equalTo: firstPodiumView.leadingAnchor, constant: -28),
             secondPodiumView.bottomAnchor.constraint(equalTo: podiumContainer.bottomAnchor, constant: -20),
             secondPodiumView.widthAnchor.constraint(equalToConstant: 60),
             secondPodiumView.heightAnchor.constraint(equalToConstant: 55),
 
-            // #3 Shortest height (right)
             thirdPodiumView.leadingAnchor.constraint(equalTo: firstPodiumView.trailingAnchor, constant: 28),
             thirdPodiumView.bottomAnchor.constraint(equalTo: podiumContainer.bottomAnchor, constant: -20),
             thirdPodiumView.widthAnchor.constraint(equalToConstant: 60),
             thirdPodiumView.heightAnchor.constraint(equalToConstant: 40),
             
-            // Avatars sitting on top of each block
             firstAvatarView.centerXAnchor.constraint(equalTo: firstPodiumView.centerXAnchor),
             firstAvatarView.bottomAnchor.constraint(equalTo: firstPodiumView.topAnchor, constant: -8),
             firstAvatarView.widthAnchor.constraint(equalToConstant: 64),
@@ -405,15 +366,12 @@ class LeaderboardView: UIView {
             thirdAvatarView.widthAnchor.constraint(equalToConstant: 56),
             thirdAvatarView.heightAnchor.constraint(equalToConstant: 56),
             
-            // Names just below avatars
             firstNameLabel.topAnchor.constraint(equalTo: firstPodiumView.bottomAnchor, constant: 2),
             firstNameLabel.centerXAnchor.constraint(equalTo: firstPodiumView.centerXAnchor),
 
-            // Second place name (left)
             secondNameLabel.topAnchor.constraint(equalTo: secondPodiumView.bottomAnchor, constant: 2),
             secondNameLabel.centerXAnchor.constraint(equalTo: secondPodiumView.centerXAnchor),
 
-            // Third place name (right)
             thirdNameLabel.topAnchor.constraint(equalTo: thirdPodiumView.bottomAnchor, constant: 2),
             thirdNameLabel.centerXAnchor.constraint(equalTo: thirdPodiumView.centerXAnchor),
             
@@ -428,7 +386,6 @@ class LeaderboardView: UIView {
         ])
 
         
-        // Current user card layout
         NSLayoutConstraint.activate([
             currentUserAvatarView.leadingAnchor.constraint(equalTo: currentUserContainer.leadingAnchor, constant: 12),
             currentUserAvatarView.centerYAnchor.constraint(equalTo: currentUserContainer.centerYAnchor),
@@ -445,11 +402,8 @@ class LeaderboardView: UIView {
             currentUserXPLabel.topAnchor.constraint(equalTo: currentUserRankLabel.bottomAnchor, constant: 4)
         ])
     }
-    
-    // MARK: - Update Methods
-    
+        
     func updatePodium(with entries: [LeaderboardEntry], avatars: [String: UIImage]) {
-        // entries[0] = #1, [1] = #2, [2] = #3 (if they exist)
         
         if entries.indices.contains(0) {
             let e = entries[0]

@@ -7,12 +7,8 @@
 
 import UIKit
 
-// MARK: - UITableViewDelegate & UITableViewDataSource
-
 extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    // MARK: - Sections
-    
+        
     func numberOfSections(in tableView: UITableView) -> Int {
         if groupedTasks.isEmpty {
             showEmptyState()
@@ -26,9 +22,7 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return groupedTasks[section].tasks.count
     }
-    
-    // MARK: - Section Headers
-    
+        
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: DateSectionHeaderView.identifier) as? DateSectionHeaderView else {
             return nil
@@ -43,9 +37,7 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 44
     }
-    
-    // MARK: - Cells
-    
+        
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: HistoryTaskCell.identifier, for: indexPath) as? HistoryTaskCell else {
             return UITableViewCell()
@@ -60,8 +52,6 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 90
     }
-    
-    // MARK: - Selection
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let task = groupedTasks[indexPath.section].tasks[indexPath.row]
@@ -81,9 +71,7 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
         
         present(detailVC, animated: true)
     }
-    
-    // MARK: - Pagination (Load More)
-    
+        
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
@@ -92,22 +80,18 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
         // Load more when user scrolls to 80% of content
         if offsetY > contentHeight - height * 1.2 {
             if !isLoading && hasMoreTasks {
-                print("📜 Loading more tasks...")
+                print("Loading more tasks...")
                 loadTasks(isLoadingMore: true)
             }
         }
     }
-    
-    // MARK: - Task Deletion Handler - ✅ UPDATED
-    
+        
     private func handleTaskDeleted() {
         // Reset pagination and reload
         resetPagination()
         loadTasks()
     }
-    
-    // MARK: - Empty State
-    
+        
     func showEmptyState() {
         // Check if empty state already exists
         if historyView.tasksTableView.viewWithTag(999) != nil {
@@ -119,14 +103,12 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
         emptyStateView.tag = 999
         emptyStateView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Icon
         let iconImageView = UIImageView()
         iconImageView.image = UIImage(systemName: "clock.arrow.circlepath")
         iconImageView.tintColor = UIColor.lightGray.withAlphaComponent(0.5)
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Title
         let titleLabel = UILabel()
         if selectedCategory != nil {
             titleLabel.text = "No tasks found"
@@ -138,7 +120,6 @@ extension HistoryScreenViewController: UITableViewDelegate, UITableViewDataSourc
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Subtitle
         let subtitleLabel = UILabel()
         if selectedCategory != nil {
             subtitleLabel.text = "Try a different filter or create new tasks"

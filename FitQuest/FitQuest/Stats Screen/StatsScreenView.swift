@@ -2,32 +2,21 @@ import UIKit
 
 class StatsScreenView: UIView {
     
-    // MARK: - Header
+    var logoImageView: UIImageView!
     var appNameLabel: UILabel!
     var backButton: UIButton!
-
-
-    // MARK: - Title
     var statsTitleLabel: UILabel!
-    
-    // MARK: - Radar Chart
     var radarView: StatsRadarView!
-    
-    // Category labels
     var physicalLabel: UILabel!
     var mentalLabel: UILabel!
     var socialLabel: UILabel!
     var creativityLabel: UILabel!
     var miscellaneousLabel: UILabel!
-    
-    // Percentage labels near each category
     var physicalPercentLabel: UILabel!
     var mentalPercentLabel: UILabel!
     var socialPercentLabel: UILabel!
     var creativityPercentLabel: UILabel!
     var miscellaneousPercentLabel: UILabel!
-    
-    // MARK: - Stats Table
     private var statsTableContainer: UIView!
     private var statsTableStack: UIStackView!
     private var xpValueLabels: [UILabel] = []
@@ -49,10 +38,15 @@ class StatsScreenView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Setup
-    
+        
     func setupHeader() {
+        logoImageView = UIImageView()
+        logoImageView.contentMode = .scaleAspectFit
+        logoImageView.image = UIImage(named: "fitquest_logo")?.withRenderingMode(.alwaysOriginal)
+        logoImageView.isUserInteractionEnabled = false
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(logoImageView)
+        
         backButton = UIButton(type: .system)
         let backConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
         backButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: backConfig), for: .normal)
@@ -150,11 +144,10 @@ class StatsScreenView: UIView {
         statsTableStack.axis = .vertical
         statsTableStack.alignment = .fill
         statsTableStack.distribution = .fillEqually
-        statsTableStack.spacing = 10      // 🔹 more space between rows
+        statsTableStack.spacing = 10
         statsTableStack.translatesAutoresizingMaskIntoConstraints = false
         statsTableContainer.addSubview(statsTableStack)
         
-        // Header row
         let headerRow = makeTableRow(
             categoryText: "Category",
             xpText: "XP",
@@ -185,7 +178,6 @@ class StatsScreenView: UIView {
         row.alignment = .center
         row.distribution = .fillEqually
         
-        // 🔹 Bigger fonts
         let baseFontSize: CGFloat = isHeader ? 18 : 16
         
         let categoryLabel = UILabel()
@@ -221,43 +213,38 @@ class StatsScreenView: UIView {
         return row
     }
 
-    
-    // MARK: - Constraints
-    
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Header
+            logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 16),
+            logoImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 40),
+            logoImageView.heightAnchor.constraint(equalToConstant: 40),
+            
             backButton.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 16),
             backButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             backButton.widthAnchor.constraint(equalToConstant: 35),
             backButton.heightAnchor.constraint(equalToConstant: 35),
             
-            appNameLabel.centerYAnchor.constraint(equalTo: backButton.centerYAnchor),
+            appNameLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 8),
             appNameLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            
-            
-            // Title
-            statsTitleLabel.topAnchor.constraint(equalTo: backButton.bottomAnchor, constant: 24),
+
+            statsTitleLabel.topAnchor.constraint(equalTo: appNameLabel.bottomAnchor, constant: 16),
             statsTitleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 40),
             statsTitleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -40),
             
-            // Radar view
             radarView.topAnchor.constraint(equalTo: statsTitleLabel.bottomAnchor, constant: 32),
             radarView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             radarView.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.7),
             radarView.heightAnchor.constraint(equalTo: radarView.widthAnchor)
         ])
         
-        // Category labels & percent labels around the radar
         NSLayoutConstraint.activate([
-            // Top (Physical)
             physicalLabel.bottomAnchor.constraint(equalTo: radarView.topAnchor, constant: -6),
             physicalLabel.centerXAnchor.constraint(equalTo: radarView.centerXAnchor),
             
             physicalPercentLabel.topAnchor.constraint(equalTo: physicalLabel.bottomAnchor, constant: 2),
             physicalPercentLabel.centerXAnchor.constraint(equalTo: physicalLabel.centerXAnchor),
             
-            // Left middle (Miscellaneous)
             miscellaneousLabel.centerYAnchor.constraint(equalTo: radarView.centerYAnchor, constant: -70),
             miscellaneousLabel.trailingAnchor.constraint(equalTo: radarView.leadingAnchor, constant: 35),
             miscellaneousLabel.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor, constant: 5),
@@ -265,7 +252,6 @@ class StatsScreenView: UIView {
             miscellaneousPercentLabel.topAnchor.constraint(equalTo: miscellaneousLabel.bottomAnchor, constant: 2),
             miscellaneousPercentLabel.centerXAnchor.constraint(equalTo: miscellaneousLabel.centerXAnchor),
             
-            // Right middle (Mental)
             mentalLabel.centerYAnchor.constraint(equalTo: radarView.centerYAnchor, constant: -70),
             mentalLabel.leadingAnchor.constraint(equalTo: radarView.trailingAnchor, constant: 4),
             mentalLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor, constant: -8),
@@ -273,7 +259,6 @@ class StatsScreenView: UIView {
             mentalPercentLabel.topAnchor.constraint(equalTo: mentalLabel.bottomAnchor, constant: 2),
             mentalPercentLabel.centerXAnchor.constraint(equalTo: mentalLabel.centerXAnchor),
             
-            // Bottom-left (Creativity)
             creativityLabel.topAnchor.constraint(equalTo: radarView.bottomAnchor, constant: -10),
             creativityLabel.centerXAnchor.constraint(equalTo: radarView.centerXAnchor, constant: -80),
             creativityLabel.widthAnchor.constraint(equalTo: radarView.widthAnchor, multiplier: 0.4),
@@ -281,7 +266,6 @@ class StatsScreenView: UIView {
             creativityPercentLabel.topAnchor.constraint(equalTo: creativityLabel.bottomAnchor, constant: 2),
             creativityPercentLabel.centerXAnchor.constraint(equalTo: creativityLabel.centerXAnchor),
             
-            // Bottom-right (Social)
             socialLabel.topAnchor.constraint(equalTo: radarView.bottomAnchor, constant: -10),
             socialLabel.centerXAnchor.constraint(equalTo: radarView.centerXAnchor, constant: 80),
             socialLabel.widthAnchor.constraint(equalTo: radarView.widthAnchor, multiplier: 0.4),
@@ -290,7 +274,6 @@ class StatsScreenView: UIView {
             socialPercentLabel.centerXAnchor.constraint(equalTo: socialLabel.centerXAnchor)
         ])
         
-        // Stats table container
         NSLayoutConstraint.activate([
             statsTableContainer.topAnchor.constraint(equalTo: radarView.bottomAnchor, constant: 96),
             statsTableContainer.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
@@ -306,9 +289,7 @@ class StatsScreenView: UIView {
 
     }
     
-    // MARK: - Update methods
-    
-    /// Update the small % labels around the radar.
+    // Update the small % labels around the radar.
     func updateCategoryPercentLabels(_ percents: [CGFloat]) {
         guard percents.count == 5 else { return }
         let p0 = Int(round(percents[0]))
@@ -324,7 +305,7 @@ class StatsScreenView: UIView {
         miscellaneousPercentLabel.text = "\(p4)%"
     }
     
-    /// Update the table below the radar with raw XP and %.
+    // Update the table below the radar with raw XP and %.
     func updateStatsTable(xpValues: [Int], percents: [CGFloat]) {
         guard xpValues.count == 5,
               percents.count == 5,

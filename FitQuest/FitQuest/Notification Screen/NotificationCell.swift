@@ -2,14 +2,6 @@
 //  NotificationCell.swift
 //  FitQuest
 //
-//  Created by Sunny Yadav on 12/4/25.
-//
-
-
-//
-//  NotificationCell.swift
-//  FitQuest
-//
 //  Created by Sunny Yadav on 12/2/25.
 //
 
@@ -47,14 +39,12 @@ class NotificationCell: UITableViewCell {
         containerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(containerView)
         
-        // Icon
         iconImageView = UIImageView()
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(iconImageView)
         
-        // Title
         titleLabel = UILabel()
         titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
         titleLabel.textColor = .white
@@ -62,7 +52,6 @@ class NotificationCell: UITableViewCell {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(titleLabel)
         
-        // Message
         messageLabel = UILabel()
         messageLabel.font = .systemFont(ofSize: 14, weight: .regular)
         messageLabel.textColor = .lightGray
@@ -70,7 +59,6 @@ class NotificationCell: UITableViewCell {
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(messageLabel)
         
-        // Time
         timeLabel = UILabel()
         timeLabel.font = .systemFont(ofSize: 12, weight: .regular)
         timeLabel.textColor = .darkGray
@@ -78,7 +66,6 @@ class NotificationCell: UITableViewCell {
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(timeLabel)
         
-        // Unread Indicator
         unreadIndicator = UIView()
         unreadIndicator.backgroundColor = .systemRed
         unreadIndicator.layer.cornerRadius = 4
@@ -132,7 +119,6 @@ class NotificationCell: UITableViewCell {
         
         unreadIndicator.isHidden = notification.isRead
         
-        // Highlight unread notifications
         if !notification.isRead {
             containerView.backgroundColor = UIColor.white.withAlphaComponent(0.08)
             containerView.layer.borderColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 0.5).cgColor

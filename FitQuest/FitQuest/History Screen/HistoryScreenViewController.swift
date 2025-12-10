@@ -14,23 +14,18 @@ class HistoryScreenViewController: UIViewController {
 
     let historyView = HistoryScreenView()
     
-    // MARK: - Data Properties
     var allTasks: [FitQuestTask] = []
     var groupedTasks: [(date: Date, tasks: [FitQuestTask])] = []
-    
     var selectedCategory: TaskCategory? = nil
     var isLoading = false
     var hasMoreTasks = true
-    
     var lastCompletedTask: DocumentSnapshot?
     var lastMissedTask: DocumentSnapshot?
     var hasMoreCompleted = true
     var hasMoreMissed = true
     
     let tasksPerBatch = 20 // Fetch 20 from each query per load
-    
-    // MARK: - Lifecycle
-    
+        
     override func loadView() {
         view = historyView
     }
@@ -43,7 +38,6 @@ class HistoryScreenViewController: UIViewController {
         setupTableView()
         setupActions()
         
-        // Load initial tasks
         loadTasks()
     }
     
@@ -55,9 +49,7 @@ class HistoryScreenViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
-    
-    // MARK: - Setup
-    
+        
     private func setupTableView() {
         historyView.tasksTableView.delegate = self
         historyView.tasksTableView.dataSource = self
@@ -68,9 +60,7 @@ class HistoryScreenViewController: UIViewController {
         historyView.clearFilterButton.addTarget(self, action: #selector(onClearFilterTapped), for: .touchUpInside)
         historyView.backButton.addTarget(self, action: #selector(onBackTapped), for: .touchUpInside)
     }
-    
-    // MARK: - Actions
-    
+        
     @objc func onFilterTapped() {
         let filterVC = CategoryFilterViewController()
         filterVC.selectedCategory = selectedCategory
@@ -97,9 +87,7 @@ class HistoryScreenViewController: UIViewController {
         print("History back button tapped - going back")
         navigationController?.popViewController(animated: true)
     }
-    
-    // MARK: - Data Loading
-    
+        
     func loadTasks(isLoadingMore: Bool = false) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         guard !isLoading else { return }
@@ -130,7 +118,7 @@ class HistoryScreenViewController: UIViewController {
                     self.historyView.loadingIndicator.stopAnimating()
                     self.isLoading = false
                     
-                    print("✅ Loaded \(tasks.count) tasks (Total: \(self.allTasks.count))")
+                    print(" Loaded \(tasks.count) tasks (Total: \(self.allTasks.count))")
                 }
                 
             } catch {
@@ -139,18 +127,16 @@ class HistoryScreenViewController: UIViewController {
                     self.historyView.loadingIndicator.stopAnimating()
                     self.isLoading = false
                 }
-                print("❌ Error loading tasks: \(error)")
+                print("Error loading tasks: \(error)")
             }
         }
     }
-    
-    // MARK: - Firebase Fetch (PAGINATED HYBRID)
-    
+        
     private func fetchHistoryTasks(userId: String, category: TaskCategory?) async throws -> [FitQuestTask] {
         let db = Firestore.firestore()
         let now = Date()
         
-        print("📅 Fetching history tasks (completed OR missed)")
+        print(" Fetching history tasks (completed OR missed)")
         if let category = category {
             print("🔍 Filtering by category: \(category.displayName)")
         }
@@ -158,7 +144,7 @@ class HistoryScreenViewController: UIViewController {
         var completedTasks: [FitQuestTask] = []
         var missedTasks: [FitQuestTask] = []
         
-        // ✅ QUERY 1: Fetch completed tasks (if more available)
+        // QUERY 1: Fetch completed tasks (if more available)
         if hasMoreCompleted {
             var completedQuery: Query
             
@@ -189,11 +175,11 @@ class HistoryScreenViewController: UIViewController {
             } else {
                 lastCompletedTask = completedSnapshot.documents.last
                 completedTasks = completedSnapshot.documents.compactMap { parseTask(from: $0) }
-                print("  ✅ Fetched \(completedTasks.count) completed tasks")
+                print("  Fetched \(completedTasks.count) completed tasks")
             }
         }
         
-        // ✅ QUERY 2: Fetch missed tasks (if more available)
+        // QUERY 2: Fetch missed tasks (if more available)
         if hasMoreMissed {
             var missedQuery: Query
             
@@ -226,11 +212,11 @@ class HistoryScreenViewController: UIViewController {
             } else {
                 lastMissedTask = missedSnapshot.documents.last
                 missedTasks = missedSnapshot.documents.compactMap { parseTask(from: $0) }
-                print("  ✅ Fetched \(missedTasks.count) missed tasks")
+                print("  Fetched \(missedTasks.count) missed tasks")
             }
         }
         
-        // ✅ Merge and deduplicate
+        // Merge and deduplicate
         var allTasks = completedTasks + missedTasks
         var uniqueTasks: [FitQuestTask] = []
         var seenIds = Set<String>()
@@ -247,9 +233,7 @@ class HistoryScreenViewController: UIViewController {
         
         return uniqueTasks
     }
-    
-    // MARK: - Helper: Parse Task
-    
+        
     private func parseTask(from document: QueryDocumentSnapshot) -> FitQuestTask? {
         let data = document.data()
         
@@ -290,9 +274,7 @@ class HistoryScreenViewController: UIViewController {
             createdAt: createdAtTimestamp.dateValue()
         )
     }
-    
-    // MARK: - Reset Pagination
-    
+        
     func resetPagination() {
         allTasks = []
         groupedTasks = []
@@ -302,9 +284,7 @@ class HistoryScreenViewController: UIViewController {
         hasMoreMissed = true
         hasMoreTasks = true
     }
-    
-    // MARK: - Group Tasks by Date
-    
+        
     private func groupTasksByDate() {
         let calendar = Calendar.current
         
@@ -320,9 +300,7 @@ class HistoryScreenViewController: UIViewController {
         // Sort tasks within each date by time
         groupedTasks = groupedTasks.map { (date: $0.date, tasks: $0.tasks.sorted { $0.scheduledTime < $1.scheduledTime }) }
     }
-    
-    // MARK: - Helper
-    
+        
     func showErrorToast(_ message: String) {
         let toastLabel = UILabel()
         toastLabel.text = message
@@ -355,8 +333,6 @@ class HistoryScreenViewController: UIViewController {
         }
     }
 }
-
-// MARK: - CategoryFilterDelegate
 
 extension HistoryScreenViewController: CategoryFilterDelegate {
     func didSelectCategory(_ category: TaskCategory?) {

@@ -8,7 +8,6 @@
 import Foundation
 import FirebaseFirestore
 
-// MARK: - Task Category Enum
 enum TaskCategory: String, Codable, CaseIterable {
     case physical = "Physical"
     case mental = "Mental"
@@ -41,7 +40,6 @@ enum TaskCategory: String, Codable, CaseIterable {
     }
 }
 
-// MARK: - Task Model
 struct FitQuestTask: Codable, Identifiable {
     var id: String?
     let userId: String
@@ -84,7 +82,6 @@ struct FitQuestTask: Codable, Identifiable {
     }
 }
 
-// MARK: - Predefined Task Model
 struct PredefinedTask: Codable, Identifiable {
     var id: String?
     let title: String

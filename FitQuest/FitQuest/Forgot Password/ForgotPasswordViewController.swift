@@ -10,11 +10,9 @@ import FirebaseAuth
 
 class ForgotPasswordViewController: UIViewController {
     
-    // MARK: - Properties
     private let forgotPasswordView = ForgotPasswordView()
     private let authService = AuthService.shared
     
-    // MARK: - Lifecycle
     override func loadView() {
         view = forgotPasswordView
     }
@@ -41,7 +39,6 @@ class ForgotPasswordViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
-    // MARK: - Setup
     private func setupViewController() {
         navigationItem.hidesBackButton = true
     }
@@ -55,7 +52,6 @@ class ForgotPasswordViewController: UIViewController {
         forgotPasswordView.emailTextField.delegate = self
     }
     
-    // MARK: - Actions
     @objc private func handleSendResetLink() {
         view.endEditing(true)
         
@@ -76,7 +72,6 @@ class ForgotPasswordViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     
-    // MARK: - Firebase Operations
     private func sendPasswordResetLink(email: String) {
         showLoadingIndicator()
         
@@ -98,7 +93,6 @@ class ForgotPasswordViewController: UIViewController {
         }
     }
     
-    // MARK: - Success Alert
     private func showSuccessAlert(email: String) {
         let alert = UIAlertController(
             title: "Check Your Email",
@@ -114,7 +108,6 @@ class ForgotPasswordViewController: UIViewController {
     }
 }
 
-// MARK: - UITextFieldDelegate
 extension ForgotPasswordViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -123,7 +116,6 @@ extension ForgotPasswordViewController: UITextFieldDelegate {
     }
 }
 
-// MARK: - Keyboard Protocol
 extension ForgotPasswordViewController: KeyboardProtocol {
     func hideKeyboardOnTapOutside() {
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideKeyboardOnTap))
@@ -136,7 +128,6 @@ extension ForgotPasswordViewController: KeyboardProtocol {
     }
 }
 
-// MARK: - Alert Protocol
 extension ForgotPasswordViewController: AlertProtocol {
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -145,7 +136,6 @@ extension ForgotPasswordViewController: AlertProtocol {
     }
 }
 
-// MARK: - Loading Indicator Protocol
 extension ForgotPasswordViewController: LoadingIndicatorProtocol {
     func showLoadingIndicator() {
         hideLoadingIndicator()

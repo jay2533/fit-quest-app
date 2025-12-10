@@ -9,21 +9,17 @@ import UIKit
 
 class HistoryScreenView: UIView {
 
-    // MARK: - Header Components
     var logoImageView: UIImageView!
     var titleLabel: UILabel!
     var filterButton: UIButton!
     var backButton: UIButton!
     
-    // MARK: - Filter Badge (shows active filter)
     var filterBadgeView: UIView!
     var filterBadgeLabel: UILabel!
     var clearFilterButton: UIButton!
     
-    // MARK: - Task List
     var tasksTableView: UITableView!
     
-    // MARK: - Loading Indicator
     var loadingIndicator: UIActivityIndicatorView!
     
     override init(frame: CGRect) {
@@ -37,21 +33,14 @@ class HistoryScreenView: UIView {
         
         initConstraints()
     }
-    
-    // MARK: - Setup Methods
-        
+            
     func setupHeader() {
-        // Logo (center, decorative)
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
-        let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .medium)
-        logoImageView.image = UIImage(systemName: "arrow.up.heart.fill", withConfiguration: config)
-        logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
-        logoImageView.isUserInteractionEnabled = false
+        logoImageView.image = UIImage(named: "fitquest_logo")?.withRenderingMode(.alwaysOriginal)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(logoImageView)
         
-        // Back button (same style as leaderboard/calendar)
         backButton = UIButton(type: .system)
         let backConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
         backButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: backConfig), for: .normal)
@@ -59,7 +48,6 @@ class HistoryScreenView: UIView {
         backButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(backButton)
         
-        // Title
         titleLabel = UILabel()
         titleLabel.text = "Task History"
         titleLabel.font = .systemFont(ofSize: 24, weight: .bold)
@@ -68,7 +56,6 @@ class HistoryScreenView: UIView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(titleLabel)
         
-        // Filter Button
         filterButton = UIButton(type: .system)
         let filterConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
         filterButton.setImage(UIImage(systemName: "line.3.horizontal.decrease.circle", withConfiguration: filterConfig), for: .normal)
@@ -78,7 +65,6 @@ class HistoryScreenView: UIView {
     }
     
     func setupFilterBadge() {
-        // Filter Badge Container
         filterBadgeView = UIView()
         filterBadgeView.backgroundColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 0.2)
         filterBadgeView.layer.cornerRadius = 20
@@ -88,7 +74,6 @@ class HistoryScreenView: UIView {
         filterBadgeView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(filterBadgeView)
         
-        // Filter Badge Label
         filterBadgeLabel = UILabel()
         filterBadgeLabel.text = "Mental"
         filterBadgeLabel.font = .systemFont(ofSize: 14, weight: .semibold)
@@ -96,7 +81,6 @@ class HistoryScreenView: UIView {
         filterBadgeLabel.translatesAutoresizingMaskIntoConstraints = false
         filterBadgeView.addSubview(filterBadgeLabel)
         
-        // Clear Filter Button (X)
         clearFilterButton = UIButton(type: .system)
         let xConfig = UIImage.SymbolConfiguration(pointSize: 12, weight: .bold)
         clearFilterButton.setImage(UIImage(systemName: "xmark.circle.fill", withConfiguration: xConfig), for: .normal)
@@ -123,7 +107,6 @@ class HistoryScreenView: UIView {
         tasksTableView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(tasksTableView)
         
-        // Register cells and headers
         tasksTableView.register(HistoryTaskCell.self, forCellReuseIdentifier: HistoryTaskCell.identifier)
         tasksTableView.register(DateSectionHeaderView.self, forHeaderFooterViewReuseIdentifier: DateSectionHeaderView.identifier)
     }
@@ -138,53 +121,43 @@ class HistoryScreenView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Logo centered at top
             logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 16),
             logoImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             logoImageView.widthAnchor.constraint(equalToConstant: 40),
             logoImageView.heightAnchor.constraint(equalToConstant: 40),
             
-            // Back button on the left
             backButton.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
             backButton.widthAnchor.constraint(equalToConstant: 32),
             backButton.heightAnchor.constraint(equalToConstant: 32),
             
-            // Filter Button on the right
             filterButton.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
             filterButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             filterButton.widthAnchor.constraint(equalToConstant: 32),
             filterButton.heightAnchor.constraint(equalToConstant: 32),
             
-            // Title below logo
             titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 8),
             titleLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 40),
             titleLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -40),
             
-            // Filter Badge (below title, centered)
             filterBadgeView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
             filterBadgeView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             filterBadgeView.heightAnchor.constraint(equalToConstant: 40),
             
-            // Tasks Table View
             tasksTableView.topAnchor.constraint(equalTo: filterBadgeView.bottomAnchor, constant: 8),
             tasksTableView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             tasksTableView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             tasksTableView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
             
-            // Loading Indicator (center)
             loadingIndicator.centerXAnchor.constraint(equalTo: tasksTableView.centerXAnchor),
             loadingIndicator.centerYAnchor.constraint(equalTo: tasksTableView.centerYAnchor),
         ])
     }
-    
-    // MARK: - Helper Methods
-    
+        
     func showFilterBadge(categoryName: String) {
         filterBadgeLabel.text = categoryName
         filterBadgeView.isHidden = false
         
-        // Animate in
         filterBadgeView.alpha = 0
         filterBadgeView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.5, options: [], animations: {

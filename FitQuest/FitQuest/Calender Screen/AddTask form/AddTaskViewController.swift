@@ -15,26 +15,19 @@ class AddTaskViewController: UIViewController {
     
     let addTaskView = AddTaskView()
     
-    // Delegate
     weak var delegate: AddTaskDelegate?
     
-    // Form data
     var taskName: String = ""
     var selectedCategory: TaskCategory
     var selectedDate: Date
     var selectedTime: Date
-    var duration: Int = 30  // Default 30 minutes
+    var duration: Int = 30
     var difficulty: PredefinedTask.TaskDifficulty = .medium
     var notes: String = ""
-    
-    // Predefined task (if selected from predefined list)
     var predefinedTask: PredefinedTask?
     var isCustomTask: Bool = true
-    
-    // Duration options (in minutes)
     let durationOptions = [5, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240]
     
-    // Init with selected date and category
     init(category: TaskCategory, selectedDate: Date, predefinedTask: PredefinedTask? = nil) {
         self.selectedCategory = category
         self.selectedDate = selectedDate
@@ -69,14 +62,12 @@ class AddTaskViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
-    // MARK: - Setup Methods
-    
+        
     func setupInitialValues() {
         // If predefined task, pre-fill fields
         if let predefined = predefinedTask {
             addTaskView.taskNameTextField.text = predefined.title
-            addTaskView.taskNameTextField.isEnabled = false  // Lock title for predefined
+            addTaskView.taskNameTextField.isEnabled = false
             addTaskView.taskNameTextField.textColor = .lightGray
             
             duration = predefined.estimatedDuration
@@ -91,68 +82,47 @@ class AddTaskViewController: UIViewController {
             addTaskView.difficultySegmentedControl.isHidden = false
         }
         
-        // Set duration button text
         updateDurationButtonText()
-        
-        // Set date button text
         updateDateButtonText()
-        
-        // Set time button text
         updateTimeButtonText()
-        
-        // Set pickers
         addTaskView.datePicker.date = selectedDate
         addTaskView.timePicker.date = selectedTime
         
-        // Set duration picker to default
         if let index = durationOptions.firstIndex(of: duration) {
             addTaskView.durationPicker.selectRow(index, inComponent: 0, animated: false)
         }
     }
     
     func setupActions() {
-        // Close button
         addTaskView.closeButton.addTarget(self, action: #selector(onCloseTapped), for: .touchUpInside)
-        
-        // Duration button
+
         addTaskView.durationButton.addTarget(self, action: #selector(onDurationButtonTapped), for: .touchUpInside)
-        
-        // Duration picker
+
         addTaskView.durationPicker.delegate = self
         addTaskView.durationPicker.dataSource = self
         
-        // Difficulty segmented control
         addTaskView.difficultySegmentedControl.addTarget(self, action: #selector(onDifficultyChanged), for: .valueChanged)
         
-        // Date button
         addTaskView.dateButton.addTarget(self, action: #selector(onDateButtonTapped), for: .touchUpInside)
         
-        // Date picker
         addTaskView.datePicker.addTarget(self, action: #selector(onDateChanged), for: .valueChanged)
         
-        // Time button
         addTaskView.timeButton.addTarget(self, action: #selector(onTimeButtonTapped), for: .touchUpInside)
         
-        // Time picker
         addTaskView.timePicker.addTarget(self, action: #selector(onTimeChanged), for: .valueChanged)
         
-        // Create button
         addTaskView.createButton.addTarget(self, action: #selector(onCreateTapped), for: .touchUpInside)
         
-        // Text field delegate
         addTaskView.taskNameTextField.delegate = self
         
-        // Text view delegate
         addTaskView.notesTextView.delegate = self
     }
     
     func setupKeyboardHandling() {
-        // Add tap gesture to dismiss keyboard
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
         
-        // Keyboard notifications
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(keyboardWillShow),
@@ -167,9 +137,7 @@ class AddTaskViewController: UIViewController {
             object: nil
         )
     }
-    
-    // MARK: - Helper Methods
-    
+        
     func updateDurationButtonText() {
         var config = addTaskView.durationButton.configuration
         config?.title = "\(duration) minutes"
@@ -181,11 +149,9 @@ class AddTaskViewController: UIViewController {
         formatter.dateFormat = "MMM d, yyyy"
         let dateString = formatter.string(from: selectedDate)
         
-        // Check if today
         let isToday = Calendar.current.isDateInToday(selectedDate)
         let displayText = isToday ? "\(dateString) (Today)" : dateString
         
-        // Update button configuration
         var config = addTaskView.dateButton.configuration
         config?.title = displayText
         addTaskView.dateButton.configuration = config
@@ -218,9 +184,7 @@ class AddTaskViewController: UIViewController {
             return Constants.XP.calculateXP(duration: duration, difficulty: difficulty)
         }
     }
-    
-    // MARK: - Action Methods
-    
+        
     @objc func onCloseTapped() {
         dismiss(animated: true)
     }
@@ -234,7 +198,6 @@ class AddTaskViewController: UIViewController {
             addTaskView.hideDurationPicker()
         }
         
-        // Animate layout change
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
@@ -262,7 +225,6 @@ class AddTaskViewController: UIViewController {
             addTaskView.hideDatePicker()
         }
         
-        // Animate layout change
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
@@ -282,7 +244,6 @@ class AddTaskViewController: UIViewController {
             addTaskView.hideTimePicker()
         }
         
-        // Animate layout change
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
@@ -294,14 +255,11 @@ class AddTaskViewController: UIViewController {
     }
     
     @objc func onCreateTapped() {
-        // Validate and create task
         if validateForm() {
             createTask()
         }
     }
-    
-    // MARK: - Validation & Task Creation
-    
+        
     func validateForm() -> Bool {
         // 1. Task name not empty
         taskName = addTaskView.taskNameTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
@@ -330,22 +288,17 @@ class AddTaskViewController: UIViewController {
     }
     
     func createTask() {
-        // Get current user ID
         guard let userId = AuthService.shared.currentUserId else {
             showAlert(title: "Error", message: "Please sign in to create tasks")
             return
         }
         
-        // Get notes
         notes = addTaskView.notesTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // Calculate notification time
         let notificationTime = calculateNotificationTime()
         
-        // Calculate XP
         let xpValue = calculateXP()
         
-        // Create FitQuestTask object
         let task = FitQuestTask(
             userId: userId,
             title: taskName,
@@ -363,12 +316,10 @@ class AddTaskViewController: UIViewController {
             createdAt: Date()
         )
         
-        // Save to Firebase
         saveTaskToFirebase(task)
     }
     
     func saveTaskToFirebase(_ task: FitQuestTask) {
-        // Show loading
         addTaskView.createButton.isEnabled = false
         addTaskView.createButton.setTitle("Creating...", for: .normal)
         
@@ -377,7 +328,7 @@ class AddTaskViewController: UIViewController {
                 let taskId = try await TaskService.shared.createTask(task)
                 
                 await MainActor.run {
-                    print("✅ Task created with ID: \(taskId)")
+                    print("Task created with ID: \(taskId)")
                     print("  Title: \(task.title)")
                     print("  Category: \(task.category.displayName)")
                     print("  Duration: \(task.duration) min")
@@ -411,7 +362,6 @@ class AddTaskViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    // MARK: - Keyboard Handling
     
     @objc func keyboardWillShow(notification: NSNotification) {
         guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
@@ -437,7 +387,6 @@ class AddTaskViewController: UIViewController {
     }
 }
 
-// MARK: - UIPickerViewDelegate & UIPickerViewDataSource
 
 extension AddTaskViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
@@ -458,7 +407,6 @@ extension AddTaskViewController: UIPickerViewDelegate, UIPickerViewDataSource {
         updateDurationButtonText()
     }
     
-    // Style the picker text
     func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
         let title = "\(durationOptions[row]) minutes"
         return NSAttributedString(
@@ -468,16 +416,12 @@ extension AddTaskViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     }
 }
 
-// MARK: - UITextFieldDelegate
-
 extension AddTaskViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
 }
-
-// MARK: - UITextViewDelegate
 
 extension AddTaskViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
@@ -494,7 +438,6 @@ extension AddTaskViewController: UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        // Limit to 200 characters
         let currentText = textView.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: text)

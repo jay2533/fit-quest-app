@@ -70,7 +70,6 @@ class LeaderboardService {
         let profileImageURL = data["profileImageURL"] as? String
         
         // Count how many users have strictly more XP
-        // (may require an index in Firestore console)
         let higherSnapshot = try await database.collection("users")
             .whereField("totalXP", isGreaterThan: xp)
             .getDocuments()

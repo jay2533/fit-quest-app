@@ -8,7 +8,6 @@
 import Foundation
 import FirebaseFirestore
 
-// MARK: - Notification Type
 enum NotificationType: String, Codable {
     case taskReminder = "task_reminder"
     case taskDue = "task_due"
@@ -28,9 +27,9 @@ enum NotificationType: String, Codable {
 
     var color: UIColor {
         switch self {
-        case .taskReminder: return UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0) // Blue
-        case .taskDue: return UIColor.systemOrange // Orange for urgent
-        case .streakReminder: return UIColor.systemRed // Red flame
+        case .taskReminder: return UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
+        case .taskDue: return UIColor.systemOrange
+        case .streakReminder: return UIColor.systemRed
         case .dailySummary: return UIColor.systemPurple
         case .levelUp: return UIColor.systemYellow
         }
@@ -47,14 +46,13 @@ enum NotificationType: String, Codable {
     }
 }
 
-// MARK: - App Notification Model
 struct AppNotification: Codable, Identifiable {
     var id: String?
     let userId: String
     let type: NotificationType
     let title: String
     let message: String
-    let relatedTaskId: String? // Task ID if related to a task
+    let relatedTaskId: String?
     var isRead: Bool
     let createdAt: Date
     

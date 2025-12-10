@@ -9,10 +9,8 @@ import UIKit
 
 class HistoryTaskCell: UITableViewCell {
     
-    // MARK: - Properties
     static let identifier = "HistoryTaskCell"
     
-    // MARK: - UI Components
     private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor(red: 28/255, green: 41/255, blue: 56/255, alpha: 1.0)
@@ -44,7 +42,7 @@ class HistoryTaskCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         label.textColor = .white
-        label.numberOfLines = 1 // ✅ CHANGED: Single line to prevent clipping
+        label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -98,7 +96,6 @@ class HistoryTaskCell: UITableViewCell {
         return label
     }()
     
-    // MARK: - Initialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -108,7 +105,6 @@ class HistoryTaskCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Setup
     private func setupUI() {
         backgroundColor = .clear
         selectionStyle = .none
@@ -129,44 +125,37 @@ class HistoryTaskCell: UITableViewCell {
     }
     
     private func setupConstraints() {
-        // ✅ Set priorities BEFORE activating constraints
+        // Set priorities BEFORE activating constraints
         timeLabel.setContentHuggingPriority(.required, for: .horizontal)
         timeLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         
         NSLayoutConstraint.activate([
-            // Container View
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 4),
             containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -4),
             
-            // Left Border
             leftBorderView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             leftBorderView.topAnchor.constraint(equalTo: containerView.topAnchor),
             leftBorderView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
             leftBorderView.widthAnchor.constraint(equalToConstant: 6),
             
-            // Status Icon
             statusIconView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 18),
             statusIconView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
             statusIconView.widthAnchor.constraint(equalToConstant: 22),
             statusIconView.heightAnchor.constraint(equalToConstant: 22),
             
-            // Title Label
             titleLabel.leadingAnchor.constraint(equalTo: statusIconView.trailingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: timeLabel.leadingAnchor, constant: -8),
             titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
             
-            // Time Label (priorities set above)
             timeLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
             timeLabel.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
             
-            // Category Label
             categoryLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             categoryLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
             categoryLabel.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16),
             
-            // Metadata Stack
             metadataStack.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             metadataStack.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 4),
             metadataStack.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16),
@@ -174,7 +163,6 @@ class HistoryTaskCell: UITableViewCell {
         ])
     }
     
-    // MARK: - Configuration
     func configure(with task: FitQuestTask) {
         // Title
         titleLabel.text = task.title
@@ -203,14 +191,13 @@ class HistoryTaskCell: UITableViewCell {
         
         // Status-based styling
         if task.isCompleted {
-            // ✅ Completed - Green
             statusIconView.image = UIImage(systemName: "checkmark.circle.fill")
             statusIconView.tintColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 1.0)
             leftBorderView.backgroundColor = UIColor(red: 16/255, green: 185/255, blue: 129/255, alpha: 1.0)
             containerView.backgroundColor = UIColor(red: 26/255, green: 47/255, blue: 47/255, alpha: 1.0)
             
         } else {
-            // ⭕ Incomplete/Missed - Red/Gray
+            // Incomplete/Missed - Red/Gray
             let isPast = task.scheduledTime < Date()
             
             if isPast {
@@ -220,7 +207,7 @@ class HistoryTaskCell: UITableViewCell {
                 leftBorderView.backgroundColor = UIColor(red: 239/255, green: 68/255, blue: 68/255, alpha: 1.0)
                 containerView.backgroundColor = UIColor(red: 45/255, green: 20/255, blue: 20/255, alpha: 1.0)
             } else {
-                // Future task (shouldn't appear in history, but just in case)
+                // Future task
                 statusIconView.image = UIImage(systemName: "circle")
                 statusIconView.tintColor = UIColor.lightGray
                 leftBorderView.backgroundColor = UIColor.lightGray
@@ -229,7 +216,6 @@ class HistoryTaskCell: UITableViewCell {
         }
     }
     
-    // MARK: - Helpers
     private func formatDuration(_ minutes: Int) -> String {
         if minutes < 60 {
             return "\(minutes) min"

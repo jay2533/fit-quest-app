@@ -45,12 +45,10 @@ class LeaderboardViewController: UIViewController {
     @objc private func onBackTapped() {
         navigationController?.popViewController(animated: true)
     }
-    
-    // MARK: - Data Loading
-    
+        
     private func loadLeaderboard() {
         guard let userId = authService.currentUserId else {
-            print("❌ No user logged in for leaderboard")
+            print(" No user logged in for leaderboard")
             return
         }
         
@@ -101,7 +99,7 @@ class LeaderboardViewController: UIViewController {
                 await MainActor.run {
                     self.leaderboardView.setLoading(false)
                 }
-                print("❌ Failed to load leaderboard: \(error)")
+                print(" Failed to load leaderboard: \(error)")
             }
         }
     }
@@ -132,8 +130,6 @@ class LeaderboardViewController: UIViewController {
         }
     }
 }
-
-// MARK: - UITableViewDataSource / UITableViewDelegate
 
 extension LeaderboardViewController: UITableViewDataSource, UITableViewDelegate {
     

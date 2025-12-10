@@ -10,7 +10,6 @@ import Foundation
 
 struct Constants {
     
-    // MARK: - Firebase Collections
     struct Collections {
         static let users = "users"
         static let tasks = "tasks"
@@ -19,7 +18,6 @@ struct Constants {
         static let notifications = "notifications"
     }
     
-    // MARK: - XP Values
     struct XP {
         static let baseXP = 50
         static let easyMultiplier = 1.0
@@ -34,7 +32,6 @@ struct Constants {
         }
     }
     
-    // MARK: - Level Thresholds
     struct Levels {
         static let tier1Threshold = 0
         static let tier2Threshold = 5000
@@ -61,7 +58,6 @@ struct Constants {
         }
     }
     
-    // MARK: - Default Values
     struct Defaults {
         static let profileImagePlaceholder = "person.circle.fill"
         static let defaultTaskDuration = 30 // minutes
@@ -69,7 +65,6 @@ struct Constants {
         static let maxTaskDuration = 240 // minutes (4 hours)
     }
     
-    // MARK: - Notification Identifiers
     struct NotificationIdentifiers {
         static let taskReminderPrefix = "task_reminder_"
         static let streakReminderPrefix = "streak_reminder_"

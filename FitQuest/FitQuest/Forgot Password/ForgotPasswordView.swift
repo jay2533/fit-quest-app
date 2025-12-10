@@ -128,52 +128,43 @@ class ForgotPasswordView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Scroll View
             scrollView.topAnchor.constraint(equalTo: self.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            
-            // Content View
+
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
-            // Logo
             logoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             logoImageView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 80),
             logoImageView.widthAnchor.constraint(equalToConstant: 90),
             logoImageView.heightAnchor.constraint(equalToConstant: 90),
             
-            // Title
             titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 20),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 40),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -40),
             
-            // Subtitle
             subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15),
             subtitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 40),
             subtitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -40),
             
-            // Email
             emailTextField.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 40),
             emailTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 50),
             emailTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
             emailTextField.heightAnchor.constraint(equalToConstant: 50),
             
-            // Send Button
             sendOTPButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 30),
             sendOTPButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 50),
             sendOTPButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
             sendOTPButton.heightAnchor.constraint(equalToConstant: 50),
             
-            // Back Button
             backToLoginButton.topAnchor.constraint(equalTo: sendOTPButton.bottomAnchor, constant: 20),
             backToLoginButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
-            // Bottom padding
             backToLoginButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -60)
         ])
     }

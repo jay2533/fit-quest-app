@@ -2,14 +2,6 @@
 //  NotificationDrawerView.swift
 //  FitQuest
 //
-//  Created by Sunny Yadav on 12/4/25.
-//
-
-
-//
-//  NotificationDrawerView.swift
-//  FitQuest
-//
 //  Created by Sunny Yadav on 12/2/25.
 //
 
@@ -36,14 +28,12 @@ class NotificationDrawerView: UIView {
     }
     
     func setupDrawer() {
-        // Background Overlay (Dark transparent)
         backgroundOverlay = UIView()
         backgroundOverlay.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         backgroundOverlay.alpha = 0
         backgroundOverlay.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(backgroundOverlay)
         
-        // Drawer Container (Slides from left)
         drawerContainer = UIView()
         drawerContainer.backgroundColor = UIColor(red: 0.08, green: 0.15, blue: 0.25, alpha: 1.0)
         drawerContainer.layer.cornerRadius = 0
@@ -54,7 +44,6 @@ class NotificationDrawerView: UIView {
         drawerContainer.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(drawerContainer)
         
-        // Header
         headerView = UIView()
         headerView.backgroundColor = UIColor.white.withAlphaComponent(0.05)
         headerView.translatesAutoresizingMaskIntoConstraints = false
@@ -81,7 +70,6 @@ class NotificationDrawerView: UIView {
         markAllReadButton.translatesAutoresizingMaskIntoConstraints = false
         headerView.addSubview(markAllReadButton)
         
-        // Table View
         tableView = UITableView()
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
@@ -90,7 +78,6 @@ class NotificationDrawerView: UIView {
         
         tableView.register(NotificationCell.self, forCellReuseIdentifier: NotificationCell.identifier)
         
-        // Empty State
         emptyStateLabel = UILabel()
         emptyStateLabel.text = "No notifications"
         emptyStateLabel.font = .systemFont(ofSize: 16, weight: .regular)
@@ -105,19 +92,16 @@ class NotificationDrawerView: UIView {
     
     func setupConstraints() {
         NSLayoutConstraint.activate([
-            // Background Overlay
             backgroundOverlay.topAnchor.constraint(equalTo: self.topAnchor),
             backgroundOverlay.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             backgroundOverlay.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             backgroundOverlay.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
-            // Drawer Container
             drawerContainer.topAnchor.constraint(equalTo: self.topAnchor),
             drawerContainer.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             drawerContainer.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             drawerContainer.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.85),
             
-            // Header
             headerView.topAnchor.constraint(equalTo: drawerContainer.safeAreaLayoutGuide.topAnchor),
             headerView.leadingAnchor.constraint(equalTo: drawerContainer.leadingAnchor),
             headerView.trailingAnchor.constraint(equalTo: drawerContainer.trailingAnchor),
@@ -134,19 +118,16 @@ class NotificationDrawerView: UIView {
             markAllReadButton.trailingAnchor.constraint(equalTo: closeButton.leadingAnchor, constant: -12),
             markAllReadButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
             
-            // Table View
             tableView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: drawerContainer.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: drawerContainer.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: drawerContainer.bottomAnchor),
             
-            // Empty State
             emptyStateLabel.centerXAnchor.constraint(equalTo: drawerContainer.centerXAnchor),
             emptyStateLabel.centerYAnchor.constraint(equalTo: drawerContainer.centerYAnchor)
         ])
     }
     
-    // MARK: - Show/Hide Drawer
     func showDrawer() {
         // Initially position drawer off-screen to the left
         self.drawerContainer.transform = CGAffineTransform(translationX: -self.bounds.width * 0.85, y: 0)

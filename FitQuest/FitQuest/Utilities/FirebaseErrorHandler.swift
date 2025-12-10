@@ -83,7 +83,7 @@ struct FirebaseErrorHandler {
                 
             // Default fallback
             default:
-                print("⚠️ Unhandled Firebase Auth Error Code: \(nsError.code)")
+                print(" Unhandled Firebase Auth Error Code: \(nsError.code)")
                 print("   Full error: \(error)")
                 return "Authentication failed. Please check your credentials and try again."
         }

@@ -42,20 +42,14 @@ class CalendarScreenView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Setup Methods
-    
     func setupHeader() {
-        // Logo (center, decorative – not a button anymore)
         logoImageView = UIImageView()
         logoImageView.contentMode = .scaleAspectFit
-        let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .medium)
-        logoImageView.image = UIImage(systemName: "arrow.up.heart.fill", withConfiguration: config)
-        logoImageView.tintColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0)
+        logoImageView.image = UIImage(named: "fitquest_logo")?.withRenderingMode(.alwaysOriginal)
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         logoImageView.isUserInteractionEnabled = false
         self.addSubview(logoImageView)
         
-        // Back button (same style as LeaderboardView)
         backButton = UIButton(type: .system)
         let backConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .medium)
         backButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: backConfig), for: .normal)
@@ -63,7 +57,6 @@ class CalendarScreenView: UIView {
         backButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(backButton)
         
-        // Title
         titleLabel = UILabel()
         titleLabel.text = "Calendar"
         titleLabel.font = .systemFont(ofSize: 24, weight: .bold)
@@ -107,7 +100,6 @@ class CalendarScreenView: UIView {
     }
     
     func setupWeekNavigationButtons() {
-        // Previous Week Button
         previousWeekButton = UIButton(type: .system)
         let leftConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .semibold)
         previousWeekButton.setImage(UIImage(systemName: "chevron.left", withConfiguration: leftConfig), for: .normal)
@@ -115,7 +107,6 @@ class CalendarScreenView: UIView {
         previousWeekButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(previousWeekButton)
         
-        // Next Week Button
         nextWeekButton = UIButton(type: .system)
         let rightConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .semibold)
         nextWeekButton.setImage(UIImage(systemName: "chevron.right", withConfiguration: rightConfig), for: .normal)
@@ -155,13 +146,11 @@ class CalendarScreenView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            // Logo centered at top (like leaderboard)
             logoImageView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 16),
             logoImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             logoImageView.widthAnchor.constraint(equalToConstant: 40),
             logoImageView.heightAnchor.constraint(equalToConstant: 40),
             
-            // Back button on left, same row as logo
             backButton.centerYAnchor.constraint(equalTo: logoImageView.centerYAnchor),
             backButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
             backButton.widthAnchor.constraint(equalToConstant: 32),

@@ -15,7 +15,6 @@ class FirestoreService {
     
     private init() {}
     
-    // MARK: - Save User Profile
     func saveUserProfile(userId: String, name: String, email: String,
                         dateOfBirth: Date?, photoURL: URL?) async throws {
         var userData: [String: Any] = [
@@ -35,8 +34,7 @@ class FirestoreService {
         
         try await database.collection("users").document(userId).setData(userData)
     }
-    
-    // MARK: - Create Default Settings
+
     func createDefaultSettings(userId: String) async throws {
         let settings = UserSettings.defaultSettings
         let settingsData = try Firestore.Encoder().encode(settings)
@@ -48,7 +46,6 @@ class FirestoreService {
             .setData(settingsData)
     }
     
-    // MARK: - Create Default Stats
     func createDefaultStats(userId: String) async throws {
         // Overall stats
         let overallStats = UserStats.defaultStats
@@ -77,9 +74,7 @@ class FirestoreService {
                 .setData(categoryData)
         }
     }
-
     
-    // MARK: - Fetch User Profile
     func fetchUserProfile(userId: String) async throws -> User {
         let document = try await database.collection("users").document(userId).getDocument()
         

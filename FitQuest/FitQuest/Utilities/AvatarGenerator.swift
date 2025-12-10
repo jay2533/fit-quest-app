@@ -13,7 +13,6 @@ class AvatarGenerator {
     
     private init() {}
     
-    // MARK: - Generate AI Avatar (Gradient)
     func generateGradientAvatar(name: String, size: CGFloat = 120) -> UIImage? {
         let colors = [
             UIColor(red: 0.55, green: 0.27, blue: 0.87, alpha: 1.0),
@@ -36,7 +35,6 @@ class AvatarGenerator {
         return gradientImage
     }
     
-    // MARK: - Generate AI Avatar (API - DiceBear)
     func generateAPIAvatar(name: String, size: Int = 120) async throws -> UIImage? {
         let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? "user"
         let avatarURLString = "https://api.dicebear.com/7.x/avataaars/png?seed=\(encodedName)&size=\(size)"
@@ -49,7 +47,6 @@ class AvatarGenerator {
         return UIImage(data: imageData)
     }
     
-    // MARK: - Get AI Avatar (Try API first, fallback to gradient)
     func getAIAvatar(name: String, size: CGFloat = 120) async -> UIImage {
         // Try API first
         do {
