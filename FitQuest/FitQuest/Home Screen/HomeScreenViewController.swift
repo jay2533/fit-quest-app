@@ -46,8 +46,15 @@ class HomeScreenViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissSearch))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
+
+        setupNetworkListener()
+
+        if NetworkManager.shared.isConnected {
+            loadDueTasks()
+        } else {
+            showOfflineBanner()
+        }
         
-        loadDueTasks()
         checkForUnreadNotifications()
         loadUserAIAvatar()
     }
@@ -63,6 +70,17 @@ class HomeScreenViewController: UIViewController {
         loadDueTasks()
         checkForUnreadNotifications()
         loadUserAIAvatar()
+    }
+    
+    private func setupNetworkListener() {
+        NetworkManager.shared.onNetworkStatusChanged = { [weak self] isConnected in
+            if isConnected {
+                self?.hideOfflineBanner()
+                self?.loadDueTasks()  // Auto-reload when connection returns
+            } else {
+                self?.showOfflineBanner()
+            }
+        }
     }
         
     private func setupCardGestures() {
@@ -213,15 +231,17 @@ class HomeScreenViewController: UIViewController {
     }
         
     @objc func onNotificationTapped() {
-        let notificationVC = NotificationDrawerViewController()
-        notificationVC.modalPresentationStyle = .overFullScreen
-        notificationVC.modalTransitionStyle = .crossDissolve
-        
-        notificationVC.onDismiss = { [weak self] in
-            self?.checkForUnreadNotifications()
+        checkNetworkAndProceed { [weak self] in
+            let notificationVC = NotificationDrawerViewController()
+            notificationVC.modalPresentationStyle = .overFullScreen
+            notificationVC.modalTransitionStyle = .crossDissolve
+            
+            notificationVC.onDismiss = { [weak self] in
+                self?.checkForUnreadNotifications()
+            }
+            
+            self?.present(notificationVC, animated: false)
         }
-        
-        present(notificationVC, animated: false)
     }
     
     private func checkForUnreadNotifications() {
@@ -241,28 +261,38 @@ class HomeScreenViewController: UIViewController {
     }
         
     @objc func onCalendarTapped() {
-        let calendarVC = CalendarScreenViewController()
-        navigationController?.pushViewController(calendarVC, animated: true)
+        checkNetworkAndProceed { [weak self] in
+            let calendarVC = CalendarScreenViewController()
+            self?.navigationController?.pushViewController(calendarVC, animated: true)
+        }
     }
     
     @objc func onTaskHistoryTapped() {
-        let historyVC = HistoryScreenViewController()
-        navigationController?.pushViewController(historyVC, animated: true)
+        checkNetworkAndProceed { [weak self] in
+            let historyVC = HistoryScreenViewController()
+            self?.navigationController?.pushViewController(historyVC, animated: true)
+        }
     }
     
     @objc func onStatsTapped() {
-        let statsVC = StatsScreenViewController()
-        navigationController?.pushViewController(statsVC, animated: true)
+        checkNetworkAndProceed { [weak self] in
+            let statsVC = StatsScreenViewController()
+            self?.navigationController?.pushViewController(statsVC, animated: true)
+        }
     }
     
     @objc func onLeaderboardsTapped() {
-        let leaderboardVC = LeaderboardViewController()
-        navigationController?.pushViewController(leaderboardVC, animated: true)
+        checkNetworkAndProceed { [weak self] in
+            let leaderboardVC = LeaderboardViewController()
+            self?.navigationController?.pushViewController(leaderboardVC, animated: true)
+        }
     }
     
     @objc func onProfileTapped() {
-        let profileVC = ProfileViewController()
-        navigationController?.pushViewController(profileVC, animated: true)
+        checkNetworkAndProceed { [weak self] in
+            let profileVC = ProfileViewController()
+            self?.navigationController?.pushViewController(profileVC, animated: true)
+        }
     }
 }
 
@@ -304,9 +334,13 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
         
         // Handle checkbox tap
         cell.onCheckboxTapped = { [weak self] in
+            guard NetworkManager.shared.isConnected else {
+                self?.showNoInternetAlert()
+                return
+            }
+            
             self?.handleTaskCompletion(task: task, at: indexPath)
         }
-        
         return cell
     }
     
@@ -316,6 +350,11 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard NetworkManager.shared.isConnected else {
+            showNoInternetAlert()
+            return
+        }
         
         let task = filteredTasks[indexPath.row]
         
@@ -340,6 +379,11 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
             
     private func handleTaskCompletion(task: FitQuestTask, at indexPath: IndexPath) {
         guard let taskId = task.id, let userId = authService.currentUserId else { return }
+        
+        guard NetworkManager.shared.isConnected else {
+            showNoInternetAlert()
+            return
+        }
         
         Task {
             do {
@@ -369,7 +413,13 @@ extension HomeScreenViewController: UITableViewDelegate, UITableViewDataSource {
                 
             } catch {
                 await MainActor.run {
-                    self.showAlert(title: "Error", message: "Failed to complete task")
+                    let nsError = error as NSError
+                    if nsError.code == NSURLErrorNotConnectedToInternet ||
+                       nsError.code == NSURLErrorNetworkConnectionLost {
+                        self.showNoInternetAlert()
+                    } else {
+                        self.showAlert(title: "Error", message: "Failed to complete task")
+                    }
                     
                     // Revert cell state
                     if let cell = self.homeView.tasksTableView.cellForRow(at: indexPath) as? TaskTableViewCell {
@@ -456,3 +506,5 @@ extension HomeScreenViewController: UITextFieldDelegate {
         return true
     }
 }
+
+extension HomeScreenViewController: NetworkCheckable {}

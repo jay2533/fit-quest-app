@@ -18,8 +18,13 @@ class StatsScreenViewController: UIViewController {
         let logoTap = UITapGestureRecognizer(target: self, action: #selector(onLogoTapped))
         statsView.backButton.addGestureRecognizer(logoTap)
         
+        setupNetworkListener()
         
-        loadStats()
+        if NetworkManager.shared.isConnected {
+            loadStats()
+        } else {
+            showOfflineBanner()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -78,6 +83,17 @@ class StatsScreenViewController: UIViewController {
         }
     }
     
+    private func setupNetworkListener() {
+        NetworkManager.shared.onNetworkStatusChanged = { [weak self] isConnected in
+            if isConnected {
+                self?.hideOfflineBanner()
+                self?.loadStats()  // Auto-reload when connection returns
+            } else {
+                self?.showOfflineBanner()
+            }
+        }
+    }
+    
     // Converts raw XP to [0–1] in the order:
     // Physical, Mental, Social, Creativity, Miscellaneous.
     private func normalizeXP(_ xp: CategoryXP) -> [CGFloat] {
@@ -105,3 +121,5 @@ class StatsScreenViewController: UIViewController {
         return xpValues.map { CGFloat($0) / CGFloat(total) * 100.0 }
     }
 }
+
+extension StatsScreenViewController: NetworkCheckable {}

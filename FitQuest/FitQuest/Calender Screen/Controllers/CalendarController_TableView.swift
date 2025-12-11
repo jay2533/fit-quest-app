@@ -27,6 +27,11 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
         cell.configure(with: task, isCompleted: task.isCompleted)
         
         cell.onCheckboxTapped = { [weak self] in
+            guard NetworkManager.shared.isConnected else {
+                self?.showNoInternetAlert()
+                return
+            }
+            
             self?.handleTaskCompletion(task: task, cell: cell)
         }
         
@@ -39,6 +44,11 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard NetworkManager.shared.isConnected else {
+            showNoInternetAlert()
+            return
+        }
         
         let task = tasks[indexPath.row]
         
@@ -64,6 +74,13 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
             
         } else {
             let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, view, completionHandler) in
+                
+                guard NetworkManager.shared.isConnected else {
+                    self?.showNoInternetAlert()
+                    completionHandler(false)
+                    return
+                }
+                
                 self?.confirmDeleteTask(task: task, at: indexPath)
                 completionHandler(true)
             }
@@ -80,6 +97,10 @@ extension CalendarScreenViewController: UITableViewDelegate, UITableViewDataSour
     
     private func showTaskDetail(for task: FitQuestTask) {
         let detailVC = TaskDetailViewController(task: task)
+        
+        detailVC.onTaskDeleted = { [weak self] in
+            self?.fetchTasks(for: self?.selectedDate ?? Date())
+        }
         
         if let sheet = detailVC.sheetPresentationController {
             sheet.detents = [.medium(), .large()]

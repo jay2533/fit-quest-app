@@ -51,8 +51,14 @@ class CalendarScreenViewController: UIViewController {
         calendarView.backButton.addTarget(self, action: #selector(onBackTapped), for: .touchUpInside)
         calendarView.weekCollectionView.delegate = self
         calendarView.weekCollectionView.dataSource = self
-        
-        loadCurrentWeek()
+                
+        setupNetworkListener()
+
+        if NetworkManager.shared.isConnected {
+            loadCurrentWeek()
+        } else {
+            showOfflineBanner()
+        }
         
         fetchTasks(for: selectedDate)
         
@@ -79,6 +85,17 @@ class CalendarScreenViewController: UIViewController {
         
         // Remove Firebase listener
         taskListener?.remove()
+    }
+    
+    private func setupNetworkListener() {
+        NetworkManager.shared.onNetworkStatusChanged = { [weak self] isConnected in
+            if isConnected {
+                self?.hideOfflineBanner()
+                self?.loadCurrentWeek()  // Auto-reload when connection returns
+            } else {
+                self?.showOfflineBanner()
+            }
+        }
     }
         
     func loadCurrentWeek() {
@@ -268,6 +285,11 @@ class CalendarScreenViewController: UIViewController {
     }
     
     @objc func onAddTaskTapped() {
+        guard NetworkManager.shared.isConnected else {
+            showNoInternetAlert()
+            return
+        }
+        
         // Check if selected date is in the past
         let startOfToday = Calendar.current.startOfDay(for: Date())
         let startOfSelected = Calendar.current.startOfDay(for: selectedDate)
@@ -545,8 +567,54 @@ class CalendarScreenViewController: UIViewController {
         
         calendarView.tasksTableView.refreshControl = refreshControl
     }
+    
+    private func handleTaskCompletion(task: FitQuestTask, at indexPath: IndexPath) {
+       guard let taskId = task.id, let userId = Auth.auth().currentUser?.uid else { return }
+       
+       // Check network before allowing completion
+       guard NetworkManager.shared.isConnected else {
+           showNoInternetAlert()
+           return
+       }
+       
+       Task {
+           do {
+               try await TaskService.shared.completeTask(taskId: taskId)
+               try await StatsService.shared.updateStatsAfterTaskCompletion(userId: userId, task: task)
+               NotificationStateManager.shared.clearReadStateForTask(userId: userId, taskId: taskId)
+               
+               await MainActor.run {
+                   if let cell = self.calendarView.tasksTableView.cellForRow(at: indexPath) as? TaskTableViewCell {
+                       cell.updateCompletionState(isCompleted: true, animated: true)
+                   }
+               }
+               
+           } catch {
+               await MainActor.run {
+                   // Check if it's a network error
+                   let nsError = error as NSError
+                   if nsError.code == NSURLErrorNotConnectedToInternet ||
+                      nsError.code == NSURLErrorNetworkConnectionLost {
+                       self.showNoInternetAlert()
+                   } else {
+                       self.showAlert(title: "Error", message: "Failed to complete task")
+                   }
+                   
+                   if let cell = self.calendarView.tasksTableView.cellForRow(at: indexPath) as? TaskTableViewCell {
+                       cell.updateCompletionState(isCompleted: false, animated: true)
+                   }
+               }
+           }
+       }
+    }
 
-    @objc private func handleRefresh() {        
+    @objc private func handleRefresh() {
+        guard NetworkManager.shared.isConnected else {
+            refreshControl.endRefreshing()
+            showNoInternetAlert()
+            return
+        }
+        
         // Re-fetch tasks for current date
         fetchTasks(for: selectedDate)
         
@@ -556,3 +624,5 @@ class CalendarScreenViewController: UIViewController {
         }
     }
 }
+
+extension CalendarScreenViewController: NetworkCheckable {}
