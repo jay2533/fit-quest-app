@@ -10,6 +10,7 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
+import PhotosUI
 
 class ProfileViewController: UIViewController {
     
@@ -17,7 +18,9 @@ class ProfileViewController: UIViewController {
     private let authService = AuthService.shared
     private let firestoreService = FirestoreService.shared
     private let database = Firestore.firestore()
+    private let storageService = StorageService.shared
     private var currentUser: User?
+    private var pickedImage: UIImage?
     
     override func loadView() {
         view = profileView
@@ -27,7 +30,14 @@ class ProfileViewController: UIViewController {
         super.viewDidLoad()
         setupViewController()
         setupActions()
-        loadUserData()
+
+        setupNetworkListener()
+        
+        if NetworkManager.shared.isConnected {
+            loadUserData()
+        } else {
+            showOfflineBanner()
+        }
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -43,12 +53,24 @@ class ProfileViewController: UIViewController {
         navigationItem.hidesBackButton = true
     }
     
+    private func setupNetworkListener() {
+        NetworkManager.shared.onNetworkStatusChanged = { [weak self] isConnected in
+            if isConnected {
+                self?.hideOfflineBanner()
+                self?.loadUserData()  // Auto-reload when connection returns
+            } else {
+                self?.showOfflineBanner()
+            }
+        }
+    }
+    
     private func setupActions() {
         profileView.backButton.addTarget(self, action: #selector(handleBack), for: .touchUpInside)
         profileView.nameEditButton.addTarget(self, action: #selector(handleEditName), for: .touchUpInside)
         profileView.dobEditButton.addTarget(self, action: #selector(handleEditDOB), for: .touchUpInside)
         profileView.logoutButton.addTarget(self, action: #selector(handleLogout), for: .touchUpInside)
         profileView.deleteAccountButton.addTarget(self, action: #selector(handleDeleteAccount), for: .touchUpInside)
+        profileView.userImageButton.menu = createImagePickerMenu()
     }
     
     private func loadUserData() {
@@ -117,6 +139,90 @@ class ProfileViewController: UIViewController {
         generateAIAvatar()
     }
     
+    private func createImagePickerMenu() -> UIMenu {
+        let menuItems = [
+            UIAction(title: "Camera", image: UIImage(systemName: "camera")) { [weak self] _ in
+                self?.presentCamera()
+            },
+            UIAction(title: "Gallery", image: UIImage(systemName: "photo.on.rectangle")) { [weak self] _ in
+                self?.presentPhotoGallery()
+            }
+        ]
+        
+        return UIMenu(title: "Update Profile Photo", children: menuItems)
+    }
+    
+    private func presentCamera() {
+        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
+            showAlert(title: "Camera Unavailable", message: "Camera is not available on this device.")
+            return
+        }
+        
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.allowsEditing = true
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+    
+    private func presentPhotoGallery() {
+        var configuration = PHPickerConfiguration()
+        configuration.filter = .images
+        configuration.selectionLimit = 1
+        
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+
+    private func updateProfileImage(_ image: UIImage) {
+        guard let userId = authService.currentUserId else { return }
+        
+        showLoadingIndicator()
+        
+        Task {
+            do {
+                // 1. Upload new image to Firebase Storage
+                let imageURL = try await storageService.uploadProfileImage(image)
+                
+                // 2. Delete old image if exists
+                if let oldURLString = currentUser?.profileImageURL,
+                   !oldURLString.isEmpty {
+                    try? await storageService.deleteProfileImage(url: oldURLString)
+                }
+                
+                // 3. Update Firestore with new URL
+                try await database.collection("users").document(userId).updateData([
+                    "profileImageURL": imageURL.absoluteString,
+                    "lastActive": FieldValue.serverTimestamp()
+                ])
+                
+                // 4. Update Auth profile
+                if let user = Auth.auth().currentUser {
+                    let changeRequest = user.createProfileChangeRequest()
+                    changeRequest.photoURL = imageURL
+                    try await changeRequest.commitChanges()
+                }
+                
+                await MainActor.run {
+                    hideLoadingIndicator()
+                    
+                    // Update UI
+                    profileView.userImageButton.setImage(image.withRenderingMode(.alwaysOriginal), for: .normal)
+                    profileView.userImageButton.imageView?.contentMode = .scaleAspectFill
+                    
+                    showAlert(title: "Success", message: "Profile photo updated successfully")
+                }
+                
+            } catch {
+                await MainActor.run {
+                    hideLoadingIndicator()
+                    showAlert(title: "Error", message: "Failed to update profile photo: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
     private func loadProfileImage(from urlString: String) {
         guard let url = URL(string: urlString) else { return }
         
@@ -125,7 +231,9 @@ class ProfileViewController: UIViewController {
                 let (data, _) = try await URLSession.shared.data(from: url)
                 if let image = UIImage(data: data) {
                     await MainActor.run {
-                        profileView.userImageView.image = image
+                        profileView.userImageButton.setImage(image.withRenderingMode(.alwaysOriginal), for: .normal)
+                        profileView.userImageButton.imageView?.contentMode = .scaleAspectFill
+
                     }
                 }
             } catch {
@@ -447,3 +555,46 @@ extension ProfileViewController: LoadingIndicatorProtocol {
         }
     }
 }
+
+// MARK: - PHPickerViewControllerDelegate
+extension ProfileViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        
+        guard let itemProvider = results.first?.itemProvider,
+              itemProvider.canLoadObject(ofClass: UIImage.self) else {
+            return
+        }
+        
+        itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+            DispatchQueue.main.async {
+                if let image = image as? UIImage {
+                    self?.pickedImage = image
+                    self?.updateProfileImage(image)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - UIImagePickerControllerDelegate
+extension ProfileViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController,
+                              didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true)
+        
+        let image = (info[.editedImage] as? UIImage) ?? (info[.originalImage] as? UIImage)
+        
+        if let image = image {
+            pickedImage = image
+            updateProfileImage(image)
+        }
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
+}
+
+extension ProfileViewController: NetworkCheckable {}
+

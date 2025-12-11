@@ -35,7 +35,24 @@ class LeaderboardViewController: UIViewController {
         
         leaderboardView.backButton.addTarget(self, action: #selector(onBackTapped), for: .touchUpInside)
         
-        loadLeaderboard()
+        setupNetworkListener()
+        
+        if NetworkManager.shared.isConnected {
+            loadLeaderboard()
+        } else {
+            showOfflineBanner()
+        }
+    }
+    
+    private func setupNetworkListener() {
+        NetworkManager.shared.onNetworkStatusChanged = { [weak self] isConnected in
+            if isConnected {
+                self?.hideOfflineBanner()
+                self?.loadLeaderboard()  // Auto-reload when connection returns
+            } else {
+                self?.showOfflineBanner()
+            }
+        }
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -161,3 +178,5 @@ extension LeaderboardViewController: UITableViewDataSource, UITableViewDelegate 
         return 56
     }
 }
+
+extension LeaderboardViewController: NetworkCheckable {}

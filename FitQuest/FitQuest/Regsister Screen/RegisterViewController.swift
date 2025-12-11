@@ -7,6 +7,7 @@
 
 import UIKit
 import PhotosUI
+import Network
 
 class RegisterViewController: UIViewController {
     
@@ -21,6 +22,8 @@ class RegisterViewController: UIViewController {
     private let authService = AuthService.shared
     private let firestoreService = FirestoreService.shared
     private let storageService = StorageService.shared
+    private let networkMonitor = NWPathMonitor()
+    private var isNetworkAvailable = true
     
     override func loadView() {
         view = registerView
@@ -33,6 +36,7 @@ class RegisterViewController: UIViewController {
         setupDelegates()
         hideKeyboardOnTapOutside()
         setupKeyboardObservers()
+        startNetworkMonitoring()
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -52,6 +56,7 @@ class RegisterViewController: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        networkMonitor.cancel()
     }
     
     private func setupViewController() {
@@ -112,6 +117,15 @@ class RegisterViewController: UIViewController {
         }
     }
 
+    private func startNetworkMonitoring() {
+        networkMonitor.pathUpdateHandler = { [weak self] path in
+            self?.isNetworkAvailable = (path.status == .satisfied)
+        }
+        
+        let queue = DispatchQueue(label: "NetworkMonitor")
+        networkMonitor.start(queue: queue)
+    }
+    
     @objc private func keyboardWillHide(notification: NSNotification) {
         UIView.animate(withDuration: 0.3) {
             self.registerView.scrollView.contentInset = .zero
@@ -160,6 +174,12 @@ class RegisterViewController: UIViewController {
         view.endEditing(true)
         
         guard validateInputs() else { return }
+        
+        guard isNetworkAvailable else {
+            showAlert(title: "No Internet Connection",
+                     message: "Please check your internet connection and try again.")
+            return
+        }
         
         Task {
             await registerUser()

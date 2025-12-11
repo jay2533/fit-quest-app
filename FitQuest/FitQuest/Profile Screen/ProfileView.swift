@@ -14,7 +14,7 @@ class ProfileView: UIView {
     var backButton: UIButton!
     var titleLabel: UILabel!
     var imagesContainer: UIView!
-    var userImageView: UIImageView!
+    var userImageButton: UIButton!
     var aiAvatarImageView: UIImageView!
     var userImageLabel: UILabel!
     var detailsContainer: UIView!
@@ -95,18 +95,24 @@ class ProfileView: UIView {
         imagesContainer.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(imagesContainer)
         
-        userImageView = UIImageView()
-        userImageView.contentMode = .scaleAspectFill
-        userImageView.clipsToBounds = true
-        userImageView.layer.cornerRadius = 60
-        userImageView.layer.borderWidth = 3
-        userImageView.layer.borderColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0).cgColor
-        userImageView.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        userImageButton = UIButton(type: .custom)
+        userImageButton.layer.cornerRadius = 60
+        userImageButton.layer.borderWidth = 3
+        userImageButton.layer.borderColor = UIColor(red: 0.33, green: 0.67, blue: 0.93, alpha: 1.0).cgColor
+        userImageButton.clipsToBounds = true
+        userImageButton.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        
         let profileConfig = UIImage.SymbolConfiguration(pointSize: 50, weight: .regular)
-        userImageView.image = UIImage(systemName: "person.circle.fill", withConfiguration: profileConfig)
-        userImageView.tintColor = .lightGray
-        userImageView.translatesAutoresizingMaskIntoConstraints = false
-        imagesContainer.addSubview(userImageView)
+        let placeholderImage = UIImage(systemName: "person.circle.fill", withConfiguration: profileConfig)
+        userImageButton.setImage(placeholderImage, for: .normal)
+        userImageButton.tintColor = .lightGray
+        userImageButton.imageView?.contentMode = .scaleAspectFill
+        
+        // Show menu on tap
+        userImageButton.showsMenuAsPrimaryAction = true
+        
+        userImageButton.translatesAutoresizingMaskIntoConstraints = false
+        imagesContainer.addSubview(userImageButton)
         
         aiAvatarImageView = UIImageView()
         aiAvatarImageView.contentMode = .scaleAspectFill
@@ -283,17 +289,24 @@ class ProfileView: UIView {
             imagesContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             imagesContainer.heightAnchor.constraint(equalToConstant: 180),
 
-            userImageView.topAnchor.constraint(equalTo: imagesContainer.topAnchor, constant: 20),
-            userImageView.trailingAnchor.constraint(equalTo: imagesContainer.centerXAnchor, constant: -12),
-            userImageView.widthAnchor.constraint(equalToConstant: 120),
-            userImageView.heightAnchor.constraint(equalToConstant: 120),
+//            userImageView.topAnchor.constraint(equalTo: imagesContainer.topAnchor, constant: 20),
+//            userImageView.trailingAnchor.constraint(equalTo: imagesContainer.centerXAnchor, constant: -12),
+//            userImageView.widthAnchor.constraint(equalToConstant: 120),
+//            userImageView.heightAnchor.constraint(equalToConstant: 120),
+            userImageButton.topAnchor.constraint(equalTo: imagesContainer.topAnchor, constant: 20),
+            userImageButton.trailingAnchor.constraint(equalTo: imagesContainer.centerXAnchor, constant: -12),
+            userImageButton.widthAnchor.constraint(equalToConstant: 120),
+            userImageButton.heightAnchor.constraint(equalToConstant: 120),
             
             aiAvatarImageView.topAnchor.constraint(equalTo: imagesContainer.topAnchor, constant: 20),
             aiAvatarImageView.leadingAnchor.constraint(equalTo: imagesContainer.centerXAnchor, constant: 12),
             aiAvatarImageView.widthAnchor.constraint(equalToConstant: 120),
             aiAvatarImageView.heightAnchor.constraint(equalToConstant: 120),
             
-            userImageLabel.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: 12),
+//            userImageLabel.topAnchor.constraint(equalTo: userImageView.bottomAnchor, constant: 12),
+//            userImageLabel.centerXAnchor.constraint(equalTo: imagesContainer.centerXAnchor),
+//            userImageLabel.bottomAnchor.constraint(equalTo: imagesContainer.bottomAnchor, constant: -12),
+            userImageLabel.topAnchor.constraint(equalTo: userImageButton.bottomAnchor, constant: 12),
             userImageLabel.centerXAnchor.constraint(equalTo: imagesContainer.centerXAnchor),
             userImageLabel.bottomAnchor.constraint(equalTo: imagesContainer.bottomAnchor, constant: -12),
             
