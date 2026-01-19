@@ -1,6 +1,4 @@
-# fit-quest-app
-
-# FitQuest
+# FitQuest (formerly DayTrack)
 
 A gamified personal productivity app that helps users build better habits through task management, XP rewards, and progress tracking.
 
@@ -173,13 +171,6 @@ The app features a dark theme with cyan/teal accent colors throughout:
 - Bottom sheet for category selection during task creation
 - Radar chart for visualizing category balance
 - Podium-style leaderboard display
-
-## Team
-
-**Group 15**
-- Sunny Yadav
-- Jay Parikh
-- Rushad Daruwalla
 
 ---
 
